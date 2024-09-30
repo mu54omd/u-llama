@@ -1,6 +1,13 @@
 package com.example.ollamaui.ui.screen.chat
 
+import com.example.ollamaui.domain.model.ChatModel
+import com.example.ollamaui.domain.model.ChatResponse
+import com.example.ollamaui.domain.model.EmptyChatModel
+import com.example.ollamaui.domain.model.EmptyChatResponse
+
 data class ChatStates(
-    val ollamaState: String = "",
-    val error: Int? = null
+    val chatModel: ChatModel = EmptyChatModel.empty,
+    val chatResponse: ChatResponse = EmptyChatResponse.empty,
+    val isResponding: Boolean = false,
+    val chatError: Int? = null,
 )

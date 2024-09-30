@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.compose.compiler)
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
+    id("org.jetbrains.kotlin.plugin.serialization")
+
 }
 
 android {
@@ -20,6 +22,9 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
+        }
+        ksp {
+            arg("room.schemaLocation", "$projectDir/schemas")
         }
     }
 
@@ -73,6 +78,13 @@ dependencies {
     implementation(libs.arrow.core)
     implementation(libs.arrow.fx.coroutines)
 
+    //Serialization
+    implementation(libs.kotlinx.serialization.json)
+
+    //Room
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

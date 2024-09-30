@@ -1,8 +1,14 @@
 package com.example.ollamaui.di
 
+import android.app.Application
+import androidx.room.Room
+import com.example.ollamaui.data.local.ChatDao
+import com.example.ollamaui.data.local.ChatDatabase
 import com.example.ollamaui.data.remote.OllamaApi
 import com.example.ollamaui.data.repository.OllamaRepositoryImpl
+import com.example.ollamaui.domain.model.ChatModel
 import com.example.ollamaui.domain.repository.OllamaRepository
+import com.example.ollamaui.utils.Constants.CHAT_DATABASE
 import com.example.ollamaui.utils.Constants.OLLAMA_BASE_URL
 import com.google.gson.GsonBuilder
 import dagger.Module
@@ -27,28 +33,54 @@ object OllamaModule {
         val gson = GsonBuilder()
             .setLenient()
             .create()
+
         val okHttpClient =  OkHttpClient.Builder().apply {
             this.addInterceptor(HttpLoggingInterceptor().apply { this.level = HttpLoggingInterceptor.Level.BODY })
                 .connectTimeout(3, TimeUnit.SECONDS)
-                .readTimeout(20,TimeUnit.SECONDS)
-                .writeTimeout(25, TimeUnit.SECONDS)
+                .readTimeout(5,TimeUnit.MINUTES)
+                .writeTimeout(5, TimeUnit.MINUTES)
         }
             .build()
+
         return Retrofit.Builder()
             .baseUrl(OLLAMA_BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(ScalarsConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
             .create(OllamaApi::class.java)
+    }
+
+    //Provide Chat Database for Hilt
+    @Provides
+    @Singleton
+    fun provideBookmarkDatabase( application: Application): ChatDatabase {
+        return Room.databaseBuilder(
+            context = application,
+            klass = ChatDatabase::class.java,
+            name = CHAT_DATABASE
+        ).fallbackToDestructiveMigration()
+            .build()
+    }
+
+    //Provide Chat Database for Hilt
+    @Provides
+    @Singleton
+    fun provideBookmarkDao(
+        chatDatabase: ChatDatabase
+    ): ChatDao{
+        return chatDatabase.chatDao
     }
 
     @Provides
     @Singleton
     fun provideOllamaRepository(
-        ollamaApi: OllamaApi
+        ollamaApi: OllamaApi,
+        chatDao: ChatDao
     ): OllamaRepository{
         return OllamaRepositoryImpl(
-            ollamaApi = ollamaApi
+            ollamaApi = ollamaApi,
+            chatDao = chatDao
         )
     }
 

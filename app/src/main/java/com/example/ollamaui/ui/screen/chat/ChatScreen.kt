@@ -1,31 +1,66 @@
 package com.example.ollamaui.ui.screen.chat
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.ollamaui.ui.screen.chat.components.ChatBottomBar
+import com.example.ollamaui.ui.screen.chat.components.Conversation
 
 @Composable
 fun ChatScreen(
-    modifier: Modifier = Modifier
+    chatViewModel: ChatViewModel,
+    chatState: ChatStates,
+    onBackClick: () -> Unit
 ) {
-    val viewModel: ChatViewModel = hiltViewModel()
-    val chatState = viewModel.state.collectAsState()
-    Column(
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.fillMaxSize()
-    ) {
-        chatState.value.error?.let {
-            Text(text = stringResource(it))
-        }
-        Text(text = chatState.value.ollamaState)
-    }
 
+    var textValue by rememberSaveable { mutableStateOf("") }
+
+    Scaffold(
+        topBar = {},
+        bottomBar = {
+            ChatBottomBar(
+                textValue = textValue,
+                onValueChange = { textValue = it },
+                onSendClick = {
+                    chatViewModel.sendButton(textValue)
+                    textValue = ""
+                },
+                onClearClick = { textValue = "" },
+                onAttachClick = {},
+                isModelSelected = chatState.chatModel.modelName != ""
+            )
+        }
+    ) { contentPadding ->
+
+            Column(
+                verticalArrangement = Arrangement.Bottom,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxSize().padding(
+                    top = contentPadding.calculateTopPadding(),
+                    bottom = contentPadding.calculateBottomPadding()
+                )
+            ) {
+                Conversation(
+                    messageModel = chatState.chatModel.chatMessages ,
+                    isResponding = chatState.isResponding
+                )
+        }
+
+        BackHandler {
+            onBackClick()
+        }
+    }
 }
