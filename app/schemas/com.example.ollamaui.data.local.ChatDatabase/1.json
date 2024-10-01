@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "eac094dd0c56defff1ffaabe078a95d6",
+    "identityHash": "50e22d551892548aa6d236fd4c2a781e",
     "entities": [
       {
         "tableName": "ChatModel",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`chatId` INTEGER NOT NULL, `modelName` TEXT NOT NULL, `chatIcon` INTEGER NOT NULL, `chatTitle` TEXT NOT NULL, `context` TEXT NOT NULL, `chatMessages` TEXT NOT NULL, PRIMARY KEY(`chatId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`chatId` INTEGER NOT NULL, `modelName` TEXT NOT NULL, `chatIcon` INTEGER NOT NULL, `yourName` TEXT NOT NULL, `chatTitle` TEXT NOT NULL, `context` TEXT NOT NULL, `chatMessages` TEXT NOT NULL, PRIMARY KEY(`chatId`))",
         "fields": [
           {
             "fieldPath": "chatId",
@@ -24,6 +24,12 @@
             "fieldPath": "chatIcon",
             "columnName": "chatIcon",
             "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "yourName",
+            "columnName": "yourName",
+            "affinity": "TEXT",
             "notNull": true
           },
           {
@@ -58,7 +64,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'eac094dd0c56defff1ffaabe078a95d6')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '50e22d551892548aa6d236fd4c2a781e')"
     ]
   }
 }

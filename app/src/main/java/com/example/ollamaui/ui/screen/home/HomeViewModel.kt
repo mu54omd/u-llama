@@ -49,7 +49,7 @@ class HomeViewModel @Inject constructor(
         getChats()
     }
 
-    fun addNewChat(chatTitle: String){
+    fun addNewChat(chatTitle: String, yourName: String){
         val id = Random.nextInt()
         val receiverAuthor = Author(id = id, name = homeState.value.selectedModel)
         val chatModel = ChatModel(
@@ -58,7 +58,8 @@ class HomeViewModel @Inject constructor(
             modelName = homeState.value.selectedModel,
             chatIcon = R.drawable.ic_launcher_foreground,
             chatMessages = MessageModel(messages = emptyList(), receiver = receiverAuthor),
-            context = emptyList()
+            context = emptyList(),
+            yourName = yourName
         )
         viewModelScope.launch {
             ollamaRepository.insertToDb(chatModel)

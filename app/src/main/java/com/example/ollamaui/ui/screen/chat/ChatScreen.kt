@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ollamaui.ui.screen.chat.components.ChatBottomBar
+import com.example.ollamaui.ui.screen.chat.components.ChatTopBar
 import com.example.ollamaui.ui.screen.chat.components.Conversation
 
 @Composable
@@ -29,7 +30,12 @@ fun ChatScreen(
     var textValue by rememberSaveable { mutableStateOf("") }
 
     Scaffold(
-        topBar = {},
+        topBar = {
+            ChatTopBar(
+                chatTitle = chatState.chatModel.chatTitle,
+                onBackClick = onBackClick
+            )
+                 },
         bottomBar = {
             ChatBottomBar(
                 textValue = textValue,

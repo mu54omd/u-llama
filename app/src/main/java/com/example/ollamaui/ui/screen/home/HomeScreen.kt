@@ -1,7 +1,7 @@
 package com.example.ollamaui.ui.screen.home
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -23,8 +23,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.ollamaui.ui.screen.home.components.CustomFabButton
 import com.example.ollamaui.ui.screen.home.components.HomeTopBar
+import com.example.ollamaui.ui.screen.home.components.NewChatDialog
 import com.example.ollamaui.ui.screen.home.components.NewChatItem
-import java.util.Date
 
 @Composable
 fun HomeScreen(
@@ -35,6 +35,9 @@ fun HomeScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
     var fabListVisible by remember { mutableStateOf(false) }
+    var isDialogVisible by remember { mutableStateOf(false) }
+    var yourName by remember { mutableStateOf("") }
+    var chatTitle by remember { mutableStateOf("") }
 
     Scaffold(
         topBar = {
@@ -53,8 +56,7 @@ fun HomeScreen(
                 onItemClick = { item ->
                     fabListVisible = false
                     homeViewModel.selectOllamaModel(item)
-                    homeViewModel.addNewChat(Date().toString().split(" ")[3])
-                    homeViewModel.reloadDatabase()
+                    isDialogVisible = true
                               },
                 onButtonClick = {
                     if(!homeState.isModelListLoaded){
@@ -66,22 +68,13 @@ fun HomeScreen(
             )
         }
     ) { paddingValues ->
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
+        Box(
+            contentAlignment = Alignment.Center,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ){
-            if (homeState.isModelListLoaded) {
-                LaunchedEffect(homeState.statusError) {
-                    snackbarHostState
-                        .showSnackbar(
-                            message = homeState.ollamaStatus,
-                            withDismissAction = true,
-                        )
-                }
-            }else {
+            if (!homeState.isModelListLoaded){
                 CircularProgressIndicator()
                 if(homeState.statusError != null){
                     val errorMessage = stringResource(homeState.statusError)
@@ -94,7 +87,25 @@ fun HomeScreen(
                     }
                 }
             }
+
+            AnimatedVisibility(
+                visible = isDialogVisible
+            ) {
+                NewChatDialog(
+                    yourName = yourName,
+                    onYourNameChange = { yourName = it },
+                    chatTitle = chatTitle,
+                    onChatTitleChange = { chatTitle = it },
+                    onCloseClick = { isDialogVisible = false},
+                    onAcceptClick = {
+                        homeViewModel.addNewChat(chatTitle, yourName)
+                        homeViewModel.reloadDatabase()
+                        isDialogVisible = false
+                    }
+                )
+            }
             LazyColumn(
+                modifier = Modifier.align(Alignment.TopCenter),
                 contentPadding = PaddingValues(10.dp)
             ) {
                 items(homeState.chatList){ chatItem ->

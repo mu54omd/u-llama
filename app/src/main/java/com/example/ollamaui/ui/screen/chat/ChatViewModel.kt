@@ -1,17 +1,22 @@
 package com.example.ollamaui.ui.screen.chat
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ollamaui.domain.model.Author
 import com.example.ollamaui.domain.model.ChatInputModel
 import com.example.ollamaui.domain.model.ChatModel
 import com.example.ollamaui.domain.model.EmptyChatModel
+import com.example.ollamaui.domain.model.EmptyChatResponse
 import com.example.ollamaui.domain.model.Message
 import com.example.ollamaui.domain.model.MessageModel
 import com.example.ollamaui.domain.repository.OllamaRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -31,7 +36,7 @@ class ChatViewModel @Inject constructor(
     fun sendButton(text: String){
         val messages = chatState.value.chatModel.chatMessages.messages.toMutableList()
         val oldChatModel = chatState.value.chatModel
-        messages.add(Message(text = text, author = Author(0, "Musa")))
+        messages.add(Message(text = text, author = Author(0, name = oldChatModel.yourName)))
 
         _chatState.update { it.copy(
             chatModel = ChatModel(
@@ -40,7 +45,8 @@ class ChatViewModel @Inject constructor(
                 chatTitle = oldChatModel.chatTitle,
                 chatMessages = MessageModel( messages = messages, receiver = Author(id = oldChatModel.chatId, name = oldChatModel.modelName)),
                 context = oldChatModel.context,
-                modelName = oldChatModel.modelName
+                modelName = oldChatModel.modelName,
+                yourName = oldChatModel.yourName
             )
         )
         }
@@ -49,7 +55,7 @@ class ChatViewModel @Inject constructor(
 
     fun loadStates(chatId: Int) {
         viewModelScope.launch {
-            val newChatModel = ollamaRepository.getChat(chatId) ?: EmptyChatModel.empty
+            val newChatModel = ollamaRepository.getChat(chatId)!!
             _chatState.update {
                 it.copy(
                     chatModel = ChatModel(
@@ -58,16 +64,20 @@ class ChatViewModel @Inject constructor(
                         chatTitle = newChatModel.chatTitle,
                         chatMessages = newChatModel.chatMessages,
                         context = newChatModel.context,
-                        modelName = newChatModel.modelName
+                        modelName = newChatModel.modelName,
+                        yourName = newChatModel.yourName
                     )
                 )
             }
         }
     }
 
+    fun clearStates(){
+        _chatState.update { it.copy(chatModel = EmptyChatModel.empty, chatResponse = EmptyChatResponse.empty, chatError = null, isResponding = false) }
+    }
+
     fun uploadChatToDatabase(chatModel: ChatModel){
         viewModelScope.launch {
-
             ollamaRepository.updateDbItem(chatModel = chatModel)
         }
     }
@@ -78,6 +88,7 @@ class ChatViewModel @Inject constructor(
     /*---------------------------------------------------------------------------------------------*/
     private fun ollamaPostMessage(text:String){
         val messages = chatState.value.chatModel.chatMessages.messages.toMutableList()
+        val context = chatState.value.chatModel.context.toMutableList()
         val oldChatModel = chatState.value.chatModel
         viewModelScope.launch {
             _chatState.update { it.copy(isResponding = true) }
@@ -86,26 +97,32 @@ class ChatViewModel @Inject constructor(
                     model = chatState.value.chatModel.modelName,
                     prompt = text,
                     stream = false,
-                    context = chatState.value.chatResponse.context
+                    context = context
                 )
             ).onRight { response ->
                 messages.add(Message(text = response.response, author = Author(id = oldChatModel.chatId, name = oldChatModel.modelName)))
+                context.addAll(response.context)
                 _chatState.update { it.copy(
-                        chatModel = ChatModel(
+                    chatModel = ChatModel(
                             chatId = oldChatModel.chatId,
                             chatIcon = oldChatModel.chatIcon,
                             chatTitle = oldChatModel.chatTitle,
                             chatMessages = MessageModel( messages = messages, receiver = Author(id = oldChatModel.chatId, name = oldChatModel.modelName)),
-                            context = response.context,
-                            modelName = oldChatModel.modelName
-                        )
+                            context = context,
+                            modelName = oldChatModel.modelName,
+                            yourName = oldChatModel.yourName
+                        ),
+                    chatResponse = response,
+                    isResponding = false
                     )
                 }
-                _chatState.update { it.copy(chatResponse = response) }
-                _chatState.update { it.copy(isResponding = false) }
             }.onLeft { error ->
-                _chatState.update { it.copy(chatError = error.error.message) }
-                _chatState.update { it.copy(isResponding = false) }
+                _chatState.update {
+                    it.copy(
+                        chatError = error.error.message,
+                        isResponding = false
+                    )
+                }
             }
         }
     }

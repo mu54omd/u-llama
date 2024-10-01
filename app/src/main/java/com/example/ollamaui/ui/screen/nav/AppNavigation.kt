@@ -1,5 +1,6 @@
 package com.example.ollamaui.ui.screen.nav
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -37,8 +38,8 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 homeState = homeState,
                 onChatClick = {
                     chatViewModel.loadStates(it)
+                    Log.d("TAG - onChatClick", "$chatState")
                     navigateToTab(navController = navController, route = Screens.ChatScreen.route)
-
                 }
             )
         }
@@ -50,6 +51,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 onBackClick = {
                     chatViewModel.uploadChatToDatabase(chatState.chatModel)
                     navigateToTab(navController = navController, route = Screens.HomeScreen.route)
+                    chatViewModel.clearStates()
                 }
             )
         }
