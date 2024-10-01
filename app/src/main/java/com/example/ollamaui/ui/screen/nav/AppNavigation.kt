@@ -1,12 +1,6 @@
 package com.example.ollamaui.ui.screen.nav
 
-import android.util.Log
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -19,13 +13,14 @@ import com.example.ollamaui.ui.screen.home.HomeScreen
 import com.example.ollamaui.ui.screen.home.HomeViewModel
 
 @Composable
-fun AppNavigation(modifier: Modifier = Modifier) {
+fun AppNavigation() {
     val navController = rememberNavController()
     val homeViewModel: HomeViewModel = hiltViewModel()
     val homeState = homeViewModel.homeState.collectAsStateWithLifecycle().value
 
     val chatViewModel: ChatViewModel = hiltViewModel()
     val chatState = chatViewModel.chatState.collectAsStateWithLifecycle().value
+
 
     NavHost(
         navController = navController,
@@ -38,7 +33,6 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 homeState = homeState,
                 onChatClick = {
                     chatViewModel.loadStates(it)
-                    Log.d("TAG - onChatClick", "$chatState")
                     navigateToTab(navController = navController, route = Screens.ChatScreen.route)
                 }
             )

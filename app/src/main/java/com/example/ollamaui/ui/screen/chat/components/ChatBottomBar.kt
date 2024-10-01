@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
@@ -31,6 +32,7 @@ fun ChatBottomBar(
         modifier = modifier
             .fillMaxWidth()
             .background(color = MaterialTheme.colorScheme.secondaryContainer)
+            .navigationBarsPadding()
             .padding(bottom = 30.dp, top = 10.dp)
     ) {
         Row(

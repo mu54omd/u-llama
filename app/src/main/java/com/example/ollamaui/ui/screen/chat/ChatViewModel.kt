@@ -1,9 +1,7 @@
 package com.example.ollamaui.ui.screen.chat
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ollamaui.domain.model.Author
 import com.example.ollamaui.domain.model.ChatInputModel
 import com.example.ollamaui.domain.model.ChatModel
@@ -13,10 +11,8 @@ import com.example.ollamaui.domain.model.Message
 import com.example.ollamaui.domain.model.MessageModel
 import com.example.ollamaui.domain.repository.OllamaRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject

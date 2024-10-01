@@ -21,10 +21,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.ollamaui.ui.screen.home.components.AboutDialog
 import com.example.ollamaui.ui.screen.home.components.CustomFabButton
 import com.example.ollamaui.ui.screen.home.components.HomeTopBar
 import com.example.ollamaui.ui.screen.home.components.NewChatDialog
 import com.example.ollamaui.ui.screen.home.components.NewChatItem
+import com.example.ollamaui.ui.screen.home.components.SettingDialog
 
 @Composable
 fun HomeScreen(
@@ -35,15 +37,18 @@ fun HomeScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
     var fabListVisible by remember { mutableStateOf(false) }
-    var isDialogVisible by remember { mutableStateOf(false) }
+    var isFabDialogVisible by remember { mutableStateOf(false) }
+    var isAboutDialogVisible by remember { mutableStateOf(false) }
+    var isSettingDialogVisible by remember { mutableStateOf(false) }
     var yourName by remember { mutableStateOf("") }
     var chatTitle by remember { mutableStateOf("") }
+    var httpValue by remember { mutableStateOf("http://localhost:11434") }
 
     Scaffold(
         topBar = {
                     HomeTopBar(
-                    onDrawerClick = {},
-                    onAboutClick = {}
+                        onSettingClick = { isSettingDialogVisible = true },
+                        onAboutClick = { isAboutDialogVisible = true}
                     )
                  },
         bottomBar = {},
@@ -56,7 +61,7 @@ fun HomeScreen(
                 onItemClick = { item ->
                     fabListVisible = false
                     homeViewModel.selectOllamaModel(item)
-                    isDialogVisible = true
+                    isFabDialogVisible = true
                               },
                 onButtonClick = {
                     if(!homeState.isModelListLoaded){
@@ -89,19 +94,38 @@ fun HomeScreen(
             }
 
             AnimatedVisibility(
-                visible = isDialogVisible
+                visible = isFabDialogVisible
             ) {
                 NewChatDialog(
                     yourName = yourName,
                     onYourNameChange = { yourName = it },
                     chatTitle = chatTitle,
                     onChatTitleChange = { chatTitle = it },
-                    onCloseClick = { isDialogVisible = false},
+                    onCloseClick = { isFabDialogVisible = false},
                     onAcceptClick = {
                         homeViewModel.addNewChat(chatTitle, yourName)
                         homeViewModel.reloadDatabase()
-                        isDialogVisible = false
+                        isFabDialogVisible = false
                     }
+                )
+            }
+            AnimatedVisibility(
+                visible = isAboutDialogVisible
+            ) {
+                AboutDialog(
+                    onCloseClick = { isAboutDialogVisible = false}
+                )
+            }
+            AnimatedVisibility(
+                visible = isSettingDialogVisible
+            ) {
+                SettingDialog(
+                    httpValue = httpValue,
+                    onAcceptClick = {
+                        homeViewModel.refresh()
+                    },
+                    onCloseClick = { isSettingDialogVisible = false},
+                    onValueChange = { httpValue = it}
                 )
             }
             LazyColumn(

@@ -20,7 +20,7 @@ import com.example.ollamaui.ui.theme.OllamaUITheme
 @Composable
 fun HomeTopBar(
     modifier: Modifier = Modifier,
-    onDrawerClick: () -> Unit,
+    onSettingClick: () -> Unit,
     onAboutClick: () -> Unit,
 ) {
     Column {
@@ -32,9 +32,9 @@ fun HomeTopBar(
                 .padding(start = 5.dp, end = 5.dp),
             ) {
             CustomButton(
-                description = "Drawer Button",
-                onButtonClick = onDrawerClick,
-                icon = R.drawable.baseline_table_rows_24,
+                description = "Setting Button",
+                onButtonClick = onSettingClick,
+                icon = R.drawable.baseline_settings_24,
                 buttonSize = 50,
                 modifier = Modifier.align(Alignment.CenterStart),
                 containerColor = MaterialTheme.colorScheme.primaryContainer
@@ -62,7 +62,7 @@ private fun HomeTopBarPreview() {
     OllamaUITheme {
         HomeTopBar(
             onAboutClick = {},
-            onDrawerClick = {}
+            onSettingClick = {}
         )
     }
 }

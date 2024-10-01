@@ -9,20 +9,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ollamaui.R
 import com.example.ollamaui.ui.screen.common.CustomButton
-import com.example.ollamaui.ui.screen.common.DropDownList
 import com.example.ollamaui.ui.screen.home.components.LogoTitle
 import com.example.ollamaui.ui.theme.OllamaUITheme
 
@@ -34,7 +27,7 @@ fun ChatTopBar(
 ) {
     Column(
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
