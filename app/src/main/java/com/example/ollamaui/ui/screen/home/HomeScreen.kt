@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -86,11 +87,13 @@ fun HomeScreen(
                 CircularProgressIndicator()
                 if(homeState.statusError != null){
                     val errorMessage = stringResource(homeState.statusError)
+                    val throwableMessage =  homeState.stateThrowable
                     LaunchedEffect(homeState.statusError) {
                         snackbarHostState
                             .showSnackbar(
-                                message = errorMessage,
+                                message = errorMessage + "\n" + throwableMessage,
                                 withDismissAction = true,
+                                duration = SnackbarDuration.Indefinite
                             )
                     }
                 }

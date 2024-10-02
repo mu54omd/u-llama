@@ -5,8 +5,10 @@ import com.example.ollamaui.domain.model.EmptyTagResponse
 import com.example.ollamaui.domain.model.TagResponse
 
 data class HomeStates(
+    val ollamaBaseAddress: String = "",
     val ollamaStatus: String = "",
     val statusError: Int? = null,
+    val stateThrowable: String? = null,
 
     val tagResponse: TagResponse = EmptyTagResponse.emptyTagResponse,
     val modelList: List<String> = emptyList(),

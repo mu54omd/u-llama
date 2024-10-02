@@ -53,7 +53,7 @@ fun AppNavigation(
                     homeViewModel = homeViewModel,
                     homeState = homeState,
                     onChatClick = {
-                        chatViewModel.loadStates(it)
+                        chatViewModel.loadStates(chatId = it, url = ollamaAddress)
                         navigateToTab(
                             navController = navController,
                             route = Screens.ChatScreen.route
@@ -61,7 +61,10 @@ fun AppNavigation(
                     },
                     isOllamaAddressSet = isOllamaAddressSet,
                     ollamaAddress = ollamaAddress,
-                    onSaveOllamaAddressClick = { onSaveOllamaAddress(it) }
+                    onSaveOllamaAddressClick = {
+                        onSaveOllamaAddress(it)
+                        homeViewModel.setOllamaBaseAddress(url = it)
+                    }
                 )
             }
 
@@ -83,7 +86,10 @@ fun AppNavigation(
             composable(route = Screens.LoadingScreen.route){
                 LoadingScreen(
                     isLocalSettingLoaded = isLocalSettingLoaded,
-                    onDispose = { navigateToTab(navController = navController , route = Screens.HomeScreen.route) }
+                    onDispose = {
+                        homeViewModel.setOllamaBaseAddress(ollamaAddress)
+                        navigateToTab(navController = navController , route = Screens.HomeScreen.route)
+                    }
                 )
             }
 

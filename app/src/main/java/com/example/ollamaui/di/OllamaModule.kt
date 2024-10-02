@@ -51,8 +51,8 @@ object OllamaModule {
             .build()
 
         return Retrofit.Builder()
-            .baseUrl(OLLAMA_BASE_URL)
             .client(okHttpClient)
+            .baseUrl(OLLAMA_BASE_URL)
             .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()

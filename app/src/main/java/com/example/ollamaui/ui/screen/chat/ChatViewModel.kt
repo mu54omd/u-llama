@@ -10,6 +10,7 @@ import com.example.ollamaui.domain.model.EmptyChatResponse
 import com.example.ollamaui.domain.model.Message
 import com.example.ollamaui.domain.model.MessageModel
 import com.example.ollamaui.domain.repository.OllamaRepository
+import com.example.ollamaui.utils.Constants.OLLAMA_CHAT_ENDPOINT
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,7 +20,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
-    private val ollamaRepository: OllamaRepository
+    private val ollamaRepository: OllamaRepository,
 ):ViewModel() {
 
     private val _chatState = MutableStateFlow(ChatStates())
@@ -49,7 +50,7 @@ class ChatViewModel @Inject constructor(
         ollamaPostMessage(text = text)
     }
 
-    fun loadStates(chatId: Int) {
+    fun loadStates(chatId: Int, url: String) {
         viewModelScope.launch {
             val newChatModel = ollamaRepository.getChat(chatId)!!
             _chatState.update {
@@ -62,7 +63,8 @@ class ChatViewModel @Inject constructor(
                         context = newChatModel.context,
                         modelName = newChatModel.modelName,
                         yourName = newChatModel.yourName
-                    )
+                    ),
+                    ollamaBaseAddress = url
                 )
             }
         }
@@ -89,6 +91,8 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             _chatState.update { it.copy(isResponding = true) }
             ollamaRepository.postOllamaChat(
+                baseUrl = chatState.value.ollamaBaseAddress,
+                chatEndpoint = OLLAMA_CHAT_ENDPOINT,
                 ChatInputModel(
                     model = chatState.value.chatModel.modelName,
                     prompt = text,

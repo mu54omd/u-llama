@@ -17,16 +17,19 @@ class OllamaRepositoryImpl @Inject constructor(
     private val ollamaApi: OllamaApi,
     private val chatDao: ChatDao
 ): OllamaRepository {
-    override suspend fun getOllamaStatus(): Either<NetworkError, String> {
-        return Either.catch { ollamaApi.ollamaState() }.mapLeft { it.toNetworkError() }
+    override suspend fun getOllamaStatus(baseUrl: String, baseEndpoint: String): Either<NetworkError, String> {
+        return Either.catch { ollamaApi.ollamaState(fullUrl = baseUrl + baseEndpoint) }.mapLeft { it.toNetworkError() }
     }
 
-    override suspend fun getOllamaModelsList(): Either<NetworkError, TagResponse> {
-        return Either.catch { ollamaApi.ollamaModelsList() }.mapLeft { it.toNetworkError() }
+    override suspend fun getOllamaModelsList(baseUrl: String, tagEndpoint: String): Either<NetworkError, TagResponse> {
+        return Either.catch { ollamaApi.ollamaModelsList(fullUrl = baseUrl + tagEndpoint) }.mapLeft { it.toNetworkError() }
     }
 
-    override suspend fun postOllamaChat(chatInputModel: ChatInputModel?): Either<NetworkError, ChatResponse> {
-        return Either.catch { ollamaApi.ollamaChat(chatInputModel = chatInputModel) }.mapLeft { it.toNetworkError() }
+    override suspend fun postOllamaChat(
+        baseUrl: String, chatEndpoint: String,
+        chatInputModel: ChatInputModel?
+    ): Either<NetworkError, ChatResponse> {
+        return Either.catch { ollamaApi.ollamaChat(fullUrl = baseUrl + chatEndpoint, chatInputModel = chatInputModel) }.mapLeft { it.toNetworkError() }
     }
 
     override suspend fun insertToDb(chatModel: ChatModel) {

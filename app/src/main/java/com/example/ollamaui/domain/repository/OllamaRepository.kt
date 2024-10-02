@@ -9,9 +9,9 @@ import com.example.ollamaui.domain.model.TagResponse
 import kotlinx.coroutines.flow.Flow
 
 interface OllamaRepository{
-    suspend fun getOllamaStatus(): Either<NetworkError, String>
-    suspend fun getOllamaModelsList(): Either<NetworkError, TagResponse>
-    suspend fun postOllamaChat(chatInputModel: ChatInputModel?): Either<NetworkError, ChatResponse>
+    suspend fun getOllamaStatus(baseUrl: String, baseEndpoint: String): Either<NetworkError, String>
+    suspend fun getOllamaModelsList(baseUrl: String, tagEndpoint: String): Either<NetworkError, TagResponse>
+    suspend fun postOllamaChat(baseUrl: String, chatEndpoint: String, chatInputModel: ChatInputModel?): Either<NetworkError, ChatResponse>
 
     suspend fun insertToDb(chatModel: ChatModel)
     suspend fun deleteFromDb(chatModel: ChatModel)
