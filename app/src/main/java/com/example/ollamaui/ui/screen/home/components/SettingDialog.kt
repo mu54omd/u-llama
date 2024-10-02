@@ -30,7 +30,7 @@ import com.example.ollamaui.ui.theme.OllamaUITheme
 @Composable
 fun SettingDialog(
     modifier: Modifier = Modifier,
-    httpValue: String = "http://localhost:11434",
+    httpValue: String,
     onValueChange: (String) -> Unit,
     onAcceptClick: () -> Unit,
     onCloseClick: () -> Unit,
@@ -91,6 +91,7 @@ fun SettingDialog(
 private fun SettingDialogPreview() {
     OllamaUITheme {
         SettingDialog(
+            httpValue = "",
             onCloseClick = {},
             onAcceptClick = {},
             onValueChange = {}

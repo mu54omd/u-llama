@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.ollamaui.ui.screen.chat.ChatScreen
 import com.example.ollamaui.ui.screen.home.HomeScreen
 import com.example.ollamaui.ui.screen.nav.AppNavigation
@@ -18,8 +20,15 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val mainViewModel: MainViewModel = hiltViewModel()
+            val mainState = mainViewModel.mainState.collectAsStateWithLifecycle()
             OllamaUITheme {
-                AppNavigation()
+                AppNavigation(
+                    isOllamaAddressSet = mainState.value.isOllamaAddressSet,
+                    isLocalSettingLoaded = mainState.value.isLocalSettingLoaded,
+                    ollamaAddress = mainState.value.ollamaAddress,
+                    onSaveOllamaAddress = { mainViewModel.saveLocalSetting(it) }
+                )
             }
         }
     }

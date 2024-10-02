@@ -19,7 +19,6 @@ import com.example.ollamaui.domain.model.MessageModel
 @Composable
 fun Conversation(
     messageModel: MessageModel,
-    isResponding: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val listState = rememberLazyListState()
@@ -36,8 +35,4 @@ fun Conversation(
 
         }
     }
-    AnimatedVisibility(visible = isResponding) {
-        LinearProgressIndicator(modifier = Modifier.width(25.dp))
-    }
-    Spacer(modifier = Modifier.height(10.dp))
 }

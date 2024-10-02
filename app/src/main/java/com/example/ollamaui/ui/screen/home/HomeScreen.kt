@@ -32,17 +32,20 @@ import com.example.ollamaui.ui.screen.home.components.SettingDialog
 fun HomeScreen(
     onChatClick: (Int) -> Unit,
     homeViewModel: HomeViewModel,
-    homeState: HomeStates
+    homeState: HomeStates,
+    isOllamaAddressSet: Boolean,
+    ollamaAddress: String,
+    onSaveOllamaAddressClick: (String) -> Unit,
 ) {
 
     val snackbarHostState = remember { SnackbarHostState() }
     var fabListVisible by remember { mutableStateOf(false) }
     var isFabDialogVisible by remember { mutableStateOf(false) }
     var isAboutDialogVisible by remember { mutableStateOf(false) }
-    var isSettingDialogVisible by remember { mutableStateOf(false) }
+    var isSettingDialogVisible by remember { mutableStateOf(!isOllamaAddressSet) }
     var yourName by remember { mutableStateOf("") }
     var chatTitle by remember { mutableStateOf("") }
-    var httpValue by remember { mutableStateOf("http://localhost:11434") }
+    var httpValue by remember { mutableStateOf(ollamaAddress) }
 
     Scaffold(
         topBar = {
@@ -122,7 +125,9 @@ fun HomeScreen(
                 SettingDialog(
                     httpValue = httpValue,
                     onAcceptClick = {
+                        onSaveOllamaAddressClick(httpValue)
                         homeViewModel.refresh()
+                        isSettingDialogVisible = false
                     },
                     onCloseClick = { isSettingDialogVisible = false},
                     onValueChange = { httpValue = it}

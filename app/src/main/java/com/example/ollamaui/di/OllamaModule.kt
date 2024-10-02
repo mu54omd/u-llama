@@ -4,11 +4,13 @@ import android.app.Application
 import androidx.room.Room
 import com.example.ollamaui.data.local.ChatDao
 import com.example.ollamaui.data.local.ChatDatabase
+import com.example.ollamaui.data.preferences.LocalUserManagerImpl
 import com.example.ollamaui.data.remote.OllamaApi
 import com.example.ollamaui.data.repository.OllamaRepositoryImpl
-import com.example.ollamaui.domain.model.ChatModel
+import com.example.ollamaui.domain.preferences.LocalUserManager
 import com.example.ollamaui.domain.repository.OllamaRepository
 import com.example.ollamaui.utils.Constants.CHAT_DATABASE
+import com.example.ollamaui.utils.Constants.OLLAMA_ADDRESS
 import com.example.ollamaui.utils.Constants.OLLAMA_BASE_URL
 import com.google.gson.GsonBuilder
 import dagger.Module
@@ -26,6 +28,12 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object OllamaModule {
+
+    @Provides
+    @Singleton
+    fun provideLocalUserManager(application: Application):LocalUserManager{
+        return LocalUserManagerImpl(application)
+    }
 
     @Provides
     @Singleton
@@ -76,11 +84,11 @@ object OllamaModule {
     @Singleton
     fun provideOllamaRepository(
         ollamaApi: OllamaApi,
-        chatDao: ChatDao
+        chatDao: ChatDao,
     ): OllamaRepository{
         return OllamaRepositoryImpl(
             ollamaApi = ollamaApi,
-            chatDao = chatDao
+            chatDao = chatDao,
         )
     }
 

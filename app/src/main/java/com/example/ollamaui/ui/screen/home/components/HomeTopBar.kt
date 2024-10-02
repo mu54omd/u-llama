@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.example.ollamaui.R
 import com.example.ollamaui.ui.screen.common.CustomButton
 import com.example.ollamaui.ui.theme.OllamaUITheme
+import com.example.ollamaui.utils.Constants.TOP_BAR_HEIGHT
 
 @Composable
 fun HomeTopBar(
@@ -28,7 +29,7 @@ fun HomeTopBar(
             modifier = modifier
                 .fillMaxWidth()
                 .background(color = MaterialTheme.colorScheme.primaryContainer)
-                .height(120.dp)
+                .height(TOP_BAR_HEIGHT)
                 .padding(start = 5.dp, end = 5.dp),
             ) {
             CustomButton(
