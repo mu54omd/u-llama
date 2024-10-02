@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -20,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -53,11 +55,13 @@ fun NewChatItem(
                     .padding(5.dp)
                     .clip(RoundedCornerShape(100))
                     .background(color = MaterialTheme.colorScheme.surfaceContainer)
-                    .size(75.dp)
+                    .size(75.dp),
+                contentAlignment = Alignment.Center
             ) {
                 Image(
                     painter = painterResource(chatImage),
                     contentDescription = chatTitle,
+                    modifier = Modifier.fillMaxSize()
                 )
             }
             Spacer(modifier = Modifier.width(10.dp))

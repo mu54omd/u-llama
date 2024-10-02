@@ -27,6 +27,9 @@ import androidx.compose.ui.unit.dp
 import com.example.ollamaui.domain.model.Author
 import com.example.ollamaui.domain.model.Message
 import com.example.ollamaui.ui.theme.OllamaUITheme
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.util.Date
 
 @Composable
 fun ChatDialog(

@@ -19,9 +19,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.ollamaui.R
 import com.example.ollamaui.ui.screen.chat.components.ChatBottomBar
 import com.example.ollamaui.ui.screen.chat.components.ChatTopBar
 import com.example.ollamaui.ui.screen.chat.components.Conversation
+import com.example.ollamaui.ui.screen.common.CustomButton
 
 @Composable
 fun ChatScreen(
@@ -31,6 +33,7 @@ fun ChatScreen(
 ) {
 
     var textValue by rememberSaveable { mutableStateOf("") }
+    var textValueBackup by rememberSaveable { mutableStateOf("") }
 
     Scaffold(
         topBar = {
@@ -46,6 +49,7 @@ fun ChatScreen(
                 onSendClick = {
                     chatViewModel.sendButton(textValue)
                     textValue = ""
+                    textValueBackup = textValue
                 },
                 onClearClick = { textValue = "" },
                 onAttachClick = {},
@@ -56,16 +60,32 @@ fun ChatScreen(
         Column(
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize().padding(
-                top = contentPadding.calculateTopPadding(),
-                bottom = contentPadding.calculateBottomPadding()
-            )
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(
+                    top = contentPadding.calculateTopPadding(),
+                    bottom = contentPadding.calculateBottomPadding()
+                )
         ) {
             Conversation(
                 messageModel = chatState.chatModel.chatMessages ,
+                modifier = Modifier.weight(1f)
             )
-            androidx.compose.animation.AnimatedVisibility(visible = chatState.isResponding) {
-                LinearProgressIndicator(modifier = Modifier.width(25.dp))
+            Column (
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.height(30.dp)
+            ) {
+                AnimatedVisibility(visible = chatState.isResponding) {
+                    LinearProgressIndicator(modifier = Modifier.width(25.dp))
+                }
+                AnimatedVisibility(visible = chatState.chatError != null) {
+                    CustomButton(
+                        description = "Resend Message",
+                        onButtonClick = { chatViewModel.sendButton(textValueBackup)},
+                        icon = R.drawable.baseline_refresh_24,
+                    )
+                }
             }
             Spacer(modifier = Modifier.height(20.dp))
         }

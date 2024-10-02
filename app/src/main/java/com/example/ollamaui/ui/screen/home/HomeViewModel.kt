@@ -62,14 +62,14 @@ class HomeViewModel @Inject constructor(
         getChats()
     }
 
-    fun addNewChat(chatTitle: String, yourName: String){
+    fun addNewChat(chatTitle: String, yourName: String, chatIcon: Int){
         val id = Random.nextInt()
         val receiverAuthor = Author(id = id, name = homeState.value.selectedModel)
         val chatModel = ChatModel(
             chatId = id,
             chatTitle = chatTitle,
             modelName = homeState.value.selectedModel,
-            chatIcon = R.drawable.ic_launcher_foreground,
+            chatIcon = chatIcon,
             chatMessages = MessageModel(messages = emptyList(), receiver = receiverAuthor),
             context = emptyList(),
             yourName = yourName

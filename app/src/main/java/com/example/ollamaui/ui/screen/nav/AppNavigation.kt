@@ -45,7 +45,8 @@ fun AppNavigation(
             modifier = Modifier
                 .background( color = MaterialTheme.colorScheme.primaryContainer )
                 .padding(
-                top = padding.calculateTopPadding(),
+                    top = padding.calculateTopPadding(),
+                    bottom = padding.calculateTopPadding()
             )
         ) {
             composable(route = Screens.HomeScreen.route) {

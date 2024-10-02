@@ -113,14 +113,16 @@ class ChatViewModel @Inject constructor(
                             yourName = oldChatModel.yourName
                         ),
                     chatResponse = response,
-                    isResponding = false
+                    isResponding = false,
+                    chatError = null
                     )
                 }
             }.onLeft { error ->
                 _chatState.update {
                     it.copy(
                         chatError = error.error.message,
-                        isResponding = false
+                        isResponding = false,
+                        chatResponse = EmptyChatResponse.empty
                     )
                 }
             }

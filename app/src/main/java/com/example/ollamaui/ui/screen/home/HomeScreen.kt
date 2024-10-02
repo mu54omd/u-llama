@@ -1,6 +1,7 @@
 package com.example.ollamaui.ui.screen.home
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,8 +21,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.ollamaui.R
 import com.example.ollamaui.ui.screen.home.components.AboutDialog
 import com.example.ollamaui.ui.screen.home.components.CustomFabButton
 import com.example.ollamaui.ui.screen.home.components.HomeTopBar
@@ -47,12 +50,19 @@ fun HomeScreen(
     var yourName by remember { mutableStateOf("") }
     var chatTitle by remember { mutableStateOf("") }
     var httpValue by remember { mutableStateOf(ollamaAddress) }
+    val avatarList = listOf(R.drawable.avatar_logo_01, R.drawable.avatar_logo_02, R.drawable.avatar_logo_03, R.drawable.avatar_logo_04, R.drawable.avatar_logo_05, R.drawable.avatar_logo_06, R.drawable.avatar_logo_07, R.drawable.avatar_logo_08, R.drawable.avatar_logo_09)
 
     Scaffold(
         topBar = {
                     HomeTopBar(
-                        onSettingClick = { isSettingDialogVisible = true },
-                        onAboutClick = { isAboutDialogVisible = true}
+                        onSettingClick = {
+                            fabListVisible = false
+                            isSettingDialogVisible = true
+                                         },
+                        onAboutClick = {
+                            fabListVisible = false
+                            isAboutDialogVisible = true
+                        }
                     )
                  },
         bottomBar = {},
@@ -65,6 +75,8 @@ fun HomeScreen(
                 onItemClick = { item ->
                     fabListVisible = false
                     homeViewModel.selectOllamaModel(item)
+                    yourName = ""
+                    chatTitle = ""
                     isFabDialogVisible = true
                               },
                 onButtonClick = {
@@ -75,7 +87,8 @@ fun HomeScreen(
                     fabListVisible = !fabListVisible
                 }
             )
-        }
+        },
+        modifier = Modifier.pointerInput(Unit){ detectTapGestures { fabListVisible = false }}
     ) { paddingValues ->
         Box(
             contentAlignment = Alignment.Center,
@@ -109,7 +122,7 @@ fun HomeScreen(
                     onChatTitleChange = { chatTitle = it },
                     onCloseClick = { isFabDialogVisible = false},
                     onAcceptClick = {
-                        homeViewModel.addNewChat(chatTitle, yourName)
+                        homeViewModel.addNewChat(chatTitle, yourName, avatarList.random())
                         homeViewModel.reloadDatabase()
                         isFabDialogVisible = false
                     }
@@ -145,10 +158,15 @@ fun HomeScreen(
                         modelName = chatItem.modelName,
                         chatTitle = chatItem.chatTitle,
                         onDeleteClick = {
+                            fabListVisible = false
                             homeViewModel.deleteChat(chatItem)
                             homeViewModel.reloadDatabase()
                         },
-                        onItemClick = { onChatClick(chatItem.chatId) }
+                        onItemClick = {
+                            fabListVisible = false
+                            onChatClick(chatItem.chatId)
+                        },
+                        chatImage = chatItem.chatIcon
                     )
                 }
             }
