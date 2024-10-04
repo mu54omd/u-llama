@@ -2,22 +2,17 @@ package com.example.ollamaui.ui.screen.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.ollamaui.R
-import com.example.ollamaui.activity.MainViewModel
 import com.example.ollamaui.domain.model.Author
 import com.example.ollamaui.domain.model.ChatModel
 import com.example.ollamaui.domain.model.EmptyTagResponse
 import com.example.ollamaui.domain.model.MessageModel
-import com.example.ollamaui.domain.preferences.LocalUserManager
 import com.example.ollamaui.domain.repository.OllamaRepository
 import com.example.ollamaui.utils.Constants.OLLAMA_BASE_ENDPOINT
-import com.example.ollamaui.utils.Constants.OLLAMA_BASE_URL
 import com.example.ollamaui.utils.Constants.OLLAMA_LIST_ENDPOINT
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -34,13 +29,22 @@ class HomeViewModel @Inject constructor(
     val homeState = _homeState
         .onStart {
             ollamaStatus()
-            getChats()
         }
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000L),
             initialValue = HomeStates()
         )
+
+
+    private val _chatList = ollamaRepository.getChats().map { HomeListState(it) }
+    val chatList = _chatList
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000L),
+            initialValue = HomeListState()
+        )
+
     //Public methods
     /*---------------------------------------------------------------------------------------------*/
     /*---------------------------------------------------------------------------------------------*/
@@ -58,10 +62,6 @@ class HomeViewModel @Inject constructor(
         refresh()
     }
 
-    fun reloadDatabase(){
-        getChats()
-    }
-
     fun addNewChat(chatTitle: String, yourName: String, chatIcon: Int){
         val id = Random.nextInt()
         val receiverAuthor = Author(id = id, name = homeState.value.selectedModel)
@@ -77,6 +77,13 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             ollamaRepository.insertToDb(chatModel)
         }
+    }
+
+    fun selectChat(chatModel: ChatModel){
+        _homeState.update { it.copy(selectedChat = chatModel) }
+    }
+    fun deselectChat(){
+        _homeState.update { it.copy(selectedChat = null) }
     }
 
     fun deleteChat(chatModel: ChatModel){
@@ -102,14 +109,6 @@ class HomeViewModel @Inject constructor(
                     _homeState.update { it.copy(tagResponse = response, modelList = modelList, isModelListLoaded = true, tagError = null, tagThrowable = null) }
                 }
                 .onLeft { error -> _homeState.update { it.copy(tagResponse = EmptyTagResponse.emptyTagResponse, tagError = error.error.message, tagThrowable = error.t.message) } }
-        }
-    }
-
-    private fun getChats(){
-        viewModelScope.launch {
-            _homeState.update {
-                it.copy(chatList = ollamaRepository.getChats().first())
-            }
         }
     }
 }

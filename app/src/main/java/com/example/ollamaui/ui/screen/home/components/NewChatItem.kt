@@ -1,9 +1,13 @@
 package com.example.ollamaui.ui.screen.home.components
 
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,10 +22,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -37,14 +46,44 @@ fun NewChatItem(
     @DrawableRes chatImage: Int = R.drawable.ic_launcher_foreground,
     onDeleteClick: () -> Unit,
     onItemClick: () -> Unit,
+    onSelectedItemClick: () -> Unit,
+    onItemLongPress: () -> Unit,
+    isSelectedChatsEmpty: Boolean
 ) {
+    var isSelected by remember { mutableStateOf(false) }
+
+    val animatedColor by animateColorAsState(
+        if(isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.tertiaryContainer,
+        label = "Animated Color"
+    )
     Box(
         modifier = modifier
             .padding(5.dp)
             .fillMaxWidth()
             .clip(shape = MaterialTheme.shapes.large)
-            .background(color = MaterialTheme.colorScheme.tertiaryContainer)
-            .clickable { onItemClick() }
+            .background(color = animatedColor)
+            .pointerInput(Unit){
+                detectTapGestures(
+                    onLongPress = {
+                        onItemLongPress()
+                        isSelected = true
+                                  } ,
+                    onTap = {
+                        if(!isSelected)
+                        {
+                            if(isSelectedChatsEmpty){
+                                onItemClick()
+                            }else{
+                                onItemLongPress()
+                                isSelected = true
+                            }
+                        } else {
+                            onSelectedItemClick()
+                            isSelected = false
+                        }
+                    }
+                )
+            }
 
     ){
         Row(
@@ -77,10 +116,17 @@ fun NewChatItem(
                 modifier = Modifier.padding(end = 10.dp)
             ) {
                 CustomButton(
-                    description = "Delete Chat",
-                    onButtonClick = onDeleteClick,
-                    icon = R.drawable.baseline_delete_outline_24,
-                    containerColor = MaterialTheme.colorScheme.tertiaryContainer
+                    description = if(isSelected) "Clear Select" else "Delete Chat",
+                    onButtonClick = {
+                        if(isSelected) {
+                            isSelected = false
+                            onSelectedItemClick()
+                        } else {
+                            onDeleteClick()
+                        }
+                                    },
+                    icon = if(isSelected) R.drawable.baseline_clear_24 else R.drawable.baseline_delete_outline_24,
+                    containerColor = Color.Transparent
                 )
             }
 
@@ -94,7 +140,10 @@ private fun NewChatItemPreview() {
     OllamaUITheme {
         NewChatItem(
             onDeleteClick = {},
-            onItemClick = {}
+            onItemClick = {},
+            onItemLongPress = {},
+            onSelectedItemClick = {},
+            isSelectedChatsEmpty = true
         )
     }
 }

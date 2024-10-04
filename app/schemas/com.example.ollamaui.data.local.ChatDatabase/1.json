@@ -2,12 +2,18 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "50e22d551892548aa6d236fd4c2a781e",
+    "identityHash": "3af35c0280f2b374ceb0b1d15cd5a13f",
     "entities": [
       {
         "tableName": "ChatModel",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`chatId` INTEGER NOT NULL, `modelName` TEXT NOT NULL, `chatIcon` INTEGER NOT NULL, `yourName` TEXT NOT NULL, `chatTitle` TEXT NOT NULL, `context` TEXT NOT NULL, `chatMessages` TEXT NOT NULL, PRIMARY KEY(`chatId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`databaseId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `chatId` INTEGER NOT NULL, `modelName` TEXT NOT NULL, `chatIcon` INTEGER NOT NULL, `yourName` TEXT NOT NULL, `chatTitle` TEXT NOT NULL, `context` TEXT NOT NULL, `chatMessages` TEXT NOT NULL)",
         "fields": [
+          {
+            "fieldPath": "databaseId",
+            "columnName": "databaseId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
           {
             "fieldPath": "chatId",
             "columnName": "chatId",
@@ -52,9 +58,9 @@
           }
         ],
         "primaryKey": {
-          "autoGenerate": false,
+          "autoGenerate": true,
           "columnNames": [
-            "chatId"
+            "databaseId"
           ]
         },
         "indices": [],
@@ -64,7 +70,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '50e22d551892548aa6d236fd4c2a781e')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3af35c0280f2b374ceb0b1d15cd5a13f')"
     ]
   }
 }

@@ -39,6 +39,7 @@ fun ChatScreen(
         topBar = {
             ChatTopBar(
                 chatTitle = chatState.chatModel.chatTitle,
+                chatIcon = chatState.chatModel.chatIcon,
                 onBackClick = onBackClick
             )
                  },

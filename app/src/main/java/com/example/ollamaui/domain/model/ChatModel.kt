@@ -5,7 +5,8 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class ChatModel(
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
+    val databaseId: Int = 0,
     val chatId: Int,
     val modelName: String,
     val chatIcon: Int,
@@ -18,6 +19,7 @@ data class ChatModel(
 
 object EmptyChatModel {
     val empty = ChatModel(
+        databaseId = 0,
         chatId = 0,
         modelName = "",
         yourName = "",

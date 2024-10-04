@@ -1,5 +1,6 @@
 package com.example.ollamaui.ui.screen.home
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -16,6 +17,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -25,8 +27,10 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.ollamaui.R
+import com.example.ollamaui.domain.model.ChatModel
 import com.example.ollamaui.ui.screen.home.components.AboutDialog
 import com.example.ollamaui.ui.screen.home.components.CustomFabButton
+import com.example.ollamaui.ui.screen.home.components.DeleteDialog
 import com.example.ollamaui.ui.screen.home.components.HomeTopBar
 import com.example.ollamaui.ui.screen.home.components.NewChatDialog
 import com.example.ollamaui.ui.screen.home.components.NewChatItem
@@ -34,9 +38,10 @@ import com.example.ollamaui.ui.screen.home.components.SettingDialog
 
 @Composable
 fun HomeScreen(
-    onChatClick: (Int) -> Unit,
+    onChatClick: (ChatModel) -> Unit,
     homeViewModel: HomeViewModel,
     homeState: HomeStates,
+    homeListState: HomeListState,
     isOllamaAddressSet: Boolean,
     ollamaAddress: String,
     onSaveOllamaAddressClick: (String) -> Unit,
@@ -47,10 +52,16 @@ fun HomeScreen(
     var isFabDialogVisible by remember { mutableStateOf(false) }
     var isAboutDialogVisible by remember { mutableStateOf(false) }
     var isSettingDialogVisible by remember { mutableStateOf(!isOllamaAddressSet) }
+    var isDeleteDialogVisible by remember { mutableStateOf(false) }
     var yourName by remember { mutableStateOf("") }
     var chatTitle by remember { mutableStateOf("") }
     var httpValue by remember { mutableStateOf(ollamaAddress) }
-    val avatarList = listOf(R.drawable.avatar_logo_01, R.drawable.avatar_logo_02, R.drawable.avatar_logo_03, R.drawable.avatar_logo_04, R.drawable.avatar_logo_05, R.drawable.avatar_logo_06, R.drawable.avatar_logo_07, R.drawable.avatar_logo_08, R.drawable.avatar_logo_09)
+    val avatarList = listOf(
+        R.drawable.avatar_logo_01, R.drawable.avatar_logo_02, R.drawable.avatar_logo_03,
+        R.drawable.avatar_logo_04, R.drawable.avatar_logo_05, R.drawable.avatar_logo_06,
+        R.drawable.avatar_logo_07, R.drawable.avatar_logo_08, R.drawable.avatar_logo_09
+    )
+    val selectedChats = remember { mutableStateListOf<ChatModel>() }
 
     Scaffold(
         topBar = {
@@ -62,7 +73,14 @@ fun HomeScreen(
                         onAboutClick = {
                             fabListVisible = false
                             isAboutDialogVisible = true
-                        }
+                        },
+                        onDeleteClick = {
+                            selectedChats.forEach{ selectedChat ->
+                                homeViewModel.deleteChat(selectedChat)
+                            }
+                            selectedChats.clear()
+                        },
+                        isSelectedChatsEmpty = selectedChats.isEmpty()
                     )
                  },
         bottomBar = {},
@@ -123,7 +141,6 @@ fun HomeScreen(
                     onCloseClick = { isFabDialogVisible = false},
                     onAcceptClick = {
                         homeViewModel.addNewChat(chatTitle, yourName, avatarList.random())
-                        homeViewModel.reloadDatabase()
                         isFabDialogVisible = false
                     }
                 )
@@ -149,27 +166,63 @@ fun HomeScreen(
                     onValueChange = { httpValue = it}
                 )
             }
+            AnimatedVisibility(
+                visible = isDeleteDialogVisible
+            ) {
+                homeState.selectedChat?.let { chatItem ->
+                    DeleteDialog(
+                        chatTitle = chatItem.chatTitle,
+                        yourName = chatItem.yourName,
+                        onAcceptClick = {
+                            homeViewModel.deleteChat(chatItem)
+                            isDeleteDialogVisible = false
+                            homeViewModel.deselectChat()
+                        },
+                        onCloseClick = { isDeleteDialogVisible = false}
+                    )
+                }
+
+            }
             LazyColumn(
                 modifier = Modifier.align(Alignment.TopCenter),
                 contentPadding = PaddingValues(10.dp)
             ) {
-                items(homeState.chatList){ chatItem ->
-                    NewChatItem(
-                        modelName = chatItem.modelName,
-                        chatTitle = chatItem.chatTitle,
-                        onDeleteClick = {
-                            fabListVisible = false
-                            homeViewModel.deleteChat(chatItem)
-                            homeViewModel.reloadDatabase()
-                        },
-                        onItemClick = {
-                            fabListVisible = false
-                            onChatClick(chatItem.chatId)
-                        },
-                        chatImage = chatItem.chatIcon
-                    )
+                    items(
+                        items = homeListState.chatList,
+                        key = { chatItem -> chatItem.chatId }
+                    ) { chatItem ->
+
+                        NewChatItem(
+                            modelName = chatItem.modelName,
+                            chatTitle = chatItem.chatTitle,
+                            onDeleteClick = {
+                                fabListVisible = false
+                                homeViewModel.selectChat(chatItem)
+                                isDeleteDialogVisible = true
+                            },
+                            onItemClick = {
+                                fabListVisible = false
+                                onChatClick(chatItem)
+                            },
+                            chatImage = chatItem.chatIcon,
+                            modifier = Modifier.animateItem(),
+                            onItemLongPress = {
+                                if(!selectedChats.contains(chatItem)) {
+                                    selectedChats.add(chatItem)
+                                    Log.d(
+                                        "cTAG",
+                                        "ADDED: ${selectedChats.size}\n ChatTitle: ${chatItem.chatTitle}\n isEmpty: ${selectedChats.isEmpty()}"
+                                    )
+                                }
+                            },
+                            onSelectedItemClick = {
+                                selectedChats.remove(chatItem)
+                                Log.d("cTAG", "REMOVED: ${selectedChats.size}\n ChatTitle: ${chatItem.chatTitle}\n isEmpty: ${selectedChats.isEmpty()}")
+                            },
+                            isSelectedChatsEmpty = selectedChats.isEmpty()
+                        )
+                    }
                 }
             }
         }
     }
-}

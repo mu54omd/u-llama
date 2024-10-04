@@ -1,5 +1,6 @@
 package com.example.ollamaui.ui.screen.home.components
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,6 +24,8 @@ fun HomeTopBar(
     modifier: Modifier = Modifier,
     onSettingClick: () -> Unit,
     onAboutClick: () -> Unit,
+    onDeleteClick: () -> Unit,
+    isSelectedChatsEmpty: Boolean
 ) {
     Column {
         Box(
@@ -44,14 +47,29 @@ fun HomeTopBar(
                 text = "Ollama UI",
                 modifier = Modifier.align(Alignment.Center)
             )
-            CustomButton(
-                description = "About Button",
-                onButtonClick = onAboutClick,
-                icon = R.drawable.baseline_info_outline_24,
-                buttonSize = 50,
-                modifier = Modifier.align(Alignment.CenterEnd),
-                containerColor = MaterialTheme.colorScheme.primaryContainer
-            )
+            Column(
+                modifier = Modifier.align(Alignment.CenterEnd)
+            ) {
+                AnimatedVisibility(visible = isSelectedChatsEmpty) {
+                    CustomButton(
+                        description = "About Button",
+                        onButtonClick = onAboutClick,
+                        icon = R.drawable.baseline_info_outline_24,
+                        buttonSize = 50,
+                        containerColor = MaterialTheme.colorScheme.primaryContainer
+                    )
+                }
+
+                AnimatedVisibility(visible = !isSelectedChatsEmpty) {
+                    CustomButton(
+                        description = "Delete Button",
+                        onButtonClick = onDeleteClick,
+                        icon = R.drawable.baseline_delete_outline_24,
+                        buttonSize = 50,
+                        containerColor = MaterialTheme.colorScheme.primaryContainer
+                    )
+                }
+            }
         }
         HorizontalDivider()
     }
@@ -63,7 +81,9 @@ private fun HomeTopBarPreview() {
     OllamaUITheme {
         HomeTopBar(
             onAboutClick = {},
-            onSettingClick = {}
+            onSettingClick = {},
+            onDeleteClick = {},
+            isSelectedChatsEmpty = true
         )
     }
 }

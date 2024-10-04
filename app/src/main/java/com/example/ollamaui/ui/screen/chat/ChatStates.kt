@@ -11,4 +11,6 @@ data class ChatStates(
     val chatResponse: ChatResponse = EmptyChatResponse.empty,
     val isResponding: Boolean = false,
     val chatError: Int? = null,
+    val isChatScreenOpen: Boolean = false,
+    val isChatDatabaseChanged: Boolean = false,
 )

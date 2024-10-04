@@ -18,5 +18,5 @@ data class HomeStates(
     val isModelListLoaded: Boolean = false,
     val selectedModel: String = "None",
 
-    val chatList: List<ChatModel> = emptyList()
+    val selectedChat: ChatModel? = null,
 )

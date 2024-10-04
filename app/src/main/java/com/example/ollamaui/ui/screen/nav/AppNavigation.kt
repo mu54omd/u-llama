@@ -1,10 +1,16 @@
 package com.example.ollamaui.ui.screen.nav
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -28,10 +34,9 @@ fun AppNavigation(
     val navController = rememberNavController()
     val homeViewModel: HomeViewModel = hiltViewModel()
     val homeState = homeViewModel.homeState.collectAsStateWithLifecycle().value
-
+    val homeListState = homeViewModel.chatList.collectAsStateWithLifecycle().value
     val chatViewModel: ChatViewModel = hiltViewModel()
     val chatState = chatViewModel.chatState.collectAsStateWithLifecycle().value
-
 
     Scaffold(
         topBar = {},
@@ -53,8 +58,9 @@ fun AppNavigation(
                 HomeScreen(
                     homeViewModel = homeViewModel,
                     homeState = homeState,
+                    homeListState = homeListState,
                     onChatClick = {
-                        chatViewModel.loadStates(chatId = it, url = ollamaAddress)
+                        chatViewModel.loadStates(chatModel = it, url = ollamaAddress)
                         navigateToTab(
                             navController = navController,
                             route = Screens.ChatScreen.route
@@ -75,11 +81,11 @@ fun AppNavigation(
                     chatState = chatState,
                     onBackClick = {
                         chatViewModel.uploadChatToDatabase(chatState.chatModel)
+                        chatViewModel.clearStates()
                         navigateToTab(
                             navController = navController,
                             route = Screens.HomeScreen.route
                         )
-                        chatViewModel.clearStates()
                     }
                 )
             }
@@ -100,13 +106,14 @@ fun AppNavigation(
 }
 private fun navigateToTab(navController: NavController, route: String){
     navController.navigate(route){
-        navController.graph.startDestinationRoute?.let { homeScreen ->
-            popUpTo(homeScreen){
-                saveState = true
-            }
-            restoreState = true
-            launchSingleTop = true
-        }
+//        navController.graph.startDestinationRoute?.let { homeScreen ->
+//            popUpTo(homeScreen){
+//                saveState = true
+//            }
+//            restoreState = true
+//            launchSingleTop = true
+//        }
+        popUpTo(0)
     }
 }
 

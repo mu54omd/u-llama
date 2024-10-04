@@ -1,5 +1,6 @@
 package com.example.ollamaui.ui.screen.chat
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ollamaui.domain.model.Author
@@ -37,6 +38,7 @@ class ChatViewModel @Inject constructor(
 
         _chatState.update { it.copy(
             chatModel = ChatModel(
+                databaseId = oldChatModel.databaseId,
                 chatId = oldChatModel.chatId,
                 chatIcon = oldChatModel.chatIcon,
                 chatTitle = oldChatModel.chatTitle,
@@ -50,33 +52,31 @@ class ChatViewModel @Inject constructor(
         ollamaPostMessage(text = text)
     }
 
-    fun loadStates(chatId: Int, url: String) {
-        viewModelScope.launch {
-            val newChatModel = ollamaRepository.getChat(chatId)!!
-            _chatState.update {
-                it.copy(
-                    chatModel = ChatModel(
-                        chatId = newChatModel.chatId,
-                        chatIcon = newChatModel.chatIcon,
-                        chatTitle = newChatModel.chatTitle,
-                        chatMessages = newChatModel.chatMessages,
-                        context = newChatModel.context,
-                        modelName = newChatModel.modelName,
-                        yourName = newChatModel.yourName
-                    ),
-                    ollamaBaseAddress = url
-                )
-            }
+    fun loadStates(chatModel: ChatModel, url: String) {
+        _chatState.update {
+            it.copy(
+                chatModel = chatModel,
+                ollamaBaseAddress = url,
+                isChatScreenOpen = true,
+            )
         }
     }
 
     fun clearStates(){
-        _chatState.update { it.copy(chatModel = EmptyChatModel.empty, chatResponse = EmptyChatResponse.empty, chatError = null, isResponding = false) }
+        _chatState.update { it.copy(
+            chatModel = EmptyChatModel.empty,
+            chatResponse = EmptyChatResponse.empty,
+            chatError = null,
+            isResponding = false,
+            isChatScreenOpen = false,
+            isChatDatabaseChanged = false
+        ) }
     }
 
     fun uploadChatToDatabase(chatModel: ChatModel){
         viewModelScope.launch {
             ollamaRepository.updateDbItem(chatModel = chatModel)
+            _chatState.update { it.copy(isChatDatabaseChanged = true) }
         }
     }
 
@@ -102,8 +102,28 @@ class ChatViewModel @Inject constructor(
             ).onRight { response ->
                 messages.add(Message(text = response.response, author = Author(id = oldChatModel.chatId, name = oldChatModel.modelName)))
                 context.addAll(response.context)
-                _chatState.update { it.copy(
-                    chatModel = ChatModel(
+                if(chatState.value.isChatScreenOpen && chatState.value.isResponding){
+                    _chatState.update { it.copy(
+                        chatModel = ChatModel(
+                                databaseId = oldChatModel.databaseId,
+                                chatId = oldChatModel.chatId,
+                                chatIcon = oldChatModel.chatIcon,
+                                chatTitle = oldChatModel.chatTitle,
+                                chatMessages = MessageModel( messages = messages, receiver = Author(id = oldChatModel.chatId, name = oldChatModel.modelName)),
+                                context = context,
+                                modelName = oldChatModel.modelName,
+                                yourName = oldChatModel.yourName
+                            ),
+                        chatResponse = response,
+                        isResponding = false,
+                        chatError = null
+                        )
+                    }
+                }else{
+                    Log.d("cTAG", "UploadChatToDatabase:\n${response.response}")
+                    uploadChatToDatabase(
+                        chatModel = ChatModel(
+                            databaseId = oldChatModel.databaseId,
                             chatId = oldChatModel.chatId,
                             chatIcon = oldChatModel.chatIcon,
                             chatTitle = oldChatModel.chatTitle,
@@ -112,12 +132,10 @@ class ChatViewModel @Inject constructor(
                             modelName = oldChatModel.modelName,
                             yourName = oldChatModel.yourName
                         ),
-                    chatResponse = response,
-                    isResponding = false,
-                    chatError = null
                     )
                 }
             }.onLeft { error ->
+
                 _chatState.update {
                     it.copy(
                         chatError = error.error.message,
