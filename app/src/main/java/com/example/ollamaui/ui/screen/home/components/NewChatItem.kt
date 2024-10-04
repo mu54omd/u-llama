@@ -2,11 +2,14 @@ package com.example.ollamaui.ui.screen.home.components
 
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.EaseInOut
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -48,17 +51,20 @@ fun NewChatItem(
     onItemClick: () -> Unit,
     onSelectedItemClick: () -> Unit,
     onItemLongPress: () -> Unit,
-    isSelectedChatsEmpty: Boolean
 ) {
     var isSelected by remember { mutableStateOf(false) }
 
     val animatedColor by animateColorAsState(
         if(isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.tertiaryContainer,
-        label = "Animated Color"
+        label = "Animated Color",
+    )
+    val animatedSize by animateIntAsState(
+        if(isSelected) 2 else 5,
+        label = "Animated Size"
     )
     Box(
         modifier = modifier
-            .padding(5.dp)
+            .padding(start = animatedSize.dp, end = animatedSize.dp, top = animatedSize.dp)
             .fillMaxWidth()
             .clip(shape = MaterialTheme.shapes.large)
             .background(color = animatedColor)
@@ -67,19 +73,17 @@ fun NewChatItem(
                     onLongPress = {
                         onItemLongPress()
                         isSelected = true
-                                  } ,
+                    } ,
                     onTap = {
-                        if(!isSelected)
-                        {
-                            if(isSelectedChatsEmpty){
-                                onItemClick()
-                            }else{
-                                onItemLongPress()
-                                isSelected = true
+                        when{
+                            isSelected -> {
+                                onSelectedItemClick()
+                                isSelected = !isSelected
                             }
-                        } else {
-                            onSelectedItemClick()
-                            isSelected = false
+                            !isSelected -> {
+                                onItemClick()
+                                isSelected = !isSelected
+                            }
                         }
                     }
                 )
@@ -126,7 +130,8 @@ fun NewChatItem(
                         }
                                     },
                     icon = if(isSelected) R.drawable.baseline_clear_24 else R.drawable.baseline_delete_outline_24,
-                    containerColor = Color.Transparent
+                    containerColor = Color.Transparent,
+                    buttonSize = 30
                 )
             }
 
@@ -143,7 +148,6 @@ private fun NewChatItemPreview() {
             onItemClick = {},
             onItemLongPress = {},
             onSelectedItemClick = {},
-            isSelectedChatsEmpty = true
         )
     }
 }

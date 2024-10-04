@@ -1,6 +1,5 @@
 package com.example.ollamaui.ui.screen.home
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -16,6 +15,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -62,6 +62,7 @@ fun HomeScreen(
         R.drawable.avatar_logo_07, R.drawable.avatar_logo_08, R.drawable.avatar_logo_09
     )
     val selectedChats = remember { mutableStateListOf<ChatModel>() }
+    val isSelectedChatsEmpty by remember(selectedChats) { derivedStateOf { selectedChats.isEmpty() } }
 
     Scaffold(
         topBar = {
@@ -80,7 +81,7 @@ fun HomeScreen(
                             }
                             selectedChats.clear()
                         },
-                        isSelectedChatsEmpty = selectedChats.isEmpty()
+                        isSelectedChatsEmpty = isSelectedChatsEmpty
                     )
                  },
         bottomBar = {},
@@ -185,7 +186,6 @@ fun HomeScreen(
             }
             LazyColumn(
                 modifier = Modifier.align(Alignment.TopCenter),
-                contentPadding = PaddingValues(10.dp)
             ) {
                     items(
                         items = homeListState.chatList,
@@ -202,24 +202,27 @@ fun HomeScreen(
                             },
                             onItemClick = {
                                 fabListVisible = false
-                                onChatClick(chatItem)
+                                if(selectedChats.isEmpty()){
+                                    onChatClick(chatItem)
+                                }else{
+                                    if(selectedChats.contains(chatItem)){
+                                        selectedChats.remove(chatItem)
+                                    }else {
+                                        selectedChats.add(chatItem)
+                                    }
+                                }
                             },
                             chatImage = chatItem.chatIcon,
                             modifier = Modifier.animateItem(),
                             onItemLongPress = {
+                                fabListVisible = false
                                 if(!selectedChats.contains(chatItem)) {
                                     selectedChats.add(chatItem)
-                                    Log.d(
-                                        "cTAG",
-                                        "ADDED: ${selectedChats.size}\n ChatTitle: ${chatItem.chatTitle}\n isEmpty: ${selectedChats.isEmpty()}"
-                                    )
                                 }
                             },
                             onSelectedItemClick = {
                                 selectedChats.remove(chatItem)
-                                Log.d("cTAG", "REMOVED: ${selectedChats.size}\n ChatTitle: ${chatItem.chatTitle}\n isEmpty: ${selectedChats.isEmpty()}")
                             },
-                            isSelectedChatsEmpty = selectedChats.isEmpty()
                         )
                     }
                 }

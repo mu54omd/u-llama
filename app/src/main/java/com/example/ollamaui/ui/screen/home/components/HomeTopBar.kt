@@ -1,6 +1,7 @@
 package com.example.ollamaui.ui.screen.home.components
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -44,6 +46,7 @@ fun HomeTopBar(
                 containerColor = MaterialTheme.colorScheme.primaryContainer
             )
             LogoTitle(
+                logo = R.drawable.icon,
                 text = "Ollama UI",
                 modifier = Modifier.align(Alignment.Center)
             )

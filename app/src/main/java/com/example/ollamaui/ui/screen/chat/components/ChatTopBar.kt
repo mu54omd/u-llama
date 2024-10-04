@@ -60,7 +60,7 @@ fun ChatTopBar(
                 modifier = Modifier.size(50.dp)
                 )
             Spacer(modifier = Modifier.width(20.dp))
-            LogoTitle(
+            ChatTitle(
                 text = chatTitle
             )
         }

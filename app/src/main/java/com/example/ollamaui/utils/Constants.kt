@@ -15,7 +15,7 @@ object Constants {
     const val OLLAMA_ADDRESS = "ollama_address"
 
     //
-    val TOP_BAR_HEIGHT = 75.dp
+    val TOP_BAR_HEIGHT = 100.dp
 
 
 }
