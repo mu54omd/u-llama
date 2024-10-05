@@ -33,7 +33,7 @@ fun HomeTopBar(
         Box(
             modifier = modifier
                 .fillMaxWidth()
-                .background(color = MaterialTheme.colorScheme.primaryContainer)
+                .background(color = MaterialTheme.colorScheme.background)
                 .height(TOP_BAR_HEIGHT)
                 .padding(start = 5.dp, end = 5.dp),
             ) {
@@ -43,7 +43,7 @@ fun HomeTopBar(
                 icon = R.drawable.baseline_settings_24,
                 buttonSize = 50,
                 modifier = Modifier.align(Alignment.CenterStart),
-                containerColor = MaterialTheme.colorScheme.primaryContainer
+                containerColor = MaterialTheme.colorScheme.background
             )
             LogoTitle(
                 logo = R.drawable.icon,
@@ -59,7 +59,7 @@ fun HomeTopBar(
                         onButtonClick = onAboutClick,
                         icon = R.drawable.baseline_info_outline_24,
                         buttonSize = 50,
-                        containerColor = MaterialTheme.colorScheme.primaryContainer
+                        containerColor = MaterialTheme.colorScheme.background
                     )
                 }
 
@@ -69,12 +69,12 @@ fun HomeTopBar(
                         onButtonClick = onDeleteClick,
                         icon = R.drawable.baseline_delete_outline_24,
                         buttonSize = 50,
-                        containerColor = MaterialTheme.colorScheme.primaryContainer
+                        containerColor = MaterialTheme.colorScheme.background
                     )
                 }
             }
         }
-        HorizontalDivider()
+        HorizontalDivider(thickness = 2.dp)
     }
 }
 

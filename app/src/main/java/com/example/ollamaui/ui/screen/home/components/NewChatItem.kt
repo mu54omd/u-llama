@@ -51,15 +51,15 @@ fun NewChatItem(
     onItemClick: () -> Unit,
     onSelectedItemClick: () -> Unit,
     onItemLongPress: () -> Unit,
+    isSelected: Boolean
 ) {
-    var isSelected by remember { mutableStateOf(false) }
 
     val animatedColor by animateColorAsState(
-        if(isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.tertiaryContainer,
+        if(isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.secondaryContainer,
         label = "Animated Color",
     )
     val animatedSize by animateIntAsState(
-        if(isSelected) 2 else 5,
+        if(isSelected) 5 else 10,
         label = "Animated Size"
     )
     Box(
@@ -72,17 +72,15 @@ fun NewChatItem(
                 detectTapGestures(
                     onLongPress = {
                         onItemLongPress()
-                        isSelected = true
+
                     } ,
                     onTap = {
                         when{
                             isSelected -> {
                                 onSelectedItemClick()
-                                isSelected = !isSelected
                             }
                             !isSelected -> {
                                 onItemClick()
-                                isSelected = !isSelected
                             }
                         }
                     }
@@ -123,7 +121,6 @@ fun NewChatItem(
                     description = if(isSelected) "Clear Select" else "Delete Chat",
                     onButtonClick = {
                         if(isSelected) {
-                            isSelected = false
                             onSelectedItemClick()
                         } else {
                             onDeleteClick()
@@ -148,6 +145,7 @@ private fun NewChatItemPreview() {
             onItemClick = {},
             onItemLongPress = {},
             onSelectedItemClick = {},
+            isSelected = true
         )
     }
 }

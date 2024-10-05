@@ -31,9 +31,8 @@ fun ChatBottomBar(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(color = MaterialTheme.colorScheme.secondaryContainer)
+            .background(color = MaterialTheme.colorScheme.background)
             .navigationBarsPadding()
-            .padding(bottom = 30.dp, top = 10.dp)
     ) {
         Row(
             modifier = modifier.padding(start = 10.dp, end = 20.dp, top = 10.dp)

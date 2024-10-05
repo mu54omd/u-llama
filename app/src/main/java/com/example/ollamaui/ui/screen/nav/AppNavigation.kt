@@ -48,7 +48,7 @@ fun AppNavigation(
             navController = navController,
             startDestination = Screens.LoadingScreen.route,
             modifier = Modifier
-                .background( color = MaterialTheme.colorScheme.primaryContainer )
+                .background( color = MaterialTheme.colorScheme.background )
                 .padding(
                     top = padding.calculateTopPadding(),
                     bottom = padding.calculateTopPadding()

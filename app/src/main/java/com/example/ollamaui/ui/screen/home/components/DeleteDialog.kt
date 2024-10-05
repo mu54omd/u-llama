@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -36,7 +37,7 @@ fun DeleteDialog(
         Box(
             modifier = modifier
                 .clip(shape = MaterialTheme.shapes.large)
-                .size(300.dp, 200.dp)
+                .size(200.dp, 175.dp)
                 .background(color = MaterialTheme.colorScheme.primaryContainer),
             contentAlignment = Alignment.Center
         ){
@@ -45,7 +46,7 @@ fun DeleteDialog(
                 horizontalAlignment = Alignment.CenterHorizontally,
 
             ) {
-                Text(text = "Are you sure?????")
+                Text(text = "Delete confirmation", fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(20.dp))
                 Text(text = "Chat title: $chatTitle", style = MaterialTheme.typography.bodySmall)
                 Text(text = "Author: $yourName", style = MaterialTheme.typography.bodySmall)
@@ -60,6 +61,7 @@ fun DeleteDialog(
                         onButtonClick = onAcceptClick,
                         icon = R.drawable.baseline_check_24,
                         buttonSize = 50,
+                        containerColor = MaterialTheme.colorScheme.errorContainer
                     )
                     Spacer(modifier = Modifier.width(30.dp))
                     CustomButton(

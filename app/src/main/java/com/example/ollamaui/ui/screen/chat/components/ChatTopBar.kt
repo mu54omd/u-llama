@@ -22,7 +22,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ollamaui.R
 import com.example.ollamaui.ui.screen.common.CustomButton
-import com.example.ollamaui.ui.screen.home.components.LogoTitle
 import com.example.ollamaui.ui.theme.OllamaUITheme
 import com.example.ollamaui.utils.Constants.TOP_BAR_HEIGHT
 
@@ -42,7 +41,7 @@ fun ChatTopBar(
             horizontalArrangement = Arrangement.Start,
             modifier = modifier
                 .fillMaxWidth()
-                .background(color = MaterialTheme.colorScheme.primaryContainer)
+                .background(color = MaterialTheme.colorScheme.background)
                 .height(TOP_BAR_HEIGHT)
                 .padding(start = 5.dp, end = 5.dp),
         ) {
@@ -51,7 +50,7 @@ fun ChatTopBar(
                 onButtonClick = onBackClick,
                 icon = R.drawable.baseline_arrow_back_24,
                 buttonSize = 50,
-                containerColor = MaterialTheme.colorScheme.primaryContainer
+                containerColor = MaterialTheme.colorScheme.background
             )
             Spacer(modifier = Modifier.width(20.dp))
             Image(

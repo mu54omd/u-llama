@@ -1,5 +1,6 @@
 package com.example.ollamaui.ui.screen.home
 
+import android.app.Activity
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -24,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.ollamaui.R
@@ -32,6 +34,7 @@ import com.example.ollamaui.ui.screen.home.components.AboutDialog
 import com.example.ollamaui.ui.screen.home.components.CustomFabButton
 import com.example.ollamaui.ui.screen.home.components.DeleteDialog
 import com.example.ollamaui.ui.screen.home.components.HomeTopBar
+import com.example.ollamaui.ui.screen.home.components.NetworkErrorDialog
 import com.example.ollamaui.ui.screen.home.components.NewChatDialog
 import com.example.ollamaui.ui.screen.home.components.NewChatItem
 import com.example.ollamaui.ui.screen.home.components.SettingDialog
@@ -47,7 +50,6 @@ fun HomeScreen(
     onSaveOllamaAddressClick: (String) -> Unit,
 ) {
 
-    val snackbarHostState = remember { SnackbarHostState() }
     var fabListVisible by remember { mutableStateOf(false) }
     var isFabDialogVisible by remember { mutableStateOf(false) }
     var isAboutDialogVisible by remember { mutableStateOf(false) }
@@ -63,6 +65,8 @@ fun HomeScreen(
     )
     val selectedChats = remember { mutableStateListOf<ChatModel>() }
     val isSelectedChatsEmpty by remember(selectedChats) { derivedStateOf { selectedChats.isEmpty() } }
+    val activity = (LocalContext.current as? Activity)
+
 
     Scaffold(
         topBar = {
@@ -85,7 +89,6 @@ fun HomeScreen(
                     )
                  },
         bottomBar = {},
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         floatingActionButton = {
             CustomFabButton(
                 isModelListLoaded = homeState.isModelListLoaded,
@@ -116,19 +119,13 @@ fun HomeScreen(
                 .padding(paddingValues)
         ){
             if (!homeState.isModelListLoaded){
-                CircularProgressIndicator()
-                if(homeState.statusError != null){
-                    val errorMessage = stringResource(homeState.statusError)
-                    val throwableMessage =  homeState.stateThrowable
-                    LaunchedEffect(homeState.statusError) {
-                        snackbarHostState
-                            .showSnackbar(
-                                message = errorMessage + "\n" + throwableMessage,
-                                withDismissAction = true,
-                                duration = SnackbarDuration.Indefinite
-                            )
-                    }
-                }
+                NetworkErrorDialog(
+                    statusError = homeState.statusError,
+                    statusThrowable = homeState.statusThrowable,
+                    onSettingClick = { isSettingDialogVisible = true },
+                    onRetryClick = { homeViewModel.refresh() },
+                    onCloseClick = { activity?.finish() }
+                )
             }
 
             AnimatedVisibility(
@@ -223,6 +220,7 @@ fun HomeScreen(
                             onSelectedItemClick = {
                                 selectedChats.remove(chatItem)
                             },
+                            isSelected = selectedChats.contains(chatItem)
                         )
                     }
                 }

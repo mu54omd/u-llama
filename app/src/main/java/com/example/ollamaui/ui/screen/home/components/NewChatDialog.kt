@@ -60,8 +60,8 @@ fun NewChatDialog(
                     colors = TextFieldDefaults.colors(
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
-                        focusedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                        unfocusedContainerColor = MaterialTheme.colorScheme.tertiaryContainer
+                        focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer
                     )
                 )
                 Spacer(modifier = Modifier.height(20.dp))
@@ -73,8 +73,8 @@ fun NewChatDialog(
                     colors = TextFieldDefaults.colors(
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
-                        focusedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                        unfocusedContainerColor = MaterialTheme.colorScheme.tertiaryContainer
+                        focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer
                     )
                 )
                 Spacer(modifier = Modifier.height(10.dp))

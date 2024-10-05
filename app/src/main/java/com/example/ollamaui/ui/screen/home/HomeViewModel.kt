@@ -36,7 +36,6 @@ class HomeViewModel @Inject constructor(
             initialValue = HomeStates()
         )
 
-
     private val _chatList = ollamaRepository.getChats().map { HomeListState(it) }
     val chatList = _chatList
         .stateIn(
@@ -100,8 +99,8 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             _homeState.update { it.copy(isModelListLoaded = false) }
             ollamaRepository.getOllamaStatus(baseUrl = homeState.value.ollamaBaseAddress, baseEndpoint = OLLAMA_BASE_ENDPOINT)
-                .onRight { response ->  _homeState.update { it.copy(ollamaStatus = response, statusError = null, stateThrowable = null) } }
-                .onLeft { error -> _homeState.update { it.copy(ollamaStatus = "", statusError = error.error.message, stateThrowable = error.t.message) } }
+                .onRight { response ->  _homeState.update { it.copy(ollamaStatus = response, statusError = null, statusThrowable = null) } }
+                .onLeft { error -> _homeState.update { it.copy(ollamaStatus = "", statusError = error.error.message, statusThrowable = error.t.message) } }
             ollamaRepository.getOllamaModelsList(baseUrl = homeState.value.ollamaBaseAddress, tagEndpoint = OLLAMA_LIST_ENDPOINT)
                 .onRight {
                         response ->

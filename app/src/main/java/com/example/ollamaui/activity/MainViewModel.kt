@@ -33,7 +33,6 @@ class MainViewModel @Inject constructor(
             _mainState.update {
                 it.copy(isOllamaAddressSet = true, ollamaAddress = url)
             }
-            Log.d("cTAG", "saveLocalSetting: ${mainState.value}")
         }
     }
 
@@ -50,7 +49,6 @@ class MainViewModel @Inject constructor(
                     isLocalSettingLoaded = true
                 )
             }
-            Log.d("cTAG", "loadLocalSetting: ${mainState.value}")
         }
     }
 }

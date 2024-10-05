@@ -55,7 +55,7 @@ fun ChatDialog(
                 .clickable {
                     isVisible = !isVisible
                 }
-                .background(color = if(message.isFromMe) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.tertiaryContainer)
+                .background(color = if(message.isFromMe) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.secondaryContainer)
                 .padding(16.dp)
         ) {
             Column(

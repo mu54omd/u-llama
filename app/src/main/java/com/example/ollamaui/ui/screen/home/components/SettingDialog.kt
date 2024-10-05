@@ -57,8 +57,8 @@ fun SettingDialog(
                     colors = TextFieldDefaults.colors(
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
-                        focusedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                        unfocusedContainerColor = MaterialTheme.colorScheme.tertiaryContainer
+                        focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer
                     )
                 )
                 Spacer(modifier = Modifier.height(20.dp))
@@ -71,7 +71,8 @@ fun SettingDialog(
                         onButtonClick = onAcceptClick,
                         icon = R.drawable.baseline_check_24,
                         buttonSize = 50,
-                        isButtonEnabled = httpValue.isNotEmpty()
+                        isButtonEnabled = httpValue.isNotEmpty(),
+                        containerColor = MaterialTheme.colorScheme.tertiaryContainer
                     )
                     Spacer(modifier = Modifier.width(30.dp))
                     CustomButton(
@@ -91,7 +92,7 @@ fun SettingDialog(
 private fun SettingDialogPreview() {
     OllamaUITheme {
         SettingDialog(
-            httpValue = "",
+            httpValue = "ss",
             onCloseClick = {},
             onAcceptClick = {},
             onValueChange = {}
