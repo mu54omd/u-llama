@@ -1,6 +1,7 @@
 package com.example.ollamaui.ui.screen.home.components
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -32,13 +33,23 @@ fun CustomFabButton(
             )
         }
         Spacer(Modifier.height(5.dp))
-        CustomButton(
-            description = "New Chat",
-            onButtonClick = onButtonClick,
-            icon = if(isModelListLoaded) { if(fabListVisible) R.drawable.baseline_expand_more_24 else R.drawable.baseline_add_24} else R.drawable.baseline_refresh_24,
-            iconSize = 40,
-            buttonSize = 60,
-        )
-
+        Crossfade(targetState = isModelListLoaded, label = "Fab Cross fade") { isModelListLoaded ->
+            when(isModelListLoaded){
+                true -> CustomButton(
+                        description = "New Chat",
+                        onButtonClick = onButtonClick,
+                        icon = if(fabListVisible) R.drawable.baseline_expand_more_24 else R.drawable.baseline_add_24,
+                        iconSize = 40,
+                        buttonSize = 60,
+                    )
+                false -> CustomButton(
+                        description = "New Chat",
+                        onButtonClick = onButtonClick,
+                        icon = R.drawable.baseline_refresh_24,
+                        iconSize = 40,
+                        buttonSize = 60,
+                    )
+            }
+        }
     }
 }

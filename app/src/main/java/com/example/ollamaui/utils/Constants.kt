@@ -17,4 +17,5 @@ object Constants {
 
     //
     val TOP_BAR_HEIGHT = 100.dp
+    const val USER_ID = -1
 }

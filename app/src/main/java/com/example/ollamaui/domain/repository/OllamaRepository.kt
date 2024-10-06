@@ -18,4 +18,5 @@ interface OllamaRepository{
     suspend fun updateDbItem(chatModel: ChatModel)
     fun getChats(): Flow<List<ChatModel>>
     suspend fun getChat(chatId: Int): ChatModel?
+    suspend fun getLastId(): Int
 }

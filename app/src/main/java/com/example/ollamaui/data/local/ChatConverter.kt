@@ -1,19 +1,19 @@
 package com.example.ollamaui.data.local
 
 import androidx.room.TypeConverter
-import com.example.ollamaui.domain.model.MessageModel
+import com.example.ollamaui.domain.model.MessagesModel
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
 class ChatConverter {
     private val gson = Gson()
     @TypeConverter
-    fun messageModelToString(messageModel: MessageModel):String{
-        return gson.toJson(messageModel)
+    fun messageModelToString(messagesModel: MessagesModel):String{
+        return gson.toJson(messagesModel)
     }
     @TypeConverter
-    fun stringToMessageModel(text: String):MessageModel{
-        return gson.fromJson(text, MessageModel::class.java)
+    fun stringToMessageModel(text: String):MessagesModel{
+        return gson.fromJson(text, MessagesModel::class.java)
     }
     @TypeConverter
     fun fromListToString(input: List<Int>):String{

@@ -69,7 +69,7 @@ fun ChatScreen(
                 )
         ) {
             Conversation(
-                messageModel = chatState.chatModel.chatMessages ,
+                messagesModel = chatState.chatModel.chatMessages ,
                 modifier = Modifier.weight(1f)
             )
             Column (

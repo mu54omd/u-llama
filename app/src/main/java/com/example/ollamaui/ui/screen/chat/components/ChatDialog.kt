@@ -2,9 +2,7 @@ package com.example.ollamaui.ui.screen.chat.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,17 +23,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ollamaui.domain.model.Author
-import com.example.ollamaui.domain.model.Message
+import com.example.ollamaui.domain.model.MessageModel
+import com.example.ollamaui.ui.common.isFromMe
 import com.example.ollamaui.ui.theme.OllamaUITheme
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.util.Date
 
 @Composable
 fun ChatDialog(
-    message: Message,
+    messageModel: MessageModel,
     modifier: Modifier = Modifier) {
     var isVisible by remember { mutableStateOf(false) }
+    val isFromMe = isFromMe(messageModel)
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -43,25 +40,25 @@ fun ChatDialog(
     ) {
         Box(
             modifier = Modifier
-                .align(if (message.isFromMe) Alignment.End else Alignment.Start)
+                .align(if (isFromMe(messageModel)) Alignment.End else Alignment.Start)
                 .clip(
                     RoundedCornerShape(
                         topStart = 48f,
                         topEnd = 48f,
-                        bottomStart = if (message.isFromMe) 48f else 0f,
-                        bottomEnd = if (message.isFromMe) 0f else 48f
+                        bottomStart = if (isFromMe) 48f else 0f,
+                        bottomEnd = if (isFromMe) 0f else 48f
                     )
                 )
                 .clickable {
                     isVisible = !isVisible
                 }
-                .background(color = if(message.isFromMe) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.secondaryContainer)
+                .background(color = if(isFromMe) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.secondaryContainer)
                 .padding(16.dp)
         ) {
             Column(
-                horizontalAlignment = if(message.isFromMe) Alignment.End else Alignment.Start
+                horizontalAlignment = if(isFromMe) Alignment.End else Alignment.Start
             ) {
-                Text(text = message.text)
+                Text(text = messageModel.text)
                 AnimatedVisibility(
                     visible = isVisible
                 ) {
@@ -71,7 +68,7 @@ fun ChatDialog(
                         )
                     ) {
                         Text(
-                            text = message.author.name,
+                            text = messageModel.author.name,
                             style = MaterialTheme.typography.bodySmall,
                             modifier = Modifier.padding(5.dp)
                         )
@@ -88,7 +85,7 @@ private fun ChatDialogPreview() {
     OllamaUITheme {
         Column {
             ChatDialog(
-                message = Message(
+                messageModel = MessageModel(
                     text = "Hi. How are you???",
                     author = Author(
                         id = 1,
@@ -97,10 +94,10 @@ private fun ChatDialogPreview() {
                 )
             )
             ChatDialog(
-                message = Message(
+                messageModel = MessageModel(
                     text = "Hello! I'm fine.",
                     author = Author(
-                        id = 0,
+                        id = -1,
                         name = "Musashi"
                     )
                 )

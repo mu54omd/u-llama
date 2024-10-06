@@ -10,16 +10,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.ollamaui.domain.model.MessageModel
+import com.example.ollamaui.domain.model.MessagesModel
 
 @Composable
 fun Conversation(
-    messageModel: MessageModel,
+    messagesModel: MessagesModel,
     modifier: Modifier = Modifier,
 ) {
     val listState = rememberLazyListState()
-    LaunchedEffect(messageModel.messages.size) {
-        listState.animateScrollToItem(messageModel.messages.size)
+    LaunchedEffect(messagesModel.messageModels.size) {
+        listState.animateScrollToItem(messagesModel.messageModels.size)
     }
     LazyColumn(
         modifier = modifier.padding(bottom = 10.dp),
@@ -28,10 +28,10 @@ fun Conversation(
         contentPadding = PaddingValues(start = 10.dp, end = 10.dp)
     ) {
         items(
-            items = messageModel.messages,
+            items = messagesModel.messageModels,
         ){ message ->
             ChatDialog(
-                message = message,
+                messageModel = message,
                 modifier = Modifier.animateItem()
             )
         }

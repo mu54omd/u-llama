@@ -51,4 +51,8 @@ class OllamaRepositoryImpl @Inject constructor(
     override suspend fun getChat(chatId: Int): ChatModel? {
         return chatDao.getChat(chatId)
     }
+
+    override suspend fun getLastId(): Int {
+        return chatDao.getLastId()
+    }
 }

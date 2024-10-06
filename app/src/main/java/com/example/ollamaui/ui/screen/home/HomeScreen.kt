@@ -66,6 +66,7 @@ fun HomeScreen(
     val selectedChats = remember { mutableStateListOf<ChatModel>() }
     val isSelectedChatsEmpty by remember(selectedChats) { derivedStateOf { selectedChats.isEmpty() } }
     val activity = (LocalContext.current as? Activity)
+    val maxChar = 25
 
 
     Scaffold(
@@ -141,9 +142,10 @@ fun HomeScreen(
             ) {
                 NewChatDialog(
                     yourName = yourName,
-                    onYourNameChange = { yourName = it },
+                    maxChar = maxChar,
+                    onYourNameChange = { if(it.length<=maxChar) yourName = it },
                     chatTitle = chatTitle,
-                    onChatTitleChange = { chatTitle = it },
+                    onChatTitleChange = { if(it.length<=maxChar) chatTitle = it },
                     onCloseClick = { isFabDialogVisible = false},
                     onAcceptClick = {
                         homeViewModel.addNewChat(chatTitle, yourName, avatarList.random())

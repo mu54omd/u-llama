@@ -4,11 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ollamaui.domain.model.Author
 import com.example.ollamaui.domain.model.ChatModel
-import com.example.ollamaui.domain.model.EmptyTagResponse
-import com.example.ollamaui.domain.model.MessageModel
+import com.example.ollamaui.domain.model.MessagesModel
 import com.example.ollamaui.domain.repository.OllamaRepository
-import com.example.ollamaui.utils.Constants.OLLAMA_BASE_ENDPOINT
-import com.example.ollamaui.utils.Constants.OLLAMA_LIST_ENDPOINT
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -55,18 +52,17 @@ class HomeViewModel @Inject constructor(
 
 
     fun addNewChat(chatTitle: String, yourName: String, chatIcon: Int){
-        val id = Random.nextInt()
-        val receiverAuthor = Author(id = id, name = homeState.value.selectedModel)
-        val chatModel = ChatModel(
-            chatId = id,
-            chatTitle = chatTitle,
-            modelName = homeState.value.selectedModel,
-            chatIcon = chatIcon,
-            chatMessages = MessageModel(messages = emptyList(), receiver = receiverAuthor),
-            context = emptyList(),
-            yourName = yourName
-        )
         viewModelScope.launch {
+            val id = ollamaRepository.getLastId().plus(1)
+            val receiverAuthor = Author(id = id, name = homeState.value.selectedModel)
+            val chatModel = ChatModel(
+                chatTitle = chatTitle,
+                modelName = homeState.value.selectedModel,
+                chatIcon = chatIcon,
+                chatMessages = MessagesModel(messageModels = emptyList(), receiver = receiverAuthor),
+                context = emptyList(),
+                yourName = yourName
+            )
             ollamaRepository.insertToDb(chatModel)
         }
     }
