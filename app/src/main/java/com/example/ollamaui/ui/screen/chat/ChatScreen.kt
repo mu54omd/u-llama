@@ -75,10 +75,10 @@ fun ChatScreen(
             Column (
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
-                modifier = Modifier.height(30.dp)
+                modifier = Modifier.height(20.dp)
             ) {
                 AnimatedVisibility(visible = chatState.isResponding) {
-                    LinearProgressIndicator(modifier = Modifier.width(25.dp))
+                    LinearProgressIndicator(modifier = Modifier.width(30.dp))
                 }
                 AnimatedVisibility(visible = chatState.chatError != null) {
                     CustomButton(
@@ -88,7 +88,7 @@ fun ChatScreen(
                     )
                 }
             }
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(2.dp))
         }
 
         BackHandler {

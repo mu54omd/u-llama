@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.example.ollamaui.activity.BaseAddress
 import com.example.ollamaui.domain.preferences.LocalUserManager
 import com.example.ollamaui.utils.Constants
 import com.example.ollamaui.utils.Constants.IS_OLLAMA_ADDRESS_SET
@@ -25,15 +26,11 @@ class LocalUserManagerImpl (
         }
     }
 
-    override fun readOllamaUrl(): Flow<String> {
+    override fun readOllamaUrl(): Flow<BaseAddress> {
         return context.dataStore.data.map { preferences ->
-            preferences[PreferencesKeys.OLLAMA_ADDRESS]?:"http://localhost:11434"
-        }
-    }
-
-    override fun readOllamaAddressStatus(): Flow<Boolean> {
-        return context.dataStore.data.map { preferences ->
-            preferences[PreferencesKeys.IS_OLLAMA_ADDRESS_SET]?:false
+            val address = preferences[PreferencesKeys.OLLAMA_ADDRESS]?:"http://localhost:11434"
+            val isSet = preferences[PreferencesKeys.IS_OLLAMA_ADDRESS_SET]?:false
+            BaseAddress(address, isSet)
         }
     }
 

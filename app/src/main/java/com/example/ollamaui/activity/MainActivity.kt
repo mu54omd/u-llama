@@ -4,14 +4,20 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.ollamaui.ui.screen.chat.ChatScreen
-import com.example.ollamaui.ui.screen.home.HomeScreen
+import com.example.ollamaui.ui.screen.loading.LoadingScreen
 import com.example.ollamaui.ui.screen.nav.AppNavigation
 import com.example.ollamaui.ui.theme.OllamaUITheme
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.HiltAndroidApp
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -21,14 +27,16 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val mainViewModel: MainViewModel = hiltViewModel()
-            val mainState = mainViewModel.mainState.collectAsStateWithLifecycle()
+            val mainState = mainViewModel.mainState.collectAsStateWithLifecycle().value
+            val baseAddress = mainViewModel.baseAddress.collectAsStateWithLifecycle().value
             OllamaUITheme {
                 AppNavigation(
-                    isOllamaAddressSet = mainState.value.isOllamaAddressSet,
-                    isLocalSettingLoaded = mainState.value.isLocalSettingLoaded,
-                    ollamaAddress = mainState.value.ollamaAddress,
-                    onSaveOllamaAddress = { mainViewModel.saveLocalSetting(it) }
+                    mainViewModel = mainViewModel,
+                    mainState = mainState,
+                    isOllamaAddressSet = baseAddress.isOllamaAddressSet,
+                    ollamaAddress = baseAddress.ollamaBaseAddress,
                 )
+
             }
         }
     }

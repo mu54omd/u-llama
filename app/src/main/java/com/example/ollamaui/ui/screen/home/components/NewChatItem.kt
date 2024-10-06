@@ -2,12 +2,7 @@ package com.example.ollamaui.ui.screen.home.components
 
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.EaseInOut
-import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateIntAsState
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -22,13 +17,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,7 +48,7 @@ fun NewChatItem(
 ) {
 
     val animatedColor by animateColorAsState(
-        if(isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.secondaryContainer,
+        if(isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
         label = "Animated Color",
     )
     val animatedSize by animateIntAsState(
@@ -99,10 +92,11 @@ fun NewChatItem(
                     .size(75.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Image(
+                Icon(
                     painter = painterResource(chatImage),
-                    contentDescription = chatTitle,
-                    modifier = Modifier.fillMaxSize()
+                    contentDescription = "Chat Title",
+                    modifier = Modifier.fillMaxSize(),
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
             }
             Spacer(modifier = Modifier.width(10.dp))
@@ -145,7 +139,7 @@ private fun NewChatItemPreview() {
             onItemClick = {},
             onItemLongPress = {},
             onSelectedItemClick = {},
-            isSelected = true
+            isSelected = false
         )
     }
 }

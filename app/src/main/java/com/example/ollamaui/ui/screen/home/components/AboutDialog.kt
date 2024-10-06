@@ -1,5 +1,6 @@
 package com.example.ollamaui.ui.screen.home.components
 
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,22 +30,22 @@ fun AboutDialog(
             modifier = modifier
             .clip(shape = MaterialTheme.shapes.large)
             .size(300.dp, 200.dp)
-            .background(color = MaterialTheme.colorScheme.primaryContainer),
+            .background(color = MaterialTheme.colorScheme.surfaceVariant),
             contentAlignment = Alignment.Center
         ){
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = "Ollama UI", fontWeight = FontWeight.Bold)
-                Text(text = "A simple interface for Ollama")
-                Text(text = "Version: 1.0.0")
+                Text(text = "Ollama UI", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(text = "A simple interface for Ollama", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(text = "Version: 1.0.0", color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun AboutDialogPreview() {
     OllamaUITheme {

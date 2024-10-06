@@ -1,6 +1,7 @@
 package com.example.ollamaui.ui.screen.chat.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -8,15 +9,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ollamaui.R
 import com.example.ollamaui.ui.screen.common.CustomButton
+import com.example.ollamaui.ui.theme.OllamaUITheme
 
 @Composable
 fun ChatBottomBar(
@@ -32,10 +37,14 @@ fun ChatBottomBar(
         modifier = modifier
             .fillMaxWidth()
             .background(color = MaterialTheme.colorScheme.background)
+            .padding(start = 5.dp, end = 5.dp, top = 0.dp, bottom = 10.dp)
             .navigationBarsPadding()
     ) {
+        HorizontalDivider(thickness = 1.dp)
         Row(
-            modifier = modifier.padding(start = 10.dp, end = 20.dp, top = 10.dp)
+            horizontalArrangement = Arrangement.spacedBy(2.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = modifier.fillMaxWidth().padding(top = 10.dp)
         ) {
             CustomButton(
                 description = "Attach Button",
@@ -44,7 +53,6 @@ fun ChatBottomBar(
                 iconSize = 25,
                 onButtonClick = onAttachClick
             )
-            Spacer(modifier = Modifier.width(5.dp))
             TextField(
                 value = textValue,
                 onValueChange = onValueChange,
@@ -67,7 +75,6 @@ fun ChatBottomBar(
                 modifier = Modifier.weight(1f),
                 maxLines = 5
                 )
-            Spacer(modifier = Modifier.width(10.dp))
             CustomButton(
                 description = "Send Button",
                 icon = R.drawable.baseline_send_24,
@@ -78,4 +85,20 @@ fun ChatBottomBar(
             )
         }
     }
+}
+
+@Preview
+@Composable
+private fun ChatBottomBarPreview() {
+    OllamaUITheme {
+        ChatBottomBar(
+            textValue = "",
+            onValueChange = {},
+            onAttachClick = {},
+            onSendClick = {},
+            onClearClick = {},
+            isModelSelected = true
+        )
+    }
+    
 }

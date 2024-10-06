@@ -38,7 +38,7 @@ fun CustomDropUpMenu(
         modifier = modifier
             .size(width = width.dp, height = 150.dp)
             .clip(shape = MaterialTheme.shapes.large)
-            .background(color = MaterialTheme.colorScheme.secondaryContainer)
+            .background(color = MaterialTheme.colorScheme.surfaceContainer)
     ) {
         Column(
             verticalArrangement = Arrangement.Center,

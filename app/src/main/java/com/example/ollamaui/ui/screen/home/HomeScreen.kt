@@ -4,18 +4,12 @@ import android.app.Activity
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -26,9 +20,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.example.ollamaui.R
+import com.example.ollamaui.activity.MainViewModel
 import com.example.ollamaui.domain.model.ChatModel
 import com.example.ollamaui.ui.screen.home.components.AboutDialog
 import com.example.ollamaui.ui.screen.home.components.CustomFabButton
@@ -43,11 +36,17 @@ import com.example.ollamaui.ui.screen.home.components.SettingDialog
 fun HomeScreen(
     onChatClick: (ChatModel) -> Unit,
     homeViewModel: HomeViewModel,
+    mainViewModel: MainViewModel,
     homeState: HomeStates,
     homeListState: HomeListState,
     isOllamaAddressSet: Boolean,
     ollamaAddress: String,
     onSaveOllamaAddressClick: (String) -> Unit,
+    isModelListLoaded: Boolean,
+    modelList: List<String>,
+    tagError: Int?,
+    statusError: Int?,
+    statusThrowable: String?
 ) {
 
     var fabListVisible by remember { mutableStateOf(false) }
@@ -85,15 +84,18 @@ fun HomeScreen(
                             }
                             selectedChats.clear()
                         },
+                        onDeselectClick = {
+                            selectedChats.clear()
+                        },
                         isSelectedChatsEmpty = isSelectedChatsEmpty
                     )
                  },
         bottomBar = {},
         floatingActionButton = {
             CustomFabButton(
-                isModelListLoaded = homeState.isModelListLoaded,
+                isModelListLoaded = isModelListLoaded,
                 fabListVisible = fabListVisible,
-                modelList = homeState.modelList,
+                modelList = modelList,
                 onItemClick = { item ->
                     fabListVisible = false
                     homeViewModel.selectOllamaModel(item)
@@ -102,8 +104,8 @@ fun HomeScreen(
                     isFabDialogVisible = true
                               },
                 onButtonClick = {
-                    if(!homeState.isModelListLoaded){
-                        homeViewModel.refresh()
+                    if(!isModelListLoaded){
+                        mainViewModel.refresh()
                     }
                     else
                     fabListVisible = !fabListVisible
@@ -118,12 +120,16 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ){
-            if (!homeState.isModelListLoaded){
+            if(tagError != null){
                 NetworkErrorDialog(
-                    statusError = homeState.statusError,
-                    statusThrowable = homeState.statusThrowable,
-                    onSettingClick = { isSettingDialogVisible = true },
-                    onRetryClick = { homeViewModel.refresh() },
+                    statusError = statusError,
+                    statusThrowable = statusThrowable,
+                    onSettingClick = {
+                        isSettingDialogVisible = true
+                                     },
+                    onRetryClick = {
+                        mainViewModel.refresh()
+                                   },
                     onCloseClick = { activity?.finish() }
                 )
             }
@@ -157,7 +163,7 @@ fun HomeScreen(
                     httpValue = httpValue,
                     onAcceptClick = {
                         onSaveOllamaAddressClick(httpValue)
-                        homeViewModel.refresh()
+                        mainViewModel.refresh()
                         isSettingDialogVisible = false
                     },
                     onCloseClick = { isSettingDialogVisible = false},

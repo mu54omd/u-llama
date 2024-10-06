@@ -41,7 +41,8 @@ fun CustomButton(
         Icon(
             painter = painterResource(icon),
             contentDescription = description,
-            modifier = Modifier.size(iconSize.dp)
+            modifier = Modifier.size(iconSize.dp),
+            tint = MaterialTheme.colorScheme.onBackground
         )
     }
 }

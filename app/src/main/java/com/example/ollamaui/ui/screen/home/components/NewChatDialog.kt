@@ -1,5 +1,6 @@
 package com.example.ollamaui.ui.screen.home.components
 
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -44,7 +45,7 @@ fun NewChatDialog(
             modifier = modifier
                 .clip(shape = MaterialTheme.shapes.large)
                 .size(300.dp, 250.dp)
-                .background(color = MaterialTheme.colorScheme.primaryContainer)
+                .background(color = MaterialTheme.colorScheme.surfaceVariant)
         ) {
             Column(
                 verticalArrangement = Arrangement.Center,
@@ -87,7 +88,8 @@ fun NewChatDialog(
                         onButtonClick = onAcceptClick,
                         icon = R.drawable.baseline_check_24,
                         buttonSize = 50,
-                        isButtonEnabled = chatTitle.isNotEmpty()
+                        isButtonEnabled = chatTitle.isNotEmpty(),
+                        containerColor = MaterialTheme.colorScheme.tertiaryContainer
                     )
                     Spacer(modifier = Modifier.width(30.dp))
                     CustomButton(
@@ -95,6 +97,7 @@ fun NewChatDialog(
                         onButtonClick = onCloseClick,
                         icon = R.drawable.baseline_clear_24,
                         buttonSize = 50,
+                        containerColor = MaterialTheme.colorScheme.errorContainer
                     )
                 }
             }
@@ -102,7 +105,7 @@ fun NewChatDialog(
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun NewChatDialogPreview() {
     OllamaUITheme {

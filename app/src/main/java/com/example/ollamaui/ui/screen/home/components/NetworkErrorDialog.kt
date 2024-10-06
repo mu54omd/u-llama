@@ -1,24 +1,21 @@
 package com.example.ollamaui.ui.screen.home.components
 
+import android.content.res.Configuration
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.ollamaui.R
 import com.example.ollamaui.ui.screen.common.CustomButton
+import com.example.ollamaui.ui.screen.common.shimmerEffect
 import com.example.ollamaui.ui.theme.OllamaUITheme
 
 @Composable
@@ -49,7 +47,7 @@ fun NetworkErrorDialog(
             modifier = modifier
                 .clip(shape = MaterialTheme.shapes.large)
                 .size(300.dp, 200.dp)
-                .background(color = MaterialTheme.colorScheme.primaryContainer),
+                .background(color = MaterialTheme.colorScheme.surfaceVariant),
             contentAlignment = Alignment.Center
         ){
             Column(
@@ -68,9 +66,36 @@ fun NetworkErrorDialog(
                     modifier = Modifier.fillMaxWidth().padding(2.dp)
                 ) {
                     Text("Type", fontWeight = FontWeight.Bold)
-                    statusError?.let { Text(text = stringResource(it), textAlign = TextAlign.Center) }
+                    if(statusError == null){
+                        Box(
+                            modifier = Modifier
+                                .clip(shape = MaterialTheme.shapes.large)
+                                .background(color = MaterialTheme.colorScheme.surfaceContainer)
+                                .size(width = 150.dp, height = 20.dp)
+                                .shimmerEffect()
+                        )
+                    }else {
+                            Text(
+                                text = stringResource(statusError),
+                                textAlign = TextAlign.Center
+                            )
+                    }
                     Text("Details", fontWeight = FontWeight.Bold)
-                    statusThrowable?.let{ Text(text = it, style = MaterialTheme.typography.bodySmall, textAlign = TextAlign.Center) }
+                    if(statusThrowable == null){
+                        Box(
+                            modifier = Modifier
+                                .clip(shape = MaterialTheme.shapes.large)
+                                .background(color = MaterialTheme.colorScheme.surfaceContainer)
+                                .size(width = 150.dp, height = 20.dp)
+                                .shimmerEffect()
+                        )
+                    }else {
+                        Text(
+                            text = statusThrowable,
+                            style = MaterialTheme.typography.bodySmall,
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
                 Spacer(modifier = Modifier.height(2.dp))
                 Row(
@@ -105,13 +130,13 @@ fun NetworkErrorDialog(
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun NetworkErrorDialogPreview() {
     OllamaUITheme {
         NetworkErrorDialog(
-            statusError = R.string.network_error,
-            statusThrowable = "Error 404. Not found!",
+            statusError = null,
+            statusThrowable = null,
             onSettingClick = {},
             onRetryClick = {},
             onCloseClick = {}

@@ -2,18 +2,13 @@ package com.example.ollamaui.ui.screen.home.components
 
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,7 +29,8 @@ import com.example.ollamaui.ui.theme.OllamaUITheme
 @Composable
 fun LogoTitle(
     modifier: Modifier = Modifier,
-    @DrawableRes logo: Int,
+    @DrawableRes lightLogo: Int,
+    @DrawableRes darkLogo: Int,
     text: String,
 ) {
     var isVisible by remember { mutableStateOf(false) }
@@ -46,11 +42,11 @@ fun LogoTitle(
 
     ) {
             Image(
-                painter = painterResource(logo),
+                painter = painterResource(if(isSystemInDarkTheme()) darkLogo else lightLogo),
                 contentDescription = "Logo Image",
                 modifier = Modifier
                     .size(width = 96.dp, height = 64.dp)
-                    .pointerInput(isVisible){detectTapGestures { isVisible = !isVisible }}
+                    .pointerInput(isVisible){detectTapGestures { isVisible = !isVisible }},
             )
         AnimatedVisibility(visible = isVisible) {
             Text(
@@ -66,7 +62,8 @@ fun LogoTitle(
 private fun LogoTitlePreview() {
     OllamaUITheme {
         LogoTitle(
-            logo = R.drawable.icon,
+            lightLogo = R.drawable.icon_light,
+            darkLogo = R.drawable.icon_dark,
             text = "Title Logo"
         )
     }

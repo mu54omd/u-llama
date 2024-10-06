@@ -6,11 +6,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -18,6 +13,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.ollamaui.activity.MainStates
+import com.example.ollamaui.activity.MainViewModel
 import com.example.ollamaui.ui.screen.chat.ChatScreen
 import com.example.ollamaui.ui.screen.chat.ChatViewModel
 import com.example.ollamaui.ui.screen.home.HomeScreen
@@ -26,10 +23,10 @@ import com.example.ollamaui.ui.screen.loading.LoadingScreen
 
 @Composable
 fun AppNavigation(
+    mainViewModel: MainViewModel,
+    mainState: MainStates,
     isOllamaAddressSet: Boolean,
-    isLocalSettingLoaded: Boolean,
     ollamaAddress: String,
-    onSaveOllamaAddress: (String) -> Unit
 ) {
     val navController = rememberNavController()
     val homeViewModel: HomeViewModel = hiltViewModel()
@@ -57,6 +54,7 @@ fun AppNavigation(
             composable(route = Screens.HomeScreen.route) {
                 HomeScreen(
                     homeViewModel = homeViewModel,
+                    mainViewModel = mainViewModel,
                     homeState = homeState,
                     homeListState = homeListState,
                     onChatClick = {
@@ -69,9 +67,13 @@ fun AppNavigation(
                     isOllamaAddressSet = isOllamaAddressSet,
                     ollamaAddress = ollamaAddress,
                     onSaveOllamaAddressClick = {
-                        onSaveOllamaAddress(it)
-                        homeViewModel.setOllamaBaseAddress(url = it)
-                    }
+                        mainViewModel.saveLocalSetting(it)
+                    },
+                    isModelListLoaded = mainState.isModelListLoaded,
+                    modelList = mainState.modelList,
+                    tagError = mainState.tagError,
+                    statusError = mainState.statusError,
+                    statusThrowable = mainState.statusThrowable,
                 )
             }
 
@@ -92,9 +94,8 @@ fun AppNavigation(
 
             composable(route = Screens.LoadingScreen.route){
                 LoadingScreen(
-                    isLocalSettingLoaded = isLocalSettingLoaded,
+                    isLocalSettingLoaded = (ollamaAddress != "") && isOllamaAddressSet,
                     onDispose = {
-                        homeViewModel.setOllamaBaseAddress(ollamaAddress)
                         navigateToTab(navController = navController , route = Screens.HomeScreen.route)
                     }
                 )
@@ -106,13 +107,6 @@ fun AppNavigation(
 }
 private fun navigateToTab(navController: NavController, route: String){
     navController.navigate(route){
-//        navController.graph.startDestinationRoute?.let { homeScreen ->
-//            popUpTo(homeScreen){
-//                saveState = true
-//            }
-//            restoreState = true
-//            launchSingleTop = true
-//        }
         popUpTo(0)
     }
 }

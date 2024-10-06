@@ -28,7 +28,7 @@ class HomeViewModel @Inject constructor(
     private val _homeState = MutableStateFlow(HomeStates())
     val homeState = _homeState
         .onStart {
-            ollamaStatus()
+
         }
         .stateIn(
             viewModelScope,
@@ -52,14 +52,7 @@ class HomeViewModel @Inject constructor(
         _homeState.update { it.copy(selectedModel = modelName) }
     }
 
-    fun refresh(){
-        ollamaStatus()
-    }
 
-    fun setOllamaBaseAddress(url: String){
-        _homeState.update { it.copy(ollamaBaseAddress = url) }
-        refresh()
-    }
 
     fun addNewChat(chatTitle: String, yourName: String, chatIcon: Int){
         val id = Random.nextInt()
@@ -94,20 +87,5 @@ class HomeViewModel @Inject constructor(
     /*---------------------------------------------------------------------------------------------*/
     /*---------------------------------------------------------------------------------------------*/
     /*---------------------------------------------------------------------------------------------*/
-    private fun ollamaStatus(){
-        val modelList = mutableListOf<String>()
-        viewModelScope.launch {
-            _homeState.update { it.copy(isModelListLoaded = false) }
-            ollamaRepository.getOllamaStatus(baseUrl = homeState.value.ollamaBaseAddress, baseEndpoint = OLLAMA_BASE_ENDPOINT)
-                .onRight { response ->  _homeState.update { it.copy(ollamaStatus = response, statusError = null, statusThrowable = null) } }
-                .onLeft { error -> _homeState.update { it.copy(ollamaStatus = "", statusError = error.error.message, statusThrowable = error.t.message) } }
-            ollamaRepository.getOllamaModelsList(baseUrl = homeState.value.ollamaBaseAddress, tagEndpoint = OLLAMA_LIST_ENDPOINT)
-                .onRight {
-                        response ->
-                    response.models.forEach { model -> modelList.add(model.model) }
-                    _homeState.update { it.copy(tagResponse = response, modelList = modelList, isModelListLoaded = true, tagError = null, tagThrowable = null) }
-                }
-                .onLeft { error -> _homeState.update { it.copy(tagResponse = EmptyTagResponse.emptyTagResponse, tagError = error.error.message, tagThrowable = error.t.message) } }
-        }
-    }
+
 }

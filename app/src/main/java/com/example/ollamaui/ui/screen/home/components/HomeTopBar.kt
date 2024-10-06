@@ -3,8 +3,10 @@ package com.example.ollamaui.ui.screen.home.components
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -27,6 +29,7 @@ fun HomeTopBar(
     onSettingClick: () -> Unit,
     onAboutClick: () -> Unit,
     onDeleteClick: () -> Unit,
+    onDeselectClick: () -> Unit,
     isSelectedChatsEmpty: Boolean
 ) {
     Column {
@@ -46,7 +49,8 @@ fun HomeTopBar(
                 containerColor = MaterialTheme.colorScheme.background
             )
             LogoTitle(
-                logo = R.drawable.icon,
+                lightLogo = R.drawable.icon_light,
+                darkLogo = R.drawable.icon_dark,
                 text = "Ollama UI",
                 modifier = Modifier.align(Alignment.Center)
             )
@@ -64,13 +68,25 @@ fun HomeTopBar(
                 }
 
                 AnimatedVisibility(visible = !isSelectedChatsEmpty) {
-                    CustomButton(
-                        description = "Delete Button",
-                        onButtonClick = onDeleteClick,
-                        icon = R.drawable.baseline_delete_outline_24,
-                        buttonSize = 50,
-                        containerColor = MaterialTheme.colorScheme.background
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        CustomButton(
+                            description = "Deselect Button",
+                            onButtonClick = onDeselectClick,
+                            icon = R.drawable.baseline_deselect_24,
+                            buttonSize = 50,
+                            containerColor = MaterialTheme.colorScheme.background
+                        )
+                        CustomButton(
+                            description = "Delete Button",
+                            onButtonClick = onDeleteClick,
+                            icon = R.drawable.baseline_delete_outline_24,
+                            buttonSize = 50,
+                            containerColor = MaterialTheme.colorScheme.background
+                        )
+                    }
                 }
             }
         }
@@ -86,7 +102,8 @@ private fun HomeTopBarPreview() {
             onAboutClick = {},
             onSettingClick = {},
             onDeleteClick = {},
-            isSelectedChatsEmpty = true
+            onDeselectClick = {},
+            isSelectedChatsEmpty = false
         )
     }
 }

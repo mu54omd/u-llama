@@ -27,8 +27,13 @@ fun Conversation(
         state = listState,
         contentPadding = PaddingValues(start = 10.dp, end = 10.dp)
     ) {
-        items(messageModel.messages){ message ->
-            ChatDialog(message)
+        items(
+            items = messageModel.messages,
+        ){ message ->
+            ChatDialog(
+                message = message,
+                modifier = Modifier.animateItem()
+            )
         }
     }
 }

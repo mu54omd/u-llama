@@ -28,7 +28,8 @@ fun ChatTitle(
 
         Text(
             text = text,
-            style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
+            style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+            color = MaterialTheme.colorScheme.onBackground
         )
     }
 

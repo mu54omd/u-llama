@@ -1,6 +1,5 @@
 package com.example.ollamaui.ui.screen.chat
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ollamaui.domain.model.Author
@@ -13,9 +12,6 @@ import com.example.ollamaui.domain.model.MessageModel
 import com.example.ollamaui.domain.repository.OllamaRepository
 import com.example.ollamaui.utils.Constants.OLLAMA_CHAT_ENDPOINT
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -105,27 +101,8 @@ class ChatViewModel @Inject constructor(
             ).onRight { response ->
                 messages.add(Message(text = response.response, author = Author(id = oldChatModel.chatId, name = oldChatModel.modelName)))
                 context.addAll(response.context)
-                if(chatState.value.isChatScreenOpen && chatState.value.isResponding){
-                    _chatState.update { it.copy(
-                        chatModel = ChatModel(
-                                databaseId = oldChatModel.databaseId,
-                                chatId = oldChatModel.chatId,
-                                chatIcon = oldChatModel.chatIcon,
-                                chatTitle = oldChatModel.chatTitle,
-                                chatMessages = MessageModel( messages = messages, receiver = Author(id = oldChatModel.chatId, name = oldChatModel.modelName)),
-                                context = context,
-                                modelName = oldChatModel.modelName,
-                                yourName = oldChatModel.yourName
-                            ),
-                        chatResponse = response,
-                        isResponding = false,
-                        chatError = null
-                        )
-                    }
-                }else{
-                    Log.d("cTAG", "UploadChatToDatabase:\n${response.response}")
-                    uploadChatToDatabase(
-                        chatModel = ChatModel(
+                _chatState.update { it.copy(
+                    chatModel = ChatModel(
                             databaseId = oldChatModel.databaseId,
                             chatId = oldChatModel.chatId,
                             chatIcon = oldChatModel.chatIcon,
@@ -135,10 +112,24 @@ class ChatViewModel @Inject constructor(
                             modelName = oldChatModel.modelName,
                             yourName = oldChatModel.yourName
                         ),
+                    chatResponse = response,
+                    isResponding = false,
+                    chatError = null
                     )
                 }
+                uploadChatToDatabase(
+                    chatModel = ChatModel(
+                        databaseId = oldChatModel.databaseId,
+                        chatId = oldChatModel.chatId,
+                        chatIcon = oldChatModel.chatIcon,
+                        chatTitle = oldChatModel.chatTitle,
+                        chatMessages = MessageModel( messages = messages, receiver = Author(id = oldChatModel.chatId, name = oldChatModel.modelName)),
+                        context = context,
+                        modelName = oldChatModel.modelName,
+                        yourName = oldChatModel.yourName
+                    ),
+                )
             }.onLeft { error ->
-
                 _chatState.update {
                     it.copy(
                         chatError = error.error.message,

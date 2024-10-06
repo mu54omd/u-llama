@@ -1,5 +1,6 @@
 package com.example.ollamaui.ui.screen.home.components
 
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,7 +39,7 @@ fun DeleteDialog(
             modifier = modifier
                 .clip(shape = MaterialTheme.shapes.large)
                 .size(200.dp, 175.dp)
-                .background(color = MaterialTheme.colorScheme.primaryContainer),
+                .background(color = MaterialTheme.colorScheme.surfaceVariant),
             contentAlignment = Alignment.Center
         ){
             Column(
@@ -46,10 +47,10 @@ fun DeleteDialog(
                 horizontalAlignment = Alignment.CenterHorizontally,
 
             ) {
-                Text(text = "Delete confirmation", fontWeight = FontWeight.Bold)
+                Text(text = "Delete confirmation", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(modifier = Modifier.height(20.dp))
-                Text(text = "Chat title: $chatTitle", style = MaterialTheme.typography.bodySmall)
-                Text(text = "Author: $yourName", style = MaterialTheme.typography.bodySmall)
+                Text(text = "Chat title: $chatTitle", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(text = "Author: $yourName", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
 
                 Spacer(modifier = Modifier.height(20.dp))
                 Row(
@@ -76,7 +77,7 @@ fun DeleteDialog(
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun DeleteDialogPreview() {
     OllamaUITheme {

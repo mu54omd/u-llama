@@ -1,5 +1,6 @@
 package com.example.ollamaui.ui.screen.home.components
 
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -42,7 +43,7 @@ fun SettingDialog(
             modifier = modifier
                 .clip(shape = MaterialTheme.shapes.large)
                 .size(300.dp, 200.dp)
-                .background(color = MaterialTheme.colorScheme.primaryContainer),
+                .background(color = MaterialTheme.colorScheme.surfaceVariant),
             contentAlignment = Alignment.Center
         ){
             Column(
@@ -80,6 +81,7 @@ fun SettingDialog(
                         onButtonClick = onCloseClick,
                         icon = R.drawable.baseline_clear_24,
                         buttonSize = 50,
+                        containerColor = MaterialTheme.colorScheme.errorContainer
                     )
                 }
             }
@@ -87,7 +89,7 @@ fun SettingDialog(
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun SettingDialogPreview() {
     OllamaUITheme {
