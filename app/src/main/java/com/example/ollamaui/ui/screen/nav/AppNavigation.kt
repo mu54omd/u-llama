@@ -27,6 +27,7 @@ fun AppNavigation(
     mainState: MainStates,
     isOllamaAddressSet: Boolean,
     ollamaAddress: String,
+    isLocalSettingsLoaded: Boolean
 ) {
     val navController = rememberNavController()
     val homeViewModel: HomeViewModel = hiltViewModel()
@@ -94,7 +95,7 @@ fun AppNavigation(
 
             composable(route = Screens.LoadingScreen.route){
                 LoadingScreen(
-                    isLocalSettingLoaded = (ollamaAddress != "") && isOllamaAddressSet,
+                    isLocalSettingLoaded = isLocalSettingsLoaded,
                     onDispose = {
                         navigateToTab(navController = navController , route = Screens.HomeScreen.route)
                     }

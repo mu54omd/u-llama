@@ -27,6 +27,7 @@ class MainViewModel @Inject constructor(
         BaseAddress(
             ollamaBaseAddress = it.ollamaBaseAddress,
             isOllamaAddressSet = it.isOllamaAddressSet,
+            isLocalSettingsLoaded = true
         )
     }
     val baseAddress = _baseAddress

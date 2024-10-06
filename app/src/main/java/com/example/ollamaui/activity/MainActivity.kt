@@ -35,6 +35,7 @@ class MainActivity : ComponentActivity() {
                     mainState = mainState,
                     isOllamaAddressSet = baseAddress.isOllamaAddressSet,
                     ollamaAddress = baseAddress.ollamaBaseAddress,
+                    isLocalSettingsLoaded = baseAddress.isLocalSettingsLoaded
                 )
 
             }
