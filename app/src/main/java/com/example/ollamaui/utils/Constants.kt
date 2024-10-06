@@ -1,6 +1,5 @@
 package com.example.ollamaui.utils
 
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.unit.dp
 
 object Constants {
