@@ -1,6 +1,7 @@
 package com.example.ollamaui.ui.screen.home
 
 import android.app.Activity
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -10,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -48,7 +50,6 @@ fun HomeScreen(
     statusError: Int?,
     statusThrowable: String?
 ) {
-
     var fabListVisible by remember { mutableStateOf(false) }
     var isFabDialogVisible by remember { mutableStateOf(false) }
     var isAboutDialogVisible by remember { mutableStateOf(false) }
@@ -120,7 +121,9 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ){
-            if(tagError != null){
+            AnimatedVisibility(
+                visible = (tagError != null) && !isSettingDialogVisible
+            ) {
                 NetworkErrorDialog(
                     statusError = statusError,
                     statusThrowable = statusThrowable,
@@ -133,7 +136,6 @@ fun HomeScreen(
                     onCloseClick = { activity?.finish() }
                 )
             }
-
             AnimatedVisibility(
                 visible = isFabDialogVisible
             ) {

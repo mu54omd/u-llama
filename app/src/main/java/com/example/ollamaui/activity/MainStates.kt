@@ -4,6 +4,7 @@ import com.example.ollamaui.domain.model.EmptyTagResponse
 import com.example.ollamaui.domain.model.TagResponse
 
 data class MainStates(
+    val launchAppGetStatusTry: Int = 0,
     val isModelListLoaded: Boolean = false,
     val ollamaStatus: String = "",
     val statusError: Int? = null,

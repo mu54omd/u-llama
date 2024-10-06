@@ -92,7 +92,6 @@ fun AppNavigation(
                     }
                 )
             }
-
             composable(route = Screens.LoadingScreen.route){
                 LoadingScreen(
                     isLocalSettingLoaded = isLocalSettingsLoaded,
@@ -104,7 +103,6 @@ fun AppNavigation(
 
         }
     }
-
 }
 private fun navigateToTab(navController: NavController, route: String){
     navController.navigate(route){

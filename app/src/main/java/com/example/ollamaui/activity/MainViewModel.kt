@@ -1,7 +1,9 @@
 package com.example.ollamaui.activity
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import arrow.core.recover
 import com.example.ollamaui.domain.model.EmptyTagResponse
 import com.example.ollamaui.domain.preferences.LocalUserManager
 import com.example.ollamaui.domain.repository.OllamaRepository
@@ -70,19 +72,67 @@ class MainViewModel @Inject constructor(
     /*---------------------------------------------------------------------------------------------*/
 
     private fun ollamaStatus(){
-        val modelList = mutableListOf<String>()
         viewModelScope.launch {
             _mainState.update { it.copy(isModelListLoaded = false) }
-            ollamaRepository.getOllamaStatus(baseUrl = baseAddress.value.ollamaBaseAddress, baseEndpoint = OLLAMA_BASE_ENDPOINT)
-                .onRight { response ->  _mainState.update { it.copy(ollamaStatus = response, statusError = null, statusThrowable = null) } }
-                .onLeft { error -> _mainState.update { it.copy(ollamaStatus = "", statusError = error.error.message, statusThrowable = error.t.message) } }
-            ollamaRepository.getOllamaModelsList(baseUrl = baseAddress.value.ollamaBaseAddress, tagEndpoint = OLLAMA_LIST_ENDPOINT)
-                .onRight {
-                        response ->
-                    response.models.forEach { model -> modelList.add(model.model) }
-                    _mainState.update { it.copy(tagResponse = response, modelList = modelList, isModelListLoaded = true, tagError = null, tagThrowable = null) }
+            if(mainState.value.launchAppGetStatusTry == 0) {
+                for (retryCount in 1..2) {
+                    getOllamaStatus()
+                    _mainState.update { it.copy(launchAppGetStatusTry = mainState.value.launchAppGetStatusTry.plus(1)) }
                 }
-                .onLeft { error -> _mainState.update { it.copy(tagResponse = EmptyTagResponse.emptyTagResponse, tagError = error.error.message, tagThrowable = error.t.message) } }
+            }else{
+                getOllamaStatus()
+            }
+            getOllamaModelsList()
         }
+    }
+
+    private suspend fun getOllamaStatus(){
+        ollamaRepository.getOllamaStatus(
+            baseUrl = baseAddress.value.ollamaBaseAddress,
+            baseEndpoint = OLLAMA_BASE_ENDPOINT
+        )
+            .onRight { response ->
+                _mainState.update {
+                    it.copy(
+                        ollamaStatus = response,
+                        statusError = null,
+                        statusThrowable = null
+                    )
+                }
+            }
+            .onLeft { error ->
+                _mainState.update {
+                    it.copy(
+                        ollamaStatus = "",
+                        statusError = error.error.message,
+                        statusThrowable = error.t.message
+                    )
+                }
+            }
+    }
+    private suspend fun getOllamaModelsList(){
+        val modelList = mutableListOf<String>()
+        ollamaRepository.getOllamaModelsList(baseUrl = baseAddress.value.ollamaBaseAddress, tagEndpoint = OLLAMA_LIST_ENDPOINT)
+            .onRight { response ->
+                response.models.forEach { model -> modelList.add(model.model) }
+                _mainState.update {
+                    it.copy(
+                        tagResponse = response,
+                        modelList = modelList,
+                        isModelListLoaded = true,
+                        tagError = null,
+                        tagThrowable = null
+                    )
+                }
+            }
+            .onLeft { error ->
+                _mainState.update {
+                    it.copy(
+                        tagResponse = EmptyTagResponse.emptyTagResponse,
+                        tagError = error.error.message,
+                        tagThrowable = error.t.message
+                    )
+                }
+            }
     }
 }
