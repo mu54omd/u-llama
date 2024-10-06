@@ -2,11 +2,18 @@ package com.example.ollamaui.ui.screen.home.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -54,23 +61,20 @@ fun HomeTopBar(
                 text = "Ollama UI",
                 modifier = Modifier.align(Alignment.Center)
             )
-            Column(
-                modifier = Modifier.align(Alignment.CenterEnd)
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
             ) {
-                AnimatedVisibility(visible = isSelectedChatsEmpty) {
-                    CustomButton(
-                        description = "About Button",
-                        onButtonClick = onAboutClick,
-                        icon = R.drawable.baseline_info_outline_24,
-                        buttonSize = 50,
-                        containerColor = MaterialTheme.colorScheme.background
-                    )
-                }
-
-                AnimatedVisibility(visible = !isSelectedChatsEmpty) {
+                AnimatedVisibility(
+                    visible = !isSelectedChatsEmpty,
+                    enter = slideInHorizontally(initialOffsetX = { w -> w }) + expandHorizontally(expandFrom = Alignment.End),
+                    exit = shrinkHorizontally()
+                ) {
                     Row(
+                        horizontalArrangement = Arrangement.SpaceAround,
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
                     ) {
                         CustomButton(
                             description = "Deselect Button",
@@ -87,6 +91,19 @@ fun HomeTopBar(
                             containerColor = MaterialTheme.colorScheme.background
                         )
                     }
+                }
+                AnimatedVisibility(
+                    visible = isSelectedChatsEmpty,
+                    enter = slideInHorizontally(initialOffsetX = { w -> w }) + expandHorizontally(expandFrom = Alignment.End),
+                    exit = shrinkHorizontally()
+                ){
+                    CustomButton(
+                        description = "About Button",
+                        onButtonClick = onAboutClick,
+                        icon = R.drawable.baseline_info_outline_24,
+                        buttonSize = 50,
+                        containerColor = MaterialTheme.colorScheme.background
+                    )
                 }
             }
         }
