@@ -10,8 +10,8 @@ data class ChatModel(
     val modelName: String,
     val chatIcon: Int,
     val yourName: String,
+    val botName: String,
     val chatTitle: String,
-    val context: List<Int>,
     val chatMessages: MessagesModel,
 )
 
@@ -21,9 +21,9 @@ object EmptyChatModel {
         chatId = 0,
         modelName = "",
         yourName = "",
-        chatMessages = TestMessageModel.empty,
+        botName = "",
+        chatMessages = EmptyMessageModel.empty,
         chatIcon = 0,
         chatTitle = "",
-        context = emptyList()
     )
 }

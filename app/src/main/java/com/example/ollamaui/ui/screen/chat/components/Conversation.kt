@@ -11,9 +11,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.ollamaui.domain.model.MessagesModel
+import com.example.ollamaui.utils.Constants.SYSTEM_ROLE
 
 @Composable
 fun Conversation(
+    botName: String,
+    yourName: String,
     messagesModel: MessagesModel,
     modifier: Modifier = Modifier,
 ) {
@@ -30,10 +33,14 @@ fun Conversation(
         items(
             items = messagesModel.messageModels,
         ){ message ->
-            ChatDialog(
-                messageModel = message,
-                modifier = Modifier.animateItem()
-            )
+            if (message.role != SYSTEM_ROLE) {
+                ChatDialog(
+                    messageModel = message,
+                    modifier = Modifier.animateItem(),
+                    botName = botName,
+                    yourName = yourName
+                )
+            }
         }
     }
 }

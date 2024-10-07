@@ -2,7 +2,6 @@ package com.example.ollamaui.ui.screen.chat
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.ollamaui.domain.model.Author
 import com.example.ollamaui.domain.model.ChatInputModel
 import com.example.ollamaui.domain.model.ChatModel
 import com.example.ollamaui.domain.model.EmptyChatModel
@@ -11,7 +10,7 @@ import com.example.ollamaui.domain.model.MessageModel
 import com.example.ollamaui.domain.model.MessagesModel
 import com.example.ollamaui.domain.repository.OllamaRepository
 import com.example.ollamaui.utils.Constants.OLLAMA_CHAT_ENDPOINT
-import com.example.ollamaui.utils.Constants.USER_ID
+import com.example.ollamaui.utils.Constants.USER_ROLE
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -34,21 +33,20 @@ class ChatViewModel @Inject constructor(
     fun sendButton(text: String){
         val messages = chatState.value.chatModel.chatMessages.messageModels.toMutableList()
         val oldChatModel = chatState.value.chatModel
-        messages.add(MessageModel(text = text, author = Author(USER_ID, name = oldChatModel.yourName)))
-
+        messages.add(MessageModel(content = text, role = USER_ROLE))
         _chatState.update { it.copy(
             chatModel = ChatModel(
                 chatId = oldChatModel.chatId,
                 chatIcon = oldChatModel.chatIcon,
                 chatTitle = oldChatModel.chatTitle,
-                chatMessages = MessagesModel( messageModels = messages, receiver = Author(id = oldChatModel.chatId, name = oldChatModel.modelName)),
-                context = oldChatModel.context,
+                chatMessages = MessagesModel( messageModels = messages),
                 modelName = oldChatModel.modelName,
-                yourName = oldChatModel.yourName
+                yourName = oldChatModel.yourName,
+                botName = oldChatModel.botName
             )
         )
         }
-        ollamaPostMessage(text = text)
+        ollamaPostMessage(MessagesModel(messageModels = messages))
     }
 
     fun loadStates(chatModel: ChatModel, url: String) {
@@ -83,33 +81,30 @@ class ChatViewModel @Inject constructor(
     /*---------------------------------------------------------------------------------------------*/
     /*---------------------------------------------------------------------------------------------*/
     /*---------------------------------------------------------------------------------------------*/
-    private fun ollamaPostMessage(text:String){
-        val messages = chatState.value.chatModel.chatMessages.messageModels.toMutableList()
-        val context = chatState.value.chatModel.context.toMutableList()
+    private fun ollamaPostMessage(messages: MessagesModel){
+        val oldMessages = chatState.value.chatModel.chatMessages.messageModels.toMutableList()
         val oldChatModel = chatState.value.chatModel
         viewModelScope.launch {
             _chatState.update { it.copy(isResponding = true) }
             ollamaRepository.postOllamaChat(
                 baseUrl = chatState.value.ollamaBaseAddress,
                 chatEndpoint = OLLAMA_CHAT_ENDPOINT,
-                ChatInputModel(
+                chatInputModel = ChatInputModel(
                     model = chatState.value.chatModel.modelName,
-                    prompt = text,
+                    messages = messages.messageModels,
                     stream = false,
-                    context = context
                 )
             ).onRight { response ->
-                messages.add(MessageModel(text = response.response, author = Author(id = oldChatModel.chatId, name = oldChatModel.modelName)))
-                context.addAll(response.context)
+                oldMessages.add(MessageModel(content = response.message.content, role = response.message.role))
                 _chatState.update { it.copy(
                     chatModel = ChatModel(
                             chatId = oldChatModel.chatId,
                             chatIcon = oldChatModel.chatIcon,
                             chatTitle = oldChatModel.chatTitle,
-                            chatMessages = MessagesModel( messageModels = messages, receiver = Author(id = oldChatModel.chatId, name = oldChatModel.modelName)),
-                            context = context,
+                            chatMessages = MessagesModel( messageModels = oldMessages ),
                             modelName = oldChatModel.modelName,
-                            yourName = oldChatModel.yourName
+                            yourName = oldChatModel.yourName,
+                        botName = oldChatModel.botName
                         ),
                     chatResponse = response,
                     isResponding = false,
@@ -121,10 +116,10 @@ class ChatViewModel @Inject constructor(
                         chatId = oldChatModel.chatId,
                         chatIcon = oldChatModel.chatIcon,
                         chatTitle = oldChatModel.chatTitle,
-                        chatMessages = MessagesModel( messageModels = messages, receiver = Author(id = oldChatModel.chatId, name = oldChatModel.modelName)),
-                        context = context,
+                        chatMessages = MessagesModel( messageModels = oldMessages),
                         modelName = oldChatModel.modelName,
-                        yourName = oldChatModel.yourName
+                        yourName = oldChatModel.yourName,
+                        botName = oldChatModel.botName
                     ),
                 )
             }.onLeft { error ->

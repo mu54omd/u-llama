@@ -38,20 +38,24 @@ import com.example.ollamaui.ui.theme.OllamaUITheme
 fun NewChatDialog(
     modifier: Modifier = Modifier,
     yourName: String,
-    maxChar: Int,
     onYourNameChange: (String) -> Unit,
+    botName: String,
+    onBotNameChange: (String) -> Unit,
+    systemPrompt: String,
+    onSystemPromptChange: (String) -> Unit,
     chatTitle: String,
     onChatTitleChange: (String) -> Unit,
     onCloseClick: () -> Unit,
     onAcceptClick: () -> Unit,
-) {
+    maxChar: Int,
+    ) {
     Dialog(
         onDismissRequest = { onCloseClick() },
     ) {
         Box(
             modifier = modifier
                 .clip(shape = MaterialTheme.shapes.large)
-                .size(300.dp, 250.dp)
+                .size(300.dp, 500.dp)
                 .background(color = MaterialTheme.colorScheme.surfaceVariant)
         ) {
             Column(
@@ -59,65 +63,13 @@ fun NewChatDialog(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxSize()
             ) {
-                Spacer(modifier = Modifier.height(20.dp))
-                TextField(
-                    value = yourName,
-                    onValueChange = onYourNameChange,
-                    label = { Text(text = "Your name") },
-                    shape = RoundedCornerShape(30),
-                    colors = TextFieldDefaults.colors(
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer
-                    ),
-                    maxLines = 1,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Next
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onNext = {}
-                    ),
-                    modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp),
-                    supportingText = {
-                        Text(
-                            text = "${yourName.length}/$maxChar",
-                            modifier = Modifier.fillMaxWidth(),
-                            textAlign = TextAlign.End,
-                        )
-                    }
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                TextField(
-                    value = chatTitle,
-                    label = { Text(text = "Chat title") },
-                    onValueChange = onChatTitleChange,
-                    shape = RoundedCornerShape(30),
-                    colors = TextFieldDefaults.colors(
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer
-                    ),
-                    maxLines = 1,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Done
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {}
-                    ),
-                    modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp),
-                    supportingText = {
-                        Text(
-                            text = "${chatTitle.length}/$maxChar",
-                            modifier = Modifier.fillMaxWidth(),
-                            textAlign = TextAlign.End,
-                        )
-                    }
-                )
-                Spacer(modifier = Modifier.height(10.dp))
+                CustomTextField(value = chatTitle, onValueChange = onChatTitleChange, label = "Chat Title", maxChar = maxChar, onDone = {})
+                Spacer(modifier = Modifier.height(5.dp))
+                CustomTextField(value = yourName, onValueChange = onYourNameChange, label = "Your Name", maxChar = maxChar, onDone = {})
+                Spacer(modifier = Modifier.height(5.dp))
+                CustomTextField(value = botName, onValueChange = onBotNameChange, label = "Bot Name", maxChar = maxChar, onDone = {})
+                Spacer(modifier = Modifier.height(5.dp))
+                CustomTextField(value = systemPrompt, onValueChange = onSystemPromptChange, label = "Describe the bot", maxChar = maxChar*6, onDone = {}, maxLines = 5)
                 Row(
                     horizontalArrangement = Arrangement.SpaceAround,
                     verticalAlignment = Alignment.CenterVertically,
@@ -151,11 +103,15 @@ private fun NewChatDialogPreview() {
         NewChatDialog(
             yourName = "Me",
             chatTitle = "Title",
+            botName = "Bot",
+            systemPrompt = "You are a serial killer!",
             maxChar = 50,
             onChatTitleChange = {},
             onCloseClick = {},
             onAcceptClick = {},
-            onYourNameChange = {}
+            onYourNameChange = {},
+            onBotNameChange = {},
+            onSystemPromptChange = {}
         )
     }
 }

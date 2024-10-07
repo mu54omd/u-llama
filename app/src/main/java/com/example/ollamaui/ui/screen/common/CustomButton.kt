@@ -25,7 +25,7 @@ fun CustomButton(
     iconSize: Int = 25,
     description: String,
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainer,
-    contentColor: Color = MaterialTheme.colorScheme.onPrimaryContainer,
+    contentColor: Color = MaterialTheme.colorScheme.tertiaryContainer,
     @DrawableRes icon: Int,
 ) {
     Button(
@@ -35,14 +35,16 @@ fun CustomButton(
         contentPadding = PaddingValues(0.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = containerColor,
-            contentColor = contentColor
+            contentColor = contentColor,
+            disabledContainerColor = containerColor,
+            disabledContentColor = contentColor
         )
     ){
         Icon(
             painter = painterResource(icon),
             contentDescription = description,
             modifier = Modifier.size(iconSize.dp),
-            tint = MaterialTheme.colorScheme.onBackground
+            tint = if(isButtonEnabled) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onBackground.copy(red = 0.5f, blue = 0.5f, green = 0.5f)
         )
     }
 }
@@ -54,7 +56,10 @@ private fun SendButtonPreview() {
         CustomButton(
             onButtonClick = {},
             description = "CustomButton",
-            icon = R.drawable.baseline_send_24
+            icon = R.drawable.baseline_send_24,
+            iconSize = 25,
+            buttonSize = 50,
+            isButtonEnabled = true
         )
     }
 }

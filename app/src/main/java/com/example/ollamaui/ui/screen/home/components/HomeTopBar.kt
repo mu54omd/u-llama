@@ -1,9 +1,6 @@
 package com.example.ollamaui.ui.screen.home.components
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandHorizontally
-import androidx.compose.animation.shrinkHorizontally
-import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -31,7 +28,9 @@ fun HomeTopBar(
     onAboutClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onDeselectClick: () -> Unit,
-    isSelectedChatsEmpty: Boolean
+    onSelectClick: () -> Unit,
+    isSelectedChatsEmpty: Boolean,
+    chatsListSize: Int,
 ) {
     Column {
         Box(
@@ -61,43 +60,53 @@ fun HomeTopBar(
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
             ) {
-                AnimatedVisibility(
-                    visible = !isSelectedChatsEmpty,
-                    enter = slideInHorizontally(initialOffsetX = { w -> w }) + expandHorizontally(expandFrom = Alignment.End),
-                    exit = shrinkHorizontally()
-                ) {
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceAround,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        CustomButton(
-                            description = "Deselect Button",
-                            onButtonClick = onDeselectClick,
-                            icon = R.drawable.baseline_deselect_24,
-                            buttonSize = 50,
-                            containerColor = MaterialTheme.colorScheme.background
-                        )
-                        CustomButton(
-                            description = "Delete Button",
-                            onButtonClick = onDeleteClick,
-                            icon = R.drawable.baseline_delete_outline_24,
-                            buttonSize = 50,
-                            containerColor = MaterialTheme.colorScheme.background
-                        )
+                Crossfade(
+                    targetState = isSelectedChatsEmpty, label = "HomeTopBar Botton",
+                ) { isSelectedChatsEmpty ->
+                    when(isSelectedChatsEmpty) {
+                        false ->
+                            Row(
+                            horizontalArrangement = Arrangement.SpaceAround,
+                            verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    CustomButton(
+                                        description = "DeselectAll Button",
+                                        onButtonClick = onDeselectClick,
+                                        icon = R.drawable.baseline_deselect_24,
+                                        buttonSize = 50,
+                                        containerColor = MaterialTheme.colorScheme.background
+                                    )
+                                    CustomButton(
+                                        description = "Delete Button",
+                                        onButtonClick = onDeleteClick,
+                                        icon = R.drawable.baseline_delete_outline_24,
+                                        buttonSize = 50,
+                                        containerColor = MaterialTheme.colorScheme.background
+                                    )
+                                }
+                        true ->
+                            Row(
+                                horizontalArrangement = Arrangement.SpaceAround,
+                                verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                CustomButton(
+                                    description = "SelectAll Button",
+                                    onButtonClick = onSelectClick,
+                                    icon = R.drawable.baseline_select_all_24,
+                                    buttonSize = 50,
+                                    containerColor = MaterialTheme.colorScheme.background,
+                                    isButtonEnabled = chatsListSize > 0
+                                )
+                                CustomButton(
+                                    description = "About Button",
+                                    onButtonClick = onAboutClick,
+                                    icon = R.drawable.baseline_info_outline_24,
+                                    buttonSize = 50,
+                                    containerColor = MaterialTheme.colorScheme.background,
+                                )
+                            }
                     }
-                }
-                AnimatedVisibility(
-                    visible = isSelectedChatsEmpty,
-                    enter = slideInHorizontally(initialOffsetX = { w -> w }) + expandHorizontally(expandFrom = Alignment.End),
-                    exit = shrinkHorizontally()
-                ){
-                    CustomButton(
-                        description = "About Button",
-                        onButtonClick = onAboutClick,
-                        icon = R.drawable.baseline_info_outline_24,
-                        buttonSize = 50,
-                        containerColor = MaterialTheme.colorScheme.background
-                    )
+
                 }
             }
         }
@@ -114,7 +123,9 @@ private fun HomeTopBarPreview() {
             onSettingClick = {},
             onDeleteClick = {},
             onDeselectClick = {},
-            isSelectedChatsEmpty = false
+            onSelectClick = {},
+            isSelectedChatsEmpty = true,
+            chatsListSize = 0
         )
     }
 }

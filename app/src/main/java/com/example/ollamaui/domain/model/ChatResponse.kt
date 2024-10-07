@@ -12,7 +12,7 @@ data class ChatResponse(
     @SerializedName("done_reason")
     val doneReason: String,
     val model: String,
-    val response: String,
+    val message: MessageModel,
     @SerializedName("total_duration")
     val totalDuration: Long
 )
@@ -24,7 +24,7 @@ object EmptyChatResponse{
         done = false,
         doneReason = "",
         model = "",
-        response = "",
+        message = MessageModel(role = "", content = ""),
         totalDuration = 0L
     )
 }

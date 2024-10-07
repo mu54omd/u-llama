@@ -59,7 +59,9 @@ fun HomeScreen(
     var isDeleteDialogVisible by remember { mutableStateOf(false) }
 
     var yourName by remember { mutableStateOf("") }
+    var botName by remember { mutableStateOf("") }
     var chatTitle by remember { mutableStateOf("") }
+    var systemPrompt by remember { mutableStateOf("") }
     var httpValue by remember { mutableStateOf(ollamaAddress) }
 
     var selectedChat by remember { mutableStateOf(EmptyChatModel.empty) }
@@ -94,10 +96,16 @@ fun HomeScreen(
                             }
                             selectedChats.clear()
                         },
+                        onSelectClick = {
+                            chatsList.items.forEach { chat ->
+                                selectedChats.add(chat.chatId)
+                            }
+                        },
                         onDeselectClick = {
                             selectedChats.clear()
                         },
-                        isSelectedChatsEmpty = isSelectedChatsEmpty
+                        isSelectedChatsEmpty = isSelectedChatsEmpty,
+                        chatsListSize = chatsList.items.size
                     )
                  },
         bottomBar = { },
@@ -150,15 +158,26 @@ fun HomeScreen(
             ) {
                 NewChatDialog(
                     yourName = yourName,
+                    botName = botName,
+                    systemPrompt = systemPrompt,
                     maxChar = maxChar,
                     onYourNameChange = { if(it.length<=maxChar) yourName = it },
                     chatTitle = chatTitle,
                     onChatTitleChange = { if(it.length<=maxChar) chatTitle = it },
                     onCloseClick = { isFabDialogVisible = false},
                     onAcceptClick = {
-                        homeViewModel.addNewChat(chatTitle, yourName, avatarList.random(), selectedModel)
+                        homeViewModel.addNewChat(
+                            chatTitle = chatTitle,
+                            yourName = yourName,
+                            botName = botName,
+                            chatIcon = avatarList.random(),
+                            selectedModel = selectedModel,
+                            systemPrompt = systemPrompt
+                            )
                         isFabDialogVisible = false
-                    }
+                    },
+                    onBotNameChange = { if(it.length<=maxChar) botName = it },
+                    onSystemPromptChange = { if(it.length<=maxChar*6) systemPrompt = it}
                 )
             }
             AnimatedVisibility(

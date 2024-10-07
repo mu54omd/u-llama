@@ -70,7 +70,9 @@ fun ChatScreen(
         ) {
             Conversation(
                 messagesModel = chatState.chatModel.chatMessages ,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                botName = chatState.chatModel.botName,
+                yourName = chatState.chatModel.yourName
             )
             Column (
                 horizontalAlignment = Alignment.CenterHorizontally,
