@@ -89,6 +89,9 @@ dependencies {
     //Data preferences
     implementation(libs.androidx.datastore.preferences)
 
+    //constraint layout
+    implementation(libs.androidx.constraintlayout.compose)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

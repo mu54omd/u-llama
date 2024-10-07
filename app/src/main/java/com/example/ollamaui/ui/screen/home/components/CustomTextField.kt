@@ -22,16 +22,18 @@ fun CustomTextField(
     modifier: Modifier = Modifier,
     value: String,
     label: String,
+    roundCornerPercent: Int = 30,
     onValueChange: (String) -> Unit,
     onDone: () -> Unit,
     maxChar: Int,
     maxLines: Int = 1,
+    minLines: Int = 1
 ) {
     TextField(
         value = value,
         label = { Text(text = label) },
         onValueChange = onValueChange,
-        shape = RoundedCornerShape(30),
+        shape = RoundedCornerShape(roundCornerPercent),
         colors = TextFieldDefaults.colors(
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
@@ -39,6 +41,7 @@ fun CustomTextField(
             unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer
         ),
         maxLines = maxLines,
+        minLines = minLines,
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Text,
             imeAction = ImeAction.Done

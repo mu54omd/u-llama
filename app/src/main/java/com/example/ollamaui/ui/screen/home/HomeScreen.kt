@@ -8,11 +8,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -21,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import com.example.ollamaui.R
@@ -53,7 +52,7 @@ fun HomeScreen(
 ) {
 
     var fabListVisible by remember { mutableStateOf(false) }
-    var isFabDialogVisible by remember { mutableStateOf(false) }
+    var isNewChatDialogVisible by remember { mutableStateOf(false) }
     var isAboutDialogVisible by remember { mutableStateOf(false) }
     var isSettingDialogVisible by remember { mutableStateOf(!isOllamaAddressSet) }
     var isDeleteDialogVisible by remember { mutableStateOf(false) }
@@ -68,6 +67,7 @@ fun HomeScreen(
     val selectedChats = remember { mutableStateListOf<Int>() }
     var selectedModel by remember { mutableStateOf("") }
     val isSelectedChatsEmpty by remember(selectedChats) { derivedStateOf { selectedChats.isEmpty() } }
+
 
     val activity = (LocalContext.current as? Activity)
 
@@ -119,7 +119,7 @@ fun HomeScreen(
                     selectedModel = item
                     yourName = ""
                     chatTitle = ""
-                    isFabDialogVisible = true
+                    isNewChatDialogVisible = true
                               },
                 onButtonClick = {
                     if(!isModelListLoaded){
@@ -154,7 +154,7 @@ fun HomeScreen(
                 )
             }
             AnimatedVisibility(
-                visible = isFabDialogVisible
+                visible = isNewChatDialogVisible
             ) {
                 NewChatDialog(
                     yourName = yourName,
@@ -164,7 +164,7 @@ fun HomeScreen(
                     onYourNameChange = { if(it.length<=maxChar) yourName = it },
                     chatTitle = chatTitle,
                     onChatTitleChange = { if(it.length<=maxChar) chatTitle = it },
-                    onCloseClick = { isFabDialogVisible = false},
+                    onCloseClick = { isNewChatDialogVisible = false},
                     onAcceptClick = {
                         homeViewModel.addNewChat(
                             chatTitle = chatTitle,
@@ -174,7 +174,7 @@ fun HomeScreen(
                             selectedModel = selectedModel,
                             systemPrompt = systemPrompt
                             )
-                        isFabDialogVisible = false
+                        isNewChatDialogVisible = false
                     },
                     onBotNameChange = { if(it.length<=maxChar) botName = it },
                     onSystemPromptChange = { if(it.length<=maxChar*6) systemPrompt = it}
