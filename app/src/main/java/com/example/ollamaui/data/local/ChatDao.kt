@@ -21,6 +21,9 @@ interface ChatDao {
     @Delete
     suspend fun delete(chatModel: ChatModel)
 
+    @Query("DELETE FROM ChatModel WHERE (chatId=:chatId)")
+    suspend fun deleteById(chatId: Int)
+
     @Query("SELECT * FROM ChatModel")
     fun getChats(): Flow<List<ChatModel>>
 

@@ -7,6 +7,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
@@ -37,7 +39,6 @@ class MainActivity : ComponentActivity() {
                     ollamaAddress = baseAddress.ollamaBaseAddress,
                     isLocalSettingsLoaded = baseAddress.isLocalSettingsLoaded
                 )
-
             }
         }
     }

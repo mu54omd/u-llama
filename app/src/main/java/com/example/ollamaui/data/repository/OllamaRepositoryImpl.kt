@@ -40,6 +40,10 @@ class OllamaRepositoryImpl @Inject constructor(
         chatDao.delete(chatModel)
     }
 
+    override suspend fun deleteFromDbById(chatId: Int) {
+        chatDao.deleteById(chatId)
+    }
+
     override suspend fun updateDbItem(chatModel: ChatModel) {
         chatDao.update(chatModel)
     }

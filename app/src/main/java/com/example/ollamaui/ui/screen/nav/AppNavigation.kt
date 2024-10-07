@@ -1,8 +1,10 @@
 package com.example.ollamaui.ui.screen.nav
 
-import android.util.Log
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -21,6 +23,7 @@ import com.example.ollamaui.ui.screen.home.HomeScreen
 import com.example.ollamaui.ui.screen.home.HomeViewModel
 import com.example.ollamaui.ui.screen.loading.LoadingScreen
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun AppNavigation(
     mainViewModel: MainViewModel,
@@ -31,8 +34,7 @@ fun AppNavigation(
 ) {
     val navController = rememberNavController()
     val homeViewModel: HomeViewModel = hiltViewModel()
-    val homeState = homeViewModel.homeState.collectAsStateWithLifecycle().value
-    val homeListState = homeViewModel.chatList.collectAsStateWithLifecycle().value
+    val chatsList = homeViewModel.chatsList.collectAsStateWithLifecycle().value
     val chatViewModel: ChatViewModel = hiltViewModel()
     val chatState = chatViewModel.chatState.collectAsStateWithLifecycle().value
 
@@ -41,23 +43,19 @@ fun AppNavigation(
         bottomBar = {},
         snackbarHost = {},
         modifier = Modifier
-    ) { padding ->
+    ) {
         NavHost(
             navController = navController,
             startDestination = Screens.LoadingScreen.route,
             modifier = Modifier
                 .background( color = MaterialTheme.colorScheme.background )
-                .padding(
-                    top = padding.calculateTopPadding(),
-                    bottom = padding.calculateTopPadding()
-            )
+                .safeDrawingPadding()
         ) {
             composable(route = Screens.HomeScreen.route) {
                 HomeScreen(
                     homeViewModel = homeViewModel,
                     mainViewModel = mainViewModel,
-                    homeState = homeState,
-                    homeListState = homeListState,
+                    chatsList = chatsList,
                     onChatClick = {
                         chatViewModel.loadStates(chatModel = it, url = ollamaAddress)
                         navigateToTab(

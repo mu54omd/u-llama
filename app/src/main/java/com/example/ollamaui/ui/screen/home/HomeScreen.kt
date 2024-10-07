@@ -8,7 +8,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -23,6 +26,7 @@ import androidx.compose.ui.platform.LocalContext
 import com.example.ollamaui.R
 import com.example.ollamaui.activity.MainViewModel
 import com.example.ollamaui.domain.model.ChatModel
+import com.example.ollamaui.domain.model.EmptyChatModel
 import com.example.ollamaui.ui.screen.home.components.AboutDialog
 import com.example.ollamaui.ui.screen.home.components.CustomFabButton
 import com.example.ollamaui.ui.screen.home.components.DeleteDialog
@@ -37,8 +41,7 @@ fun HomeScreen(
     onChatClick: (ChatModel) -> Unit,
     homeViewModel: HomeViewModel,
     mainViewModel: MainViewModel,
-    homeState: HomeStates,
-    homeListState: HomeListState,
+    chatsList: ChatsList,
     isOllamaAddressSet: Boolean,
     ollamaAddress: String,
     onSaveOllamaAddressClick: (String) -> Unit,
@@ -48,23 +51,30 @@ fun HomeScreen(
     statusError: Int?,
     statusThrowable: String?
 ) {
+
     var fabListVisible by remember { mutableStateOf(false) }
     var isFabDialogVisible by remember { mutableStateOf(false) }
     var isAboutDialogVisible by remember { mutableStateOf(false) }
     var isSettingDialogVisible by remember { mutableStateOf(!isOllamaAddressSet) }
     var isDeleteDialogVisible by remember { mutableStateOf(false) }
+
     var yourName by remember { mutableStateOf("") }
     var chatTitle by remember { mutableStateOf("") }
     var httpValue by remember { mutableStateOf(ollamaAddress) }
+
+    var selectedChat by remember { mutableStateOf(EmptyChatModel.empty) }
+    val selectedChats = remember { mutableStateListOf<Int>() }
+    var selectedModel by remember { mutableStateOf("") }
+    val isSelectedChatsEmpty by remember(selectedChats) { derivedStateOf { selectedChats.isEmpty() } }
+
+    val activity = (LocalContext.current as? Activity)
+
+    val maxChar = 25
     val avatarList = listOf(
         R.drawable.avatar_logo_01, R.drawable.avatar_logo_02, R.drawable.avatar_logo_03,
         R.drawable.avatar_logo_04, R.drawable.avatar_logo_05, R.drawable.avatar_logo_06,
         R.drawable.avatar_logo_07, R.drawable.avatar_logo_08, R.drawable.avatar_logo_09
     )
-    val selectedChats = remember { mutableStateListOf<ChatModel>() }
-    val isSelectedChatsEmpty by remember(selectedChats) { derivedStateOf { selectedChats.isEmpty() } }
-    val activity = (LocalContext.current as? Activity)
-    val maxChar = 25
 
 
     Scaffold(
@@ -80,7 +90,7 @@ fun HomeScreen(
                         },
                         onDeleteClick = {
                             selectedChats.forEach{ selectedChat ->
-                                homeViewModel.deleteChat(selectedChat)
+                                homeViewModel.deleteChatById(selectedChat)
                             }
                             selectedChats.clear()
                         },
@@ -90,7 +100,7 @@ fun HomeScreen(
                         isSelectedChatsEmpty = isSelectedChatsEmpty
                     )
                  },
-        bottomBar = {},
+        bottomBar = { },
         floatingActionButton = {
             CustomFabButton(
                 isModelListLoaded = isModelListLoaded,
@@ -98,7 +108,7 @@ fun HomeScreen(
                 modelList = modelList,
                 onItemClick = { item ->
                     fabListVisible = false
-                    homeViewModel.selectOllamaModel(item)
+                    selectedModel = item
                     yourName = ""
                     chatTitle = ""
                     isFabDialogVisible = true
@@ -146,7 +156,7 @@ fun HomeScreen(
                     onChatTitleChange = { if(it.length<=maxChar) chatTitle = it },
                     onCloseClick = { isFabDialogVisible = false},
                     onAcceptClick = {
-                        homeViewModel.addNewChat(chatTitle, yourName, avatarList.random())
+                        homeViewModel.addNewChat(chatTitle, yourName, avatarList.random(), selectedModel)
                         isFabDialogVisible = false
                     }
                 )
@@ -175,14 +185,13 @@ fun HomeScreen(
             AnimatedVisibility(
                 visible = isDeleteDialogVisible
             ) {
-                homeState.selectedChat?.let { chatItem ->
+                selectedChat.let { chatItem ->
                     DeleteDialog(
                         chatTitle = chatItem.chatTitle,
                         yourName = chatItem.yourName,
                         onAcceptClick = {
                             homeViewModel.deleteChat(chatItem)
                             isDeleteDialogVisible = false
-                            homeViewModel.deselectChat()
                         },
                         onCloseClick = { isDeleteDialogVisible = false}
                     )
@@ -193,16 +202,15 @@ fun HomeScreen(
                 modifier = Modifier.align(Alignment.TopCenter),
             ) {
                     items(
-                        items = homeListState.chatList,
+                        items = chatsList.items,
                         key = { chatItem -> chatItem.chatId }
                     ) { chatItem ->
-
                         NewChatItem(
                             modelName = chatItem.modelName,
                             chatTitle = chatItem.chatTitle,
                             onDeleteClick = {
                                 fabListVisible = false
-                                homeViewModel.selectChat(chatItem)
+                                selectedChat = chatItem
                                 isDeleteDialogVisible = true
                             },
                             onItemClick = {
@@ -210,10 +218,10 @@ fun HomeScreen(
                                 if(selectedChats.isEmpty()){
                                     onChatClick(chatItem)
                                 }else{
-                                    if(selectedChats.contains(chatItem)){
-                                        selectedChats.remove(chatItem)
+                                    if(selectedChats.contains(chatItem.chatId)){
+                                        selectedChats.remove(chatItem.chatId)
                                     }else {
-                                        selectedChats.add(chatItem)
+                                        selectedChats.add(chatItem.chatId)
                                     }
                                 }
                             },
@@ -221,14 +229,14 @@ fun HomeScreen(
                             modifier = Modifier.animateItem(),
                             onItemLongPress = {
                                 fabListVisible = false
-                                if(!selectedChats.contains(chatItem)) {
-                                    selectedChats.add(chatItem)
+                                if(!selectedChats.contains(chatItem.chatId)) {
+                                    selectedChats.add(chatItem.chatId)
                                 }
                             },
                             onSelectedItemClick = {
-                                selectedChats.remove(chatItem)
+                                selectedChats.remove(chatItem.chatId)
                             },
-                            isSelected = selectedChats.contains(chatItem)
+                            isSelected = selectedChats.contains(chatItem.chatId)
                         )
                     }
                 }

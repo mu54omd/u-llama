@@ -7,12 +7,9 @@ import com.example.ollamaui.domain.model.ChatModel
 import com.example.ollamaui.domain.model.MessagesModel
 import com.example.ollamaui.domain.repository.OllamaRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,42 +18,26 @@ class HomeViewModel @Inject constructor(
     private val ollamaRepository: OllamaRepository,
 ):ViewModel(){
 
-    private val _homeState = MutableStateFlow(HomeStates())
-    val homeState = _homeState
-        .onStart {
-
-        }
+    private val _chatsList = ollamaRepository.getChats().map { ChatsList(items = it) }
+    val chatsList = _chatsList
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000L),
-            initialValue = HomeStates()
-        )
-
-    private val _chatList = ollamaRepository.getChats().map { HomeListState(it) }
-    val chatList = _chatList
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000L),
-            initialValue = HomeListState()
+            initialValue = ChatsList()
         )
 
     //Public methods
     /*---------------------------------------------------------------------------------------------*/
     /*---------------------------------------------------------------------------------------------*/
     /*---------------------------------------------------------------------------------------------*/
-    fun selectOllamaModel(modelName: String){
-        _homeState.update { it.copy(selectedModel = modelName) }
-    }
 
-
-
-    fun addNewChat(chatTitle: String, yourName: String, chatIcon: Int){
+    fun addNewChat(chatTitle: String, yourName: String, chatIcon: Int, selectedModel: String){
         viewModelScope.launch {
             val id = ollamaRepository.getLastId().plus(1)
-            val receiverAuthor = Author(id = id, name = homeState.value.selectedModel)
+            val receiverAuthor = Author(id = id, name = selectedModel)
             val chatModel = ChatModel(
                 chatTitle = chatTitle,
-                modelName = homeState.value.selectedModel,
+                modelName = selectedModel,
                 chatIcon = chatIcon,
                 chatMessages = MessagesModel(messageModels = emptyList(), receiver = receiverAuthor),
                 context = emptyList(),
@@ -66,16 +47,14 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun selectChat(chatModel: ChatModel){
-        _homeState.update { it.copy(selectedChat = chatModel) }
-    }
-    fun deselectChat(){
-        _homeState.update { it.copy(selectedChat = null) }
-    }
-
     fun deleteChat(chatModel: ChatModel){
         viewModelScope.launch {
             ollamaRepository.deleteFromDb(chatModel)
+        }
+    }
+    fun deleteChatById(chatId: Int){
+        viewModelScope.launch {
+            ollamaRepository.deleteFromDbById(chatId)
         }
     }
     //Private methods
