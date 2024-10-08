@@ -16,7 +16,7 @@ import com.example.ollamaui.utils.Constants.SYSTEM_ROLE
 @Composable
 fun Conversation(
     botName: String,
-    yourName: String,
+    userName: String,
     messagesModel: MessagesModel,
     modifier: Modifier = Modifier,
 ) {
@@ -38,7 +38,7 @@ fun Conversation(
                     messageModel = message,
                     modifier = Modifier.animateItem(),
                     botName = botName,
-                    yourName = yourName
+                    userName = userName
                 )
             }
         }

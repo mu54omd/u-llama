@@ -9,7 +9,7 @@ data class ChatModel(
     val chatId: Int = 0,
     val modelName: String,
     val chatIcon: Int,
-    val yourName: String,
+    val userName: String,
     val botName: String,
     val chatTitle: String,
     val chatMessages: MessagesModel,
@@ -20,7 +20,7 @@ object EmptyChatModel {
     val empty = ChatModel(
         chatId = 0,
         modelName = "",
-        yourName = "",
+        userName = "",
         botName = "",
         chatMessages = EmptyMessageModel.empty,
         chatIcon = 0,

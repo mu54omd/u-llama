@@ -92,6 +92,11 @@ dependencies {
     //constraint layout
     implementation(libs.androidx.constraintlayout.compose)
 
+//    //RichText
+//    implementation(libs.richtext.ui.material3)
+//    implementation(libs.richtext.markdown)
+//    implementation(libs.richtext.commonmark)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

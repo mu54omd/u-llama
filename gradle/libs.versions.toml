@@ -16,6 +16,7 @@ converterScalars = "2.11.0"
 okhttp = "4.12.0"
 arrowCore = "1.2.4"
 kotlinxSerializationJson = "1.7.1"
+richtext= "1.0.0-alpha01"
 roomRuntime = "2.6.1"
 datastorePreferences = "1.1.1"
 constraintlayoutCompose = "1.0.1"
@@ -54,6 +55,9 @@ androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref =
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomRuntime" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
+richtext-ui-material3 = { module = "com.halilibo.compose-richtext:richtext-ui-material3", version.ref = "richtext" }
+richtext-markdown = { module = "com.halilibo.compose-richtext:richtext-markdown", version.ref = "richtext" }
+richtext-commonmark = { module = "com.halilibo.compose-richtext:richtext-commonmark", version.ref = "richtext" }
 
 
 [plugins]

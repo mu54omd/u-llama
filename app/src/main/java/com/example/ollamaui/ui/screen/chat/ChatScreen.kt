@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -23,6 +21,7 @@ import com.example.ollamaui.R
 import com.example.ollamaui.ui.screen.chat.components.ChatBottomBar
 import com.example.ollamaui.ui.screen.chat.components.ChatTopBar
 import com.example.ollamaui.ui.screen.chat.components.Conversation
+import com.example.ollamaui.ui.screen.chat.components.DotsPulsing
 import com.example.ollamaui.ui.screen.common.CustomButton
 
 @Composable
@@ -31,13 +30,12 @@ fun ChatScreen(
     chatState: ChatStates,
     onBackClick: () -> Unit
 ) {
-
     var textValue by rememberSaveable { mutableStateOf("") }
     var textValueBackup by rememberSaveable { mutableStateOf("") }
-
     Scaffold(
         topBar = {
             ChatTopBar(
+                botName = chatState.chatModel.botName,
                 chatTitle = chatState.chatModel.chatTitle,
                 chatIcon = chatState.chatModel.chatIcon,
                 onBackClick = onBackClick
@@ -72,15 +70,16 @@ fun ChatScreen(
                 messagesModel = chatState.chatModel.chatMessages ,
                 modifier = Modifier.weight(1f),
                 botName = chatState.chatModel.botName,
-                yourName = chatState.chatModel.yourName
+                userName = chatState.chatModel.userName
             )
             Column (
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
                 modifier = Modifier.height(20.dp)
             ) {
-                AnimatedVisibility(visible = chatState.isResponding) {
-                    LinearProgressIndicator(modifier = Modifier.width(30.dp))
+                AnimatedVisibility(visible = chatState.isRespondingList.contains(chatState.chatModel.chatId)) {
+//                    LinearProgressIndicator(modifier = Modifier.width(30.dp))
+                    DotsPulsing()
                 }
                 AnimatedVisibility(visible = chatState.chatError != null) {
                     CustomButton(

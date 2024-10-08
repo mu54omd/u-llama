@@ -3,7 +3,6 @@ package com.example.ollamaui.ui.screen.chat.components
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -32,7 +31,7 @@ import com.example.ollamaui.ui.theme.OllamaUITheme
 @Composable
 fun ChatDialog(
     messageModel: MessageModel,
-    yourName: String,
+    userName: String,
     botName: String,
     modifier: Modifier = Modifier) {
     var isVisible by remember { mutableStateOf(false) }
@@ -73,7 +72,7 @@ fun ChatDialog(
                             )
                         ) {
                             Text(
-                                text = if(isFromMe(messageModel)) yourName else botName,
+                                text = if(isFromMe(messageModel)) userName else botName,
                                 style = MaterialTheme.typography.bodySmall,
                                 modifier = Modifier.padding(5.dp)
                             )
@@ -95,7 +94,7 @@ private fun ChatDialogPreview() {
                     content = "Hi. How are you???",
                     role = "system",
                 ),
-                yourName = "Musa",
+                userName = "Musa",
                 botName = "Musashi"
             )
             ChatDialog(
@@ -103,7 +102,7 @@ private fun ChatDialogPreview() {
                     content = "Hello! I'm fine.",
                     role = "assistant"
                 ),
-                yourName = "Musa",
+                userName = "Musa",
                 botName = "Musashi"
             )
             ChatDialog(
@@ -111,7 +110,7 @@ private fun ChatDialogPreview() {
                     content = "Hello! I'm fine.",
                     role = "user"
                 ),
-                yourName = "Musa",
+                userName = "Musa",
                 botName = "Musashi"
             )
         }

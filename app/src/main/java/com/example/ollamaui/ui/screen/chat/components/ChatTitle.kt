@@ -18,17 +18,22 @@ import com.example.ollamaui.ui.theme.OllamaUITheme
 @Composable
 fun ChatTitle(
     modifier: Modifier = Modifier,
-    text: String,
+    title: String,
+    botName: String,
     ) {
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
+        horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.Center,
-        modifier = modifier.fillMaxHeight()
+        modifier = modifier
     ) {
-
         Text(
-            text = text,
-            style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+            text = botName,
+            style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold),
+            color = MaterialTheme.colorScheme.onBackground
+        )
+        Text(
+            text = title,
+            style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
             color = MaterialTheme.colorScheme.onBackground
         )
     }
@@ -40,7 +45,8 @@ fun ChatTitle(
 private fun ChatTitlePreview() {
     OllamaUITheme {
         ChatTitle(
-            text = "Chat"
+            botName = "Bot",
+            title = "Chat"
         )
     }
 }

@@ -1,6 +1,5 @@
 package com.example.ollamaui.ui.screen.home.components
 
-import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,7 +27,7 @@ import com.example.ollamaui.ui.theme.OllamaUITheme
 fun DeleteDialog(
     modifier: Modifier = Modifier,
     chatTitle: String,
-    yourName: String,
+    userName: String,
     onCloseClick: () -> Unit,
     onAcceptClick: () -> Unit
 ) {
@@ -50,7 +49,7 @@ fun DeleteDialog(
                 Text(text = "Delete confirmation", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(modifier = Modifier.height(20.dp))
                 Text(text = "Chat title: $chatTitle", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(text = "Author: $yourName", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(text = "Author: $userName", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
 
                 Spacer(modifier = Modifier.height(20.dp))
                 Row(
@@ -83,7 +82,7 @@ private fun DeleteDialogPreview() {
     OllamaUITheme {
         DeleteDialog(
             chatTitle = "newChat",
-            yourName = "author",
+            userName = "author",
             onCloseClick = {},
             onAcceptClick = {},
         )

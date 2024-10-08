@@ -1,6 +1,7 @@
 package com.example.ollamaui.ui.screen.home
 
 import android.app.Activity
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -19,7 +20,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import com.example.ollamaui.R
@@ -48,16 +48,15 @@ fun HomeScreen(
     modelList: List<String>,
     tagError: Int?,
     statusError: Int?,
-    statusThrowable: String?
+    statusThrowable: String?,
 ) {
-
     var fabListVisible by remember { mutableStateOf(false) }
     var isNewChatDialogVisible by remember { mutableStateOf(false) }
     var isAboutDialogVisible by remember { mutableStateOf(false) }
     var isSettingDialogVisible by remember { mutableStateOf(!isOllamaAddressSet) }
     var isDeleteDialogVisible by remember { mutableStateOf(false) }
 
-    var yourName by remember { mutableStateOf("") }
+    var userName by remember { mutableStateOf("") }
     var botName by remember { mutableStateOf("") }
     var chatTitle by remember { mutableStateOf("") }
     var systemPrompt by remember { mutableStateOf("") }
@@ -68,7 +67,6 @@ fun HomeScreen(
     var selectedModel by remember { mutableStateOf("") }
     val isSelectedChatsEmpty by remember(selectedChats) { derivedStateOf { selectedChats.isEmpty() } }
 
-
     val activity = (LocalContext.current as? Activity)
 
     val maxChar = 25
@@ -77,7 +75,6 @@ fun HomeScreen(
         R.drawable.avatar_logo_04, R.drawable.avatar_logo_05, R.drawable.avatar_logo_06,
         R.drawable.avatar_logo_07, R.drawable.avatar_logo_08, R.drawable.avatar_logo_09
     )
-
 
     Scaffold(
         topBar = {
@@ -117,8 +114,10 @@ fun HomeScreen(
                 onItemClick = { item ->
                     fabListVisible = false
                     selectedModel = item
-                    yourName = ""
+                    userName = ""
                     chatTitle = ""
+                    botName = ""
+                    systemPrompt = ""
                     isNewChatDialogVisible = true
                               },
                 onButtonClick = {
@@ -157,18 +156,18 @@ fun HomeScreen(
                 visible = isNewChatDialogVisible
             ) {
                 NewChatDialog(
-                    yourName = yourName,
+                    userName = userName,
                     botName = botName,
                     systemPrompt = systemPrompt,
                     maxChar = maxChar,
-                    onYourNameChange = { if(it.length<=maxChar) yourName = it },
+                    onUserNameChange = { if(it.length<=maxChar) userName = it },
                     chatTitle = chatTitle,
                     onChatTitleChange = { if(it.length<=maxChar) chatTitle = it },
                     onCloseClick = { isNewChatDialogVisible = false},
                     onAcceptClick = {
                         homeViewModel.addNewChat(
                             chatTitle = chatTitle,
-                            yourName = yourName,
+                            userName = userName,
                             botName = botName,
                             chatIcon = avatarList.random(),
                             selectedModel = selectedModel,
@@ -207,7 +206,7 @@ fun HomeScreen(
                 selectedChat.let { chatItem ->
                     DeleteDialog(
                         chatTitle = chatItem.chatTitle,
-                        yourName = chatItem.yourName,
+                        userName = chatItem.userName,
                         onAcceptClick = {
                             homeViewModel.deleteChat(chatItem)
                             isDeleteDialogVisible = false
@@ -227,6 +226,8 @@ fun HomeScreen(
                         NewChatItem(
                             modelName = chatItem.modelName,
                             chatTitle = chatItem.chatTitle,
+                            userName = chatItem.userName,
+                            botName = chatItem.botName,
                             onDeleteClick = {
                                 fabListVisible = false
                                 selectedChat = chatItem
@@ -255,7 +256,8 @@ fun HomeScreen(
                             onSelectedItemClick = {
                                 selectedChats.remove(chatItem.chatId)
                             },
-                            isSelected = selectedChats.contains(chatItem.chatId)
+                            isSelected = selectedChats.contains(chatItem.chatId),
+                            isNewMessageReceived = true
                         )
                     }
                 }

@@ -28,8 +28,8 @@ import com.example.ollamaui.ui.theme.OllamaUITheme
 @Composable
 fun NewChatDialog(
     modifier: Modifier = Modifier,
-    yourName: String,
-    onYourNameChange: (String) -> Unit,
+    userName: String,
+    onUserNameChange: (String) -> Unit,
     botName: String,
     onBotNameChange: (String) -> Unit,
     systemPrompt: String,
@@ -64,8 +64,8 @@ fun NewChatDialog(
                     onDone = { focusManager.moveFocus(FocusDirection.Next) },)
                 Spacer(modifier = Modifier.height(5.dp))
                 CustomTextField(
-                    value = yourName,
-                    onValueChange = onYourNameChange,
+                    value = userName,
+                    onValueChange = onUserNameChange,
                     label = "Your Name",
                     maxChar = maxChar,
                     onDone = { focusManager.moveFocus(FocusDirection.Next) })
@@ -82,7 +82,7 @@ fun NewChatDialog(
                     onValueChange = onSystemPromptChange,
                     label = "Describe the bot",
                     maxChar = maxChar * 6,
-                    onDone = { if (yourName != "" && chatTitle != "") onAcceptClick() },
+                    onDone = { if (userName != "" && chatTitle != "") onAcceptClick() },
                     maxLines = 5,
                     minLines = 5,
                     roundCornerPercent = 10
@@ -99,7 +99,7 @@ fun NewChatDialog(
                     onButtonClick = onAcceptClick,
                     icon = R.drawable.baseline_check_24,
                     buttonSize = 50,
-                    isButtonEnabled = chatTitle.isNotEmpty() && yourName.isNotEmpty(),
+                    isButtonEnabled = chatTitle.isNotEmpty() && userName.isNotEmpty(),
                     containerColor = MaterialTheme.colorScheme.tertiaryContainer
                 )
                 Spacer(modifier = Modifier.width(30.dp))
@@ -120,7 +120,7 @@ fun NewChatDialog(
 private fun NewChatDialogPreview() {
     OllamaUITheme {
         NewChatDialog(
-            yourName = "Me",
+            userName = "Me",
             chatTitle = "Title",
             botName = "Bot",
             systemPrompt = "You are a serial killer!",
@@ -128,7 +128,7 @@ private fun NewChatDialogPreview() {
             onChatTitleChange = {},
             onCloseClick = {},
             onAcceptClick = {},
-            onYourNameChange = {},
+            onUserNameChange = {},
             onBotNameChange = {},
             onSystemPromptChange = {},
         )

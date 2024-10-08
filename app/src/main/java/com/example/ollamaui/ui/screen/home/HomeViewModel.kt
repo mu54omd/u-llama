@@ -1,6 +1,5 @@
 package com.example.ollamaui.ui.screen.home
 
-import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ollamaui.domain.model.ChatModel
@@ -35,20 +34,20 @@ class HomeViewModel @Inject constructor(
 
     fun addNewChat(
         chatTitle: String,
-        yourName: String,
+        userName: String,
         botName: String,
         systemPrompt: String,
         chatIcon: Int,
         selectedModel: String
     ){
-        val startMessage = MessageModel(content = "My name is $yourName and your name is ${botName}. $systemPrompt", role = SYSTEM_ROLE)
+        val startMessage = MessageModel(content = "Your name is $botName and mine is ${userName}. $systemPrompt", role = SYSTEM_ROLE)
         viewModelScope.launch {
             val chatModel = ChatModel(
                 chatTitle = chatTitle,
                 modelName = selectedModel,
                 chatIcon = chatIcon,
                 chatMessages = MessagesModel(messageModels = listOf(startMessage)),
-                yourName = yourName,
+                userName = userName,
                 botName = botName,
             )
             ollamaRepository.insertToDb(chatModel)

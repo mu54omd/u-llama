@@ -1,9 +1,9 @@
 package com.example.ollamaui.ui.screen.home.components
 
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateIntAsState
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -23,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -37,9 +38,12 @@ import com.example.ollamaui.ui.theme.OllamaUITheme
 @Composable
 fun NewChatItem(
     modifier: Modifier = Modifier,
-    modelName: String = "Bot",
-    chatTitle: String = "New Chat",
-    @DrawableRes chatImage: Int = R.drawable.ic_launcher_foreground,
+    modelName: String,
+    botName: String,
+    userName: String,
+    chatTitle: String,
+    isNewMessageReceived: Boolean,
+    @DrawableRes chatImage: Int,
     onDeleteClick: () -> Unit,
     onItemClick: () -> Unit,
     onSelectedItemClick: () -> Unit,
@@ -81,9 +85,16 @@ fun NewChatItem(
             }
 
     ){
+        NewMessageIndicator(
+            isNewMessageReceived = isNewMessageReceived,
+            color = MaterialTheme.colorScheme.tertiaryContainer,
+            size = 15,
+            modifier = Modifier.align(alignment = BiasAlignment(1f, -1f))
+        )
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
+
             Box(
                 modifier = Modifier
                     .padding(5.dp)
@@ -94,16 +105,18 @@ fun NewChatItem(
             ) {
                 Icon(
                     painter = painterResource(chatImage),
-                    contentDescription = "Chat Title",
+                    contentDescription = "Chat Image",
                     modifier = Modifier.fillMaxSize(),
                     tint = MaterialTheme.colorScheme.onSurface
                 )
+
             }
             Spacer(modifier = Modifier.width(10.dp))
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-                Text(text = modelName, style = MaterialTheme.typography.labelMedium)
+                Text(text = "$botName ($modelName)", style = MaterialTheme.typography.labelMedium)
+                Text(text = "Your Name: $userName", style = MaterialTheme.typography.labelMedium)
                 Text(text = chatTitle, style = MaterialTheme.typography.headlineMedium)
             }
             Column(
@@ -139,7 +152,13 @@ private fun NewChatItemPreview() {
             onItemClick = {},
             onItemLongPress = {},
             onSelectedItemClick = {},
-            isSelected = false
+            isSelected = false,
+            userName = "User",
+            botName = "Bot",
+            modelName = "llama3.1",
+            chatTitle = "Title",
+            chatImage = R.drawable.ic_launcher_foreground,
+            isNewMessageReceived = true
         )
     }
 }

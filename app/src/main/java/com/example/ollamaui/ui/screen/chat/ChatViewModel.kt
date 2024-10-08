@@ -25,6 +25,7 @@ class ChatViewModel @Inject constructor(
 
     private val _chatState = MutableStateFlow(ChatStates())
     val chatState = _chatState.asStateFlow()
+    private val isRespondingList = mutableListOf<Int>()
 
     //Public methods
     /*---------------------------------------------------------------------------------------------*/
@@ -41,12 +42,12 @@ class ChatViewModel @Inject constructor(
                 chatTitle = oldChatModel.chatTitle,
                 chatMessages = MessagesModel( messageModels = messages),
                 modelName = oldChatModel.modelName,
-                yourName = oldChatModel.yourName,
+                userName = oldChatModel.userName,
                 botName = oldChatModel.botName
             )
         )
         }
-        ollamaPostMessage(MessagesModel(messageModels = messages))
+        ollamaPostMessage(messages = MessagesModel(messageModels = messages), chatId = oldChatModel.chatId)
     }
 
     fun loadStates(chatModel: ChatModel, url: String) {
@@ -64,9 +65,8 @@ class ChatViewModel @Inject constructor(
             chatModel = EmptyChatModel.empty,
             chatResponse = EmptyChatResponse.empty,
             chatError = null,
-            isResponding = false,
             isChatScreenOpen = false,
-            isChatDatabaseChanged = false
+            isChatDatabaseChanged = false,
         ) }
     }
 
@@ -81,11 +81,12 @@ class ChatViewModel @Inject constructor(
     /*---------------------------------------------------------------------------------------------*/
     /*---------------------------------------------------------------------------------------------*/
     /*---------------------------------------------------------------------------------------------*/
-    private fun ollamaPostMessage(messages: MessagesModel){
+    private fun ollamaPostMessage(messages: MessagesModel, chatId: Int){
         val oldMessages = chatState.value.chatModel.chatMessages.messageModels.toMutableList()
         val oldChatModel = chatState.value.chatModel
         viewModelScope.launch {
-            _chatState.update { it.copy(isResponding = true) }
+            if(!isRespondingList.contains(chatState.value.chatModel.chatId)) isRespondingList.add(chatId)
+            _chatState.update { it.copy(isRespondingList = isRespondingList) }
             ollamaRepository.postOllamaChat(
                 baseUrl = chatState.value.ollamaBaseAddress,
                 chatEndpoint = OLLAMA_CHAT_ENDPOINT,
@@ -96,20 +97,24 @@ class ChatViewModel @Inject constructor(
                 )
             ).onRight { response ->
                 oldMessages.add(MessageModel(content = response.message.content, role = response.message.role))
-                _chatState.update { it.copy(
-                    chatModel = ChatModel(
-                            chatId = oldChatModel.chatId,
-                            chatIcon = oldChatModel.chatIcon,
-                            chatTitle = oldChatModel.chatTitle,
-                            chatMessages = MessagesModel( messageModels = oldMessages ),
-                            modelName = oldChatModel.modelName,
-                            yourName = oldChatModel.yourName,
-                        botName = oldChatModel.botName
-                        ),
-                    chatResponse = response,
-                    isResponding = false,
-                    chatError = null
-                    )
+                isRespondingList.remove(chatId)
+                _chatState.update { it.copy(isRespondingList = isRespondingList) }
+                if(chatState.value.chatModel.chatId == oldChatModel.chatId) {
+                    _chatState.update {
+                        it.copy(
+                            chatModel = ChatModel(
+                                chatId = oldChatModel.chatId,
+                                chatIcon = oldChatModel.chatIcon,
+                                chatTitle = oldChatModel.chatTitle,
+                                chatMessages = MessagesModel(messageModels = oldMessages),
+                                modelName = oldChatModel.modelName,
+                                userName = oldChatModel.userName,
+                                botName = oldChatModel.botName
+                            ),
+                            chatResponse = response,
+                            chatError = null
+                        )
+                    }
                 }
                 uploadChatToDatabase(
                     chatModel = ChatModel(
@@ -118,17 +123,20 @@ class ChatViewModel @Inject constructor(
                         chatTitle = oldChatModel.chatTitle,
                         chatMessages = MessagesModel( messageModels = oldMessages),
                         modelName = oldChatModel.modelName,
-                        yourName = oldChatModel.yourName,
+                        userName = oldChatModel.userName,
                         botName = oldChatModel.botName
                     ),
                 )
             }.onLeft { error ->
-                _chatState.update {
-                    it.copy(
-                        chatError = error.error.message,
-                        isResponding = false,
-                        chatResponse = EmptyChatResponse.empty
-                    )
+                isRespondingList.remove(chatId)
+                _chatState.update { it.copy(isRespondingList = isRespondingList) }
+                if(chatState.value.chatModel.chatId == oldChatModel.chatId) {
+                    _chatState.update {
+                        it.copy(
+                            chatError = error.error.message,
+                            chatResponse = EmptyChatResponse.empty
+                        )
+                    }
                 }
             }
         }

@@ -9,7 +9,7 @@ data class ChatStates(
     val ollamaBaseAddress: String = "",
     val chatModel: ChatModel = EmptyChatModel.empty,
     val chatResponse: ChatResponse = EmptyChatResponse.empty,
-    val isResponding: Boolean = false,
+    val isRespondingList: List<Int> = emptyList(),
     val chatError: Int? = null,
     val isChatScreenOpen: Boolean = false,
     val isChatDatabaseChanged: Boolean = false,
