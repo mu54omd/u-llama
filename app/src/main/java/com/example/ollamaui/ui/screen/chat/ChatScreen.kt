@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,13 +47,18 @@ fun ChatScreen(
                 textValue = textValue,
                 onValueChange = { textValue = it },
                 onSendClick = {
-                    chatViewModel.sendButton(textValue)
-                    textValue = ""
-                    textValueBackup = textValue
+                    if(chatState.isSendingFailed){
+                        chatViewModel.retry()
+                    }else {
+                        chatViewModel.sendButton(textValue)
+                        textValue = ""
+                        textValueBackup = textValue
+                    }
                 },
                 onClearClick = { textValue = "" },
                 onAttachClick = {},
-                isModelSelected = chatState.chatModel.modelName != ""
+                isModelSelected = chatState.chatModel.modelName != "",
+                isSendingFailed = chatState.isSendingFailed
             )
         }
     ) { contentPadding ->
@@ -70,7 +76,7 @@ fun ChatScreen(
                 messagesModel = chatState.chatModel.chatMessages ,
                 modifier = Modifier.weight(1f),
                 botName = chatState.chatModel.botName,
-                userName = chatState.chatModel.userName
+                userName = chatState.chatModel.userName,
             )
             Column (
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -78,15 +84,10 @@ fun ChatScreen(
                 modifier = Modifier.height(20.dp)
             ) {
                 AnimatedVisibility(visible = chatState.isRespondingList.contains(chatState.chatModel.chatId)) {
-//                    LinearProgressIndicator(modifier = Modifier.width(30.dp))
                     DotsPulsing()
                 }
-                AnimatedVisibility(visible = chatState.chatError != null) {
-                    CustomButton(
-                        description = "Resend Message",
-                        onButtonClick = { chatViewModel.sendButton(textValueBackup)},
-                        icon = R.drawable.baseline_refresh_24,
-                    )
+                AnimatedVisibility(visible = chatState.isSendingFailed) {
+                    Text(text = "Try again!")
                 }
             }
             Spacer(modifier = Modifier.height(2.dp))

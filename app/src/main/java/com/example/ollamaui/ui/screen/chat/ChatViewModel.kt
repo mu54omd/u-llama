@@ -49,31 +49,51 @@ class ChatViewModel @Inject constructor(
         }
         ollamaPostMessage(messages = MessagesModel(messageModels = messages), chatId = oldChatModel.chatId)
     }
+    fun retry(){
+        if(!isRespondingList.contains(chatState.value.chatModel.chatId)) {
+            isRespondingList.add(chatState.value.chatModel.chatId)
+        }
+        _chatState.update { it.copy(chatError = null, isRespondingList = isRespondingList, isSendingFailed = false) }
+        ollamaPostMessage(messages = chatState.value.chatModel.chatMessages, chatId = chatState.value.chatModel.chatId)
+    }
 
     fun loadStates(chatModel: ChatModel, url: String) {
         _chatState.update {
             it.copy(
                 chatModel = chatModel,
                 ollamaBaseAddress = url,
-                isChatScreenOpen = true,
+                isSendingFailed = chatModel.newMessageStatus == 2
             )
+        }
+        viewModelScope.launch {
+            if(chatModel.newMessageStatus !=2) {
+                ollamaRepository.updateDbItem(chatModel.copy(newMessageStatus = 0))
+            }
         }
     }
 
     fun clearStates(){
-        _chatState.update { it.copy(
-            chatModel = EmptyChatModel.empty,
-            chatResponse = EmptyChatResponse.empty,
-            chatError = null,
-            isChatScreenOpen = false,
-            isChatDatabaseChanged = false,
-        ) }
+        viewModelScope.launch {
+            if(chatState.value.chatModel.newMessageStatus == 1) {
+                ollamaRepository.updateDbItem(
+                    chatModel = chatState.value.chatModel.copy(
+                        newMessageStatus = 0
+                    )
+                )
+            }
+            _chatState.update {
+                it.copy(
+                    chatModel = EmptyChatModel.empty,
+                    chatResponse = EmptyChatResponse.empty,
+                    chatError = null,
+                )
+            }
+        }
     }
 
     fun uploadChatToDatabase(chatModel: ChatModel){
         viewModelScope.launch {
             ollamaRepository.updateDbItem(chatModel = chatModel)
-            _chatState.update { it.copy(isChatDatabaseChanged = true) }
         }
     }
 
@@ -124,12 +144,13 @@ class ChatViewModel @Inject constructor(
                         chatMessages = MessagesModel( messageModels = oldMessages),
                         modelName = oldChatModel.modelName,
                         userName = oldChatModel.userName,
-                        botName = oldChatModel.botName
+                        botName = oldChatModel.botName,
+                        newMessageStatus = if(chatState.value.chatModel.chatId == oldChatModel.chatId) 0 else 1
                     ),
                 )
             }.onLeft { error ->
                 isRespondingList.remove(chatId)
-                _chatState.update { it.copy(isRespondingList = isRespondingList) }
+                _chatState.update { it.copy(isRespondingList = isRespondingList, isSendingFailed = true) }
                 if(chatState.value.chatModel.chatId == oldChatModel.chatId) {
                     _chatState.update {
                         it.copy(
@@ -138,6 +159,7 @@ class ChatViewModel @Inject constructor(
                         )
                     }
                 }
+                uploadChatToDatabase(oldChatModel.copy(newMessageStatus = 2))
             }
         }
     }

@@ -9,6 +9,7 @@ object Constants {
     const val OLLAMA_CHAT_ENDPOINT = "/api/chat"
 
     const val CHAT_DATABASE = "chat_db"
+    const val CHAT_STATUS_DATABASE = "chat_status_db"
 
     const val USER_SETTING = "user_setting"
     const val IS_OLLAMA_ADDRESS_SET = "is_ollama_address_set"

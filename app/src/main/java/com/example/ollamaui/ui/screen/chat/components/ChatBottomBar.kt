@@ -32,6 +32,7 @@ fun ChatBottomBar(
     modifier: Modifier = Modifier,
     textValue: String,
     onValueChange: (String) -> Unit,
+    isSendingFailed: Boolean,
     onSendClick: () -> Unit,
     onClearClick: () -> Unit,
     onAttachClick: () -> Unit,
@@ -93,11 +94,11 @@ fun ChatBottomBar(
                 )
             CustomButton(
                 description = "Send Button",
-                icon = R.drawable.baseline_send_24,
+                icon = if(isSendingFailed) R.drawable.baseline_refresh_24 else R.drawable.baseline_send_24,
                 buttonSize = 50,
                 iconSize = 25,
                 onButtonClick = onSendClick,
-                isButtonEnabled = (textValue != "") && isModelSelected
+                isButtonEnabled = ((textValue != "")|| isSendingFailed) && isModelSelected
             )
         }
     }
@@ -113,7 +114,8 @@ private fun ChatBottomBarPreview() {
             onAttachClick = {},
             onSendClick = {},
             onClearClick = {},
-            isModelSelected = true
+            isModelSelected = true,
+            isSendingFailed = false
         )
     }
     

@@ -51,6 +51,7 @@ class HomeViewModel @Inject constructor(
                 botName = botName,
             )
             ollamaRepository.insertToDb(chatModel)
+
         }
     }
 

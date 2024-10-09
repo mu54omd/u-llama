@@ -80,7 +80,7 @@ fun LoadingScreen(
 private fun LoadingScreenPreview() {
     OllamaUITheme {
         LoadingScreen(
-            isLocalSettingLoaded = false,
+            isLocalSettingLoaded = true,
             onDispose = {}
         )
     }

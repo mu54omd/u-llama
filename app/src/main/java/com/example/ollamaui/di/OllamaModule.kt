@@ -11,6 +11,7 @@ import com.example.ollamaui.data.repository.OllamaRepositoryImpl
 import com.example.ollamaui.domain.preferences.LocalUserManager
 import com.example.ollamaui.domain.repository.OllamaRepository
 import com.example.ollamaui.utils.Constants.CHAT_DATABASE
+import com.example.ollamaui.utils.Constants.CHAT_STATUS_DATABASE
 import com.example.ollamaui.utils.Constants.OLLAMA_ADDRESS
 import com.example.ollamaui.utils.Constants.OLLAMA_BASE_URL
 import com.google.gson.GsonBuilder
@@ -64,7 +65,7 @@ object OllamaModule {
     //Provide Chat Database for Hilt
     @Provides
     @Singleton
-    fun provideBookmarkDatabase( application: Application): ChatDatabase {
+    fun provideChatDatabase( application: Application): ChatDatabase {
         return Room.databaseBuilder(
             context = application,
             klass = ChatDatabase::class.java,
@@ -73,14 +74,16 @@ object OllamaModule {
             .build()
     }
 
-    //Provide Chat Database for Hilt
+    //Provide Chat Dao for Hilt
     @Provides
     @Singleton
-    fun provideBookmarkDao(
+    fun provideChatDao(
         chatDatabase: ChatDatabase
     ): ChatDao{
         return chatDatabase.chatDao
     }
+
+
 
     @Provides
     @Singleton

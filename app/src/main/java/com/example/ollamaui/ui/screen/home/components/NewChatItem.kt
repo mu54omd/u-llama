@@ -1,9 +1,10 @@
 package com.example.ollamaui.ui.screen.home.components
 
 import androidx.annotation.DrawableRes
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -43,6 +44,7 @@ fun NewChatItem(
     userName: String,
     chatTitle: String,
     isNewMessageReceived: Boolean,
+    newMessageStatus: Int,
     @DrawableRes chatImage: Int,
     onDeleteClick: () -> Unit,
     onItemClick: () -> Unit,
@@ -59,6 +61,14 @@ fun NewChatItem(
         if(isSelected) 5 else 10,
         label = "Animated Size"
     )
+    val indicatorAnimation by animateColorAsState(
+        if(isNewMessageReceived) {
+            if(newMessageStatus == 1) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.error
+        } else MaterialTheme.colorScheme.surfaceContainer,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioHighBouncy, stiffness = Spring.StiffnessMedium),
+        label = "Indicator",
+    )
+
     Box(
         modifier = modifier
             .padding(start = animatedSize.dp, end = animatedSize.dp, top = animatedSize.dp)
@@ -83,14 +93,7 @@ fun NewChatItem(
                     }
                 )
             }
-
     ){
-        NewMessageIndicator(
-            isNewMessageReceived = isNewMessageReceived,
-            color = MaterialTheme.colorScheme.tertiaryContainer,
-            size = 15,
-            modifier = Modifier.align(alignment = BiasAlignment(1f, -1f))
-        )
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -99,14 +102,17 @@ fun NewChatItem(
                 modifier = Modifier
                     .padding(5.dp)
                     .clip(RoundedCornerShape(100))
-                    .background(color = MaterialTheme.colorScheme.surfaceContainer)
+                    .background(color = indicatorAnimation)
                     .size(75.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     painter = painterResource(chatImage),
                     contentDescription = "Chat Image",
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(100))
+                        .background(color = MaterialTheme.colorScheme.surfaceContainer)
+                        .size(60.dp),
                     tint = MaterialTheme.colorScheme.onSurface
                 )
 
@@ -158,7 +164,8 @@ private fun NewChatItemPreview() {
             modelName = "llama3.1",
             chatTitle = "Title",
             chatImage = R.drawable.ic_launcher_foreground,
-            isNewMessageReceived = true
+            isNewMessageReceived = true,
+            newMessageStatus = 2
         )
     }
 }

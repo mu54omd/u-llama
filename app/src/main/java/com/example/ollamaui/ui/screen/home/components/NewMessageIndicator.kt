@@ -1,11 +1,14 @@
 package com.example.ollamaui.ui.screen.home.components
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -20,17 +23,17 @@ fun NewMessageIndicator(
     color: Color,
     size: Int,
 ) {
-    AnimatedVisibility(
-        visible = isNewMessageReceived,
+    val animatedSize by animateIntAsState(
+        targetValue = if(isNewMessageReceived) size else 0,
+        animationSpec = tween(),
+        label = "Animated Size"
+    )
+    Box(
         modifier = modifier
-    ) {
-        Box(
-            modifier = Modifier
-                .clip(RoundedCornerShape(100))
-                .background(color = color)
-                .size(size.dp)
-        )
-    }
+            .clip(RoundedCornerShape(100))
+            .background(color = color)
+            .size(animatedSize.dp)
+    )
 }
 
 @Preview

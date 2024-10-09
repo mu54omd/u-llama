@@ -5,7 +5,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.ollamaui.domain.model.ChatModel
 
-@Database(entities = [ChatModel::class], version = 2, exportSchema = true)
+@Database(entities = [ChatModel::class], version = 1, exportSchema = true)
 @TypeConverters(value = [ChatConverter::class])
 abstract class ChatDatabase:RoomDatabase() {
     abstract val chatDao: ChatDao

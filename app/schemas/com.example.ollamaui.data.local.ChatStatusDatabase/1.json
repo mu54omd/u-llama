@@ -1,0 +1,40 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "91f12eaefa8f108997fe38139abc7be0",
+    "entities": [
+      {
+        "tableName": "ChatStatusModel",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`chatId` INTEGER NOT NULL, `isNewMessageReceived` INTEGER NOT NULL, PRIMARY KEY(`chatId`))",
+        "fields": [
+          {
+            "fieldPath": "chatId",
+            "columnName": "chatId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isNewMessageReceived",
+            "columnName": "isNewMessageReceived",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "chatId"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '91f12eaefa8f108997fe38139abc7be0')"
+    ]
+  }
+}

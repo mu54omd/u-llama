@@ -33,7 +33,8 @@ fun ChatDialog(
     messageModel: MessageModel,
     userName: String,
     botName: String,
-    modifier: Modifier = Modifier) {
+    modifier: Modifier = Modifier
+) {
     var isVisible by remember { mutableStateOf(false) }
     val isFromMe = isFromMe(messageModel)
     Column(

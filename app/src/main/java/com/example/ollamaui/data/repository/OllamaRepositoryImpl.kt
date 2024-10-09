@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 class OllamaRepositoryImpl @Inject constructor(
     private val ollamaApi: OllamaApi,
-    private val chatDao: ChatDao
+    private val chatDao: ChatDao,
 ): OllamaRepository {
     override suspend fun getOllamaStatus(baseUrl: String, baseEndpoint: String): Either<NetworkError, String> {
         return Either.catch { ollamaApi.ollamaState(fullUrl = baseUrl + baseEndpoint) }.mapLeft { it.toNetworkError() }

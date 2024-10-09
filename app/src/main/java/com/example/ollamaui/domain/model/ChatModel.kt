@@ -13,6 +13,7 @@ data class ChatModel(
     val botName: String,
     val chatTitle: String,
     val chatMessages: MessagesModel,
+    val newMessageStatus: Int = 0,
 )
 
 
@@ -25,5 +26,6 @@ object EmptyChatModel {
         chatMessages = EmptyMessageModel.empty,
         chatIcon = 0,
         chatTitle = "",
+        newMessageStatus = 0
     )
 }
