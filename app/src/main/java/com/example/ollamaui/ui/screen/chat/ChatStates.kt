@@ -12,4 +12,5 @@ data class ChatStates(
     val isRespondingList: List<Int> = emptyList(),
     val chatError: Int? = null,
     val isSendingFailed: Boolean = false,
+    val isDatabaseChanged: Boolean = false
 )

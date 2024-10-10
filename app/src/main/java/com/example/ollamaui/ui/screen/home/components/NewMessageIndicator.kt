@@ -1,6 +1,5 @@
 package com.example.ollamaui.ui.screen.home.components
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background

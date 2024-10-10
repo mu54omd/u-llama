@@ -68,11 +68,6 @@ fun HomeScreen(
     val activity = (LocalContext.current as? Activity)
 
     val maxChar = 25
-//    val avatarList = listOf(
-//        R.drawable.avatar_logo_01, R.drawable.avatar_logo_02, R.drawable.avatar_logo_03,
-//        R.drawable.avatar_logo_04, R.drawable.avatar_logo_05, R.drawable.avatar_logo_06,
-//        R.drawable.avatar_logo_07, R.drawable.avatar_logo_08, R.drawable.avatar_logo_09
-//    )
     val avatarList = listOf(
         R.drawable.avatar_man_01, R.drawable.avatar_man_02, R.drawable.avatar_man_03, R.drawable.avatar_man_04,
         R.drawable.avatar_woman_01, R.drawable.avatar_woman_02, R.drawable.avatar_woman_03, R.drawable.avatar_woman_04

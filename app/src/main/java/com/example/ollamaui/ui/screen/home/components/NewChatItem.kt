@@ -1,6 +1,5 @@
 package com.example.ollamaui.ui.screen.home.components
 
-import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.animateColorAsState
@@ -79,7 +78,6 @@ fun NewChatItem(
                 detectTapGestures(
                     onLongPress = {
                         onItemLongPress()
-
                     } ,
                     onTap = {
                         when{

@@ -43,8 +43,9 @@ class ChatViewModel @Inject constructor(
                 chatMessages = MessagesModel( messageModels = messages),
                 modelName = oldChatModel.modelName,
                 userName = oldChatModel.userName,
-                botName = oldChatModel.botName
-            )
+                botName = oldChatModel.botName,
+            ),
+            isDatabaseChanged = true
         )
         }
         ollamaPostMessage(messages = MessagesModel(messageModels = messages), chatId = oldChatModel.chatId)
@@ -67,33 +68,24 @@ class ChatViewModel @Inject constructor(
         }
         viewModelScope.launch {
             if(chatModel.newMessageStatus !=2) {
-                ollamaRepository.updateDbItem(chatModel.copy(newMessageStatus = 0))
+                uploadChatToDatabase(chatModel = chatModel.copy(newMessageStatus = 0))
             }
         }
     }
 
     fun clearStates(){
         viewModelScope.launch {
-            if(chatState.value.chatModel.newMessageStatus == 1) {
-                ollamaRepository.updateDbItem(
-                    chatModel = chatState.value.chatModel.copy(
-                        newMessageStatus = 0
-                    )
-                )
+            if(chatState.value.isDatabaseChanged && chatState.value.chatModel.newMessageStatus != 2) {
+                uploadChatToDatabase(chatModel = chatState.value.chatModel.copy(newMessageStatus = 0))
             }
             _chatState.update {
                 it.copy(
                     chatModel = EmptyChatModel.empty,
                     chatResponse = EmptyChatResponse.empty,
                     chatError = null,
+                    isDatabaseChanged = false
                 )
             }
-        }
-    }
-
-    fun uploadChatToDatabase(chatModel: ChatModel){
-        viewModelScope.launch {
-            ollamaRepository.updateDbItem(chatModel = chatModel)
         }
     }
 
@@ -162,5 +154,9 @@ class ChatViewModel @Inject constructor(
                 uploadChatToDatabase(oldChatModel.copy(newMessageStatus = 2))
             }
         }
+    }
+
+    private suspend fun uploadChatToDatabase(chatModel: ChatModel){
+        ollamaRepository.updateDbItem(chatModel = chatModel)
     }
 }

@@ -58,30 +58,17 @@ fun ChatDialog(
                     }
                     .background(color = if (isFromMe) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.secondaryContainer)
                     .padding(16.dp)
+
             ) {
                 Column(
                     horizontalAlignment = if (isFromMe) Alignment.End else Alignment.Start,
                 ) {
                     Text(text = messageModel.content)
-                    Spacer(modifier = Modifier.height(2.dp))
-                    AnimatedVisibility(
-                        visible = isVisible
-                    ) {
-                        Card(
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                            )
-                        ) {
-                            Text(
-                                text = if(isFromMe(messageModel)) userName else botName,
-                                style = MaterialTheme.typography.bodySmall,
-                                modifier = Modifier.padding(5.dp)
-                            )
-                        }
-                    }
                 }
+                Spacer(modifier = Modifier.height(2.dp))
             }
-        }
+        ChatDialogDetails(isVisible = isVisible, isFromMe = isFromMe, userName = userName, botName = botName)
+    }
 
 }
 

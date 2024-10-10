@@ -81,7 +81,6 @@ fun AppNavigation(
                     chatViewModel = chatViewModel,
                     chatState = chatState,
                     onBackClick = {
-                        //chatViewModel.uploadChatToDatabase(chatState.chatModel)
                         chatViewModel.clearStates()
                         navigateToTab(
                             navController = navController,
