@@ -12,6 +12,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.ollamaui.R
+import com.example.ollamaui.domain.model.MessageModel
 import com.example.ollamaui.domain.model.MessagesModel
 import com.example.ollamaui.ui.screen.common.CustomButton
 import com.example.ollamaui.utils.Constants.SYSTEM_ROLE
@@ -22,6 +23,11 @@ fun Conversation(
     userName: String,
     messagesModel: MessagesModel,
     modifier: Modifier = Modifier,
+    isSelected: (MessageModel) -> Boolean,
+    isVisible: (MessageModel) -> Boolean,
+    onItemClick: (MessageModel) -> Unit,
+    onLongPressItem: (MessageModel) -> Unit,
+    onSelectedItemClick: (MessageModel) -> Unit,
 ) {
     val listState = rememberLazyListState()
     LaunchedEffect(messagesModel.messageModels.size) {
@@ -42,6 +48,11 @@ fun Conversation(
                     modifier = Modifier.animateItem(),
                     botName = botName,
                     userName = userName,
+                    isSelected = isSelected(message),
+                    isVisible = isVisible(message),
+                    onLongPressItem = { onLongPressItem(message) },
+                    onItemClick = { onItemClick(message) },
+                    onSelectedItemClick = { onSelectedItemClick(message) },
                 )
             }
         }
