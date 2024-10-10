@@ -64,15 +64,18 @@ fun ChatTopBar(
                 modifier = Modifier
                     .padding(5.dp)
                     .clip(RoundedCornerShape(100))
-                    .background(color = MaterialTheme.colorScheme.surfaceContainer)
+                    .background(color = MaterialTheme.colorScheme.surfaceVariant)
                     .size(75.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
+                Image(
                     painter = painterResource(chatIcon),
                     contentDescription = chatTitle,
-                    modifier = Modifier.fillMaxSize(),
-                    tint = MaterialTheme.colorScheme.onSurface
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(100))
+                        .background(color = MaterialTheme.colorScheme.outline)
+                        .size(65.dp),
+//                    tint = MaterialTheme.colorScheme.onSurface
                 )
             }
             Spacer(modifier = Modifier.width(10.dp))
@@ -89,7 +92,7 @@ private fun ChatTopBarPreview() {
         ChatTopBar(
             botName = "Name",
             chatTitle = "Title",
-            chatIcon = R.drawable.avatar_logo_06,
+            chatIcon = R.drawable.avatar_man_03,
             onBackClick = {}
         )
     }

@@ -1,10 +1,13 @@
 package com.example.ollamaui.ui.screen.home.components
 
+import android.content.res.Configuration
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -12,19 +15,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -106,14 +106,14 @@ fun NewChatItem(
                     .size(75.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
+                Image(
                     painter = painterResource(chatImage),
                     contentDescription = "Chat Image",
                     modifier = Modifier
                         .clip(RoundedCornerShape(100))
-                        .background(color = MaterialTheme.colorScheme.surfaceContainer)
-                        .size(60.dp),
-                    tint = MaterialTheme.colorScheme.onSurface
+                        .background(color = MaterialTheme.colorScheme.outline)
+                        .size(65.dp),
+//                    tint = MaterialTheme.colorScheme.primaryContainer
                 )
 
             }
@@ -149,6 +149,7 @@ fun NewChatItem(
     }
 }
 
+@Preview(uiMode = UI_MODE_NIGHT_YES)
 @Preview
 @Composable
 private fun NewChatItemPreview() {
@@ -163,8 +164,8 @@ private fun NewChatItemPreview() {
             botName = "Bot",
             modelName = "llama3.1",
             chatTitle = "Title",
-            chatImage = R.drawable.ic_launcher_foreground,
-            isNewMessageReceived = true,
+            chatImage = R.drawable.avatar_man_01,
+            isNewMessageReceived = false,
             newMessageStatus = 2
         )
     }
