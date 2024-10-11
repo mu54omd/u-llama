@@ -1,5 +1,6 @@
 package com.example.ollamaui.ui.screen.home.components
 
+import android.view.KeyEvent.ACTION_DOWN
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,6 +13,9 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -49,7 +53,18 @@ fun CustomTextField(
         keyboardActions = KeyboardActions(
             onDone = { onDone() }
         ),
-        modifier = modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(start = 10.dp, end = 10.dp)
+            .onPreviewKeyEvent { event ->
+                if(event.key == Key.Enter && event.nativeKeyEvent.action == ACTION_DOWN){
+                    onDone()
+                    true
+                } else {
+                    false
+                }
+            }
+        ,
         supportingText = {
             Text(
                 text = "${value.length}/$maxChar",

@@ -34,7 +34,9 @@ fun ChatTopBar(
     @DrawableRes chatIcon: Int,
     botName: String,
     chatTitle: String,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onCopyClick: () -> Unit,
+    isCopyButtonEnabled: Boolean
 ) {
     Column(
         verticalArrangement = Arrangement.Center,
@@ -42,7 +44,7 @@ fun ChatTopBar(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start,
+            horizontalArrangement = Arrangement.SpaceBetween,
             modifier = modifier
                 .fillMaxWidth()
                 .background(color = MaterialTheme.colorScheme.background)
@@ -56,41 +58,55 @@ fun ChatTopBar(
                 buttonSize = 50,
                 containerColor = MaterialTheme.colorScheme.background
             )
-            Spacer(modifier = Modifier.width(20.dp))
-            Box(
-                modifier = Modifier
-                    .padding(5.dp)
-                    .clip(RoundedCornerShape(100))
-                    .background(color = MaterialTheme.colorScheme.surfaceVariant)
-                    .size(75.dp),
-                contentAlignment = Alignment.Center
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start,
+                modifier = Modifier.weight(1f)
             ) {
-                Image(
-                    painter = painterResource(chatIcon),
-                    contentDescription = chatTitle,
+                Box(
                     modifier = Modifier
+                        .padding(5.dp)
                         .clip(RoundedCornerShape(100))
-                        .background(color = MaterialTheme.colorScheme.outline)
-                        .size(65.dp),
-//                    tint = MaterialTheme.colorScheme.onSurface
-                )
+                        .background(color = MaterialTheme.colorScheme.surfaceVariant)
+                        .size(75.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = painterResource(chatIcon),
+                        contentDescription = chatTitle,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(100))
+                            .background(color = MaterialTheme.colorScheme.outline)
+                            .size(65.dp),
+                    )
+                }
+                Spacer(modifier = Modifier.width(10.dp))
+                ChatTitle(title = chatTitle, botName = botName)
             }
-            Spacer(modifier = Modifier.width(10.dp))
-            ChatTitle(title = chatTitle, botName = botName)
+            CustomButton(
+                description = "Copy Icon",
+                onButtonClick = onCopyClick,
+                icon = R.drawable.baseline_content_copy_24,
+                buttonSize = 50,
+                containerColor = MaterialTheme.colorScheme.background,
+                isButtonEnabled = isCopyButtonEnabled
+            )
         }
         HorizontalDivider()
     }
 }
 
-@Preview
+@Preview(showSystemUi = true)
 @Composable
 private fun ChatTopBarPreview() {
     OllamaUITheme {
         ChatTopBar(
-            botName = "Name",
-            chatTitle = "Title",
+            botName = "Very very very very very long name",
+            chatTitle = "Very very very very very long title",
             chatIcon = R.drawable.avatar_man_03,
-            onBackClick = {}
+            onBackClick = {},
+            onCopyClick = {},
+            isCopyButtonEnabled = true
         )
     }
 }

@@ -4,13 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TextField
@@ -19,9 +15,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
 import com.example.ollamaui.R
 import com.example.ollamaui.ui.screen.common.CustomButton
@@ -33,6 +28,7 @@ fun ChatBottomBar(
     textValue: String,
     onValueChange: (String) -> Unit,
     isSendingFailed: Boolean,
+    isResponding: Boolean,
     onSendClick: () -> Unit,
     onClearClick: () -> Unit,
     onAttachClick: () -> Unit,
@@ -48,7 +44,7 @@ fun ChatBottomBar(
         HorizontalDivider(thickness = 1.dp)
         Row(
             horizontalArrangement = Arrangement.spacedBy(2.dp),
-            verticalAlignment = Alignment.CenterVertically,
+            verticalAlignment = Alignment.Bottom,
             modifier = modifier.fillMaxWidth().padding(top = 10.dp)
         ) {
             CustomButton(
@@ -77,24 +73,18 @@ fun ChatBottomBar(
                         )
                     }
                 },
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .weight(1f)
+                ,
                 maxLines = 5,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Send
-                ),
-                keyboardActions = KeyboardActions(
-                    onSend = {
-                        onSendClick()
-                    },
-                    onDone = {
-                        onSendClick()
-                    }
-                ),
                 )
             CustomButton(
                 description = "Send Button",
-                icon = if(isSendingFailed) R.drawable.baseline_refresh_24 else R.drawable.baseline_send_24,
+                icon = when{
+                    isSendingFailed -> R.drawable.baseline_refresh_24
+                    isResponding -> R.drawable.baseline_stop_24
+                    else -> R.drawable.baseline_send_24
+                           },
                 buttonSize = 50,
                 iconSize = 25,
                 onButtonClick = onSendClick,
@@ -109,13 +99,14 @@ fun ChatBottomBar(
 private fun ChatBottomBarPreview() {
     OllamaUITheme {
         ChatBottomBar(
-            textValue = "",
+            textValue = LoremIpsum(500).values.joinToString(),
             onValueChange = {},
             onAttachClick = {},
             onSendClick = {},
             onClearClick = {},
             isModelSelected = true,
-            isSendingFailed = false
+            isSendingFailed = false,
+            isResponding = true
         )
     }
     

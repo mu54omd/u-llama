@@ -1,5 +1,6 @@
 package com.example.ollamaui.ui.screen.chat
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
@@ -19,8 +20,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ClipboardManager
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import com.example.ollamaui.domain.model.MessageModel
+import com.example.ollamaui.ui.common.messageModelToText
 import com.example.ollamaui.ui.screen.chat.components.ChatBottomBar
 import com.example.ollamaui.ui.screen.chat.components.ChatTopBar
 import com.example.ollamaui.ui.screen.chat.components.Conversation
@@ -36,13 +41,22 @@ fun ChatScreen(
     var textValueBackup by rememberSaveable { mutableStateOf("") }
     val selectedDialogs = remember { mutableStateListOf<MessageModel>() }
     val visibleDetails = remember { mutableStateListOf<MessageModel>() }
+    val clipboard: ClipboardManager = LocalClipboardManager.current
+
     Scaffold(
         topBar = {
             ChatTopBar(
                 botName = chatState.chatModel.botName,
                 chatTitle = chatState.chatModel.chatTitle,
                 chatIcon = chatState.chatModel.chatIcon,
-                onBackClick = onBackClick
+                onBackClick = onBackClick,
+                onCopyClick = {
+                    Log.d("cTAG", "$selectedDialogs")
+                    clipboard.setText(AnnotatedString(text = messageModelToText(selectedDialogs)))
+                    Log.d("cTAG", clipboard.toString())
+                    selectedDialogs.clear()
+                              },
+                isCopyButtonEnabled = selectedDialogs.isNotEmpty()
             )
                  },
         bottomBar = {
@@ -50,18 +64,21 @@ fun ChatScreen(
                 textValue = textValue,
                 onValueChange = { textValue = it },
                 onSendClick = {
-                    if(chatState.isSendingFailed){
-                        chatViewModel.retry()
-                    }else {
-                        chatViewModel.sendButton(textValue)
-                        textValue = ""
-                        textValueBackup = textValue
+                    when{
+                     chatState.isSendingFailed -> { chatViewModel.retry() }
+                     chatState.isRespondingList.contains(chatState.chatModel.chatId) -> {  }
+                     else -> {
+                         chatViewModel.sendButton(textValue)
+                         textValue = ""
+                         textValueBackup = textValue
+                     }
                     }
                 },
                 onClearClick = { textValue = "" },
                 onAttachClick = {},
                 isModelSelected = chatState.chatModel.modelName != "",
-                isSendingFailed = chatState.isSendingFailed
+                isSendingFailed = chatState.isSendingFailed,
+                isResponding = chatState.isRespondingList.contains(chatState.chatModel.chatId)
             )
         }
     ) { contentPadding ->

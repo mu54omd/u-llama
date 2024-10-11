@@ -7,7 +7,9 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.MarqueeSpacing
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,6 +31,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ollamaui.R
@@ -111,7 +115,6 @@ fun NewChatItem(
                         .clip(RoundedCornerShape(100))
                         .background(color = MaterialTheme.colorScheme.outline)
                         .size(65.dp),
-//                    tint = MaterialTheme.colorScheme.primaryContainer
                 )
 
             }
@@ -119,9 +122,27 @@ fun NewChatItem(
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-                Text(text = "$botName ($modelName)", style = MaterialTheme.typography.labelMedium)
-                Text(text = "Your Name: $userName", style = MaterialTheme.typography.labelMedium)
-                Text(text = chatTitle, style = MaterialTheme.typography.headlineMedium)
+                Text(
+                    text = "$botName: ($modelName)",
+                    style = MaterialTheme.typography.labelSmall,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                    modifier = Modifier.basicMarquee(spacing = MarqueeSpacing(10.dp))
+                    )
+                Text(
+                    text = userName,
+                    style = MaterialTheme.typography.labelMedium,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                    modifier = Modifier.basicMarquee()
+                )
+                Text(
+                    text = chatTitle,
+                    style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                    modifier = Modifier.basicMarquee()
+                )
             }
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
