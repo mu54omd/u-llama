@@ -66,7 +66,7 @@ fun ChatScreen(
                 onSendClick = {
                     when{
                      chatState.isSendingFailed -> { chatViewModel.retry() }
-                     chatState.isRespondingList.contains(chatState.chatModel.chatId) -> {  }
+                     chatState.isRespondingList.contains(chatState.chatModel.chatId) -> { chatViewModel.stop() }
                      else -> {
                          chatViewModel.sendButton(textValue)
                          textValue = ""

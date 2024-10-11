@@ -12,6 +12,7 @@ import com.example.ollamaui.domain.repository.OllamaRepository
 import com.example.ollamaui.utils.Constants.OLLAMA_CHAT_ENDPOINT
 import com.example.ollamaui.utils.Constants.USER_ROLE
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -56,6 +57,9 @@ class ChatViewModel @Inject constructor(
         }
         _chatState.update { it.copy(chatError = null, isRespondingList = isRespondingList, isSendingFailed = false) }
         ollamaPostMessage(messages = chatState.value.chatModel.chatMessages, chatId = chatState.value.chatModel.chatId)
+    }
+    fun stop(){
+        //TODO()
     }
 
     fun loadStates(chatModel: ChatModel, url: String) {

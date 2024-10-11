@@ -88,7 +88,7 @@ fun ChatBottomBar(
                 buttonSize = 50,
                 iconSize = 25,
                 onButtonClick = onSendClick,
-                isButtonEnabled = ((textValue != "")|| isSendingFailed) && isModelSelected
+                isButtonEnabled = ((textValue != "")|| isSendingFailed || isResponding) && isModelSelected
             )
         }
     }
