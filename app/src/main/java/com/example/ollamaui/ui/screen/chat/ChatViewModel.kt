@@ -73,6 +73,19 @@ class ChatViewModel @Inject constructor(
         ) }
     }
 
+    fun removeLastDialogFromDatabase(){
+        val messages = chatState.value.chatModel.chatMessages.messageModels.toMutableList()
+        messages.removeLast()
+        _chatState.update {
+            it.copy(
+                chatModel = chatState.value.chatModel.copy(chatMessages = MessagesModel(messageModels = messages), newMessageStatus = 0),
+                isDatabaseChanged = true,
+                isSendingFailed = false,
+                chatError = null
+            )
+        }
+    }
+
     fun loadStates(chatModel: ChatModel, url: String) {
         _chatState.update {
             it.copy(
