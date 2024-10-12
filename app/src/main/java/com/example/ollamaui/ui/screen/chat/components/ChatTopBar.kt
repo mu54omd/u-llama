@@ -1,6 +1,7 @@
 package com.example.ollamaui.ui.screen.chat.components
 
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -83,14 +84,16 @@ fun ChatTopBar(
                 Spacer(modifier = Modifier.width(10.dp))
                 ChatTitle(title = chatTitle, botName = botName)
             }
-            CustomButton(
-                description = "Copy Icon",
-                onButtonClick = onCopyClick,
-                icon = R.drawable.baseline_content_copy_24,
-                buttonSize = 50,
-                containerColor = MaterialTheme.colorScheme.background,
-                isButtonEnabled = isCopyButtonEnabled
-            )
+            AnimatedVisibility(visible = isCopyButtonEnabled) {
+                CustomButton(
+                    description = "Copy Icon",
+                    onButtonClick = onCopyClick,
+                    icon = R.drawable.baseline_content_copy_24,
+                    buttonSize = 50,
+                    containerColor = MaterialTheme.colorScheme.background,
+                    isButtonEnabled = isCopyButtonEnabled
+                )
+            }
         }
         HorizontalDivider()
     }
@@ -106,7 +109,7 @@ private fun ChatTopBarPreview() {
             chatIcon = R.drawable.avatar_man_03,
             onBackClick = {},
             onCopyClick = {},
-            isCopyButtonEnabled = true
+            isCopyButtonEnabled = false
         )
     }
 }
