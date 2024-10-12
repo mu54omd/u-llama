@@ -2,6 +2,7 @@ package com.example.ollamaui.ui.screen.chat
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ollamaui.domain.model.ApiError
 import com.example.ollamaui.domain.model.ChatInputModel
 import com.example.ollamaui.domain.model.ChatModel
 import com.example.ollamaui.domain.model.EmptyChatModel
@@ -12,6 +13,7 @@ import com.example.ollamaui.domain.repository.OllamaRepository
 import com.example.ollamaui.utils.Constants.OLLAMA_CHAT_ENDPOINT
 import com.example.ollamaui.utils.Constants.USER_ROLE
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -26,6 +28,7 @@ class ChatViewModel @Inject constructor(
     private val _chatState = MutableStateFlow(ChatStates())
     val chatState = _chatState.asStateFlow()
     private val isRespondingList = mutableListOf<Int>()
+    private val jobs = mutableMapOf<Int, Job>()
 
     //Public methods
     /*---------------------------------------------------------------------------------------------*/
@@ -57,8 +60,17 @@ class ChatViewModel @Inject constructor(
         _chatState.update { it.copy(chatError = null, isRespondingList = isRespondingList, isSendingFailed = false) }
         ollamaPostMessage(messages = chatState.value.chatModel.chatMessages, chatId = chatState.value.chatModel.chatId)
     }
-    fun stop(){
-        //TODO()
+    fun stop(chatId: Int){
+        jobs[chatId]?.cancel()
+        jobs.remove(chatId)
+        isRespondingList.remove(chatId)
+        _chatState.update { it.copy(
+            isSendingFailed = true,
+            isRespondingList = isRespondingList,
+            isDatabaseChanged = true,
+            chatError = ApiError.UnknownError.message,
+            chatModel = chatState.value.chatModel.copy(newMessageStatus = 2)
+        ) }
     }
 
     fun loadStates(chatModel: ChatModel, url: String) {
@@ -80,6 +92,8 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             if(chatState.value.isDatabaseChanged && chatState.value.chatModel.newMessageStatus != 2) {
                 uploadChatToDatabase(chatModel = chatState.value.chatModel.copy(newMessageStatus = 0))
+            }else if(chatState.value.isDatabaseChanged && chatState.value.chatModel.newMessageStatus == 2){
+                uploadChatToDatabase(chatModel = chatState.value.chatModel)
             }
             _chatState.update {
                 it.copy(
@@ -99,7 +113,9 @@ class ChatViewModel @Inject constructor(
     private fun ollamaPostMessage(messages: MessagesModel, chatId: Int){
         val oldMessages = chatState.value.chatModel.chatMessages.messageModels.toMutableList()
         val oldChatModel = chatState.value.chatModel
-        viewModelScope.launch {
+        val job = jobs[chatId] ?: Job()
+        jobs[chatId] = job
+        viewModelScope.launch(job) {
             if(!isRespondingList.contains(chatState.value.chatModel.chatId)) isRespondingList.add(chatId)
             _chatState.update { it.copy(isRespondingList = isRespondingList) }
             ollamaRepository.postOllamaChat(
