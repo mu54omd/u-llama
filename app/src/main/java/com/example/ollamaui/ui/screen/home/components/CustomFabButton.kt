@@ -2,6 +2,8 @@ package com.example.ollamaui.ui.screen.home.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -25,7 +27,9 @@ fun CustomFabButton(
     ) {
         Spacer(Modifier.height(5.dp))
         AnimatedVisibility(
-            visible = !isNewChatDialogVisible
+            visible = !isNewChatDialogVisible,
+            enter = scaleIn(),
+            exit = scaleOut(),
         ) {
             Crossfade(
                 targetState = isModelListLoaded,

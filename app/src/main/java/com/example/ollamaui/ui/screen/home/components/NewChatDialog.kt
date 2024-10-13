@@ -135,7 +135,7 @@ fun NewChatDialog(
                     onValueChange = onSystemPromptChange,
                     label = "Describe the bot",
                     maxChar = maxChar * 6,
-                    onDone = { if (userName != "" && chatTitle != "") onAcceptClick() },
+                    onDone = { if (userName.isNotEmpty() && chatTitle.isNotEmpty() && isModelSelected) onAcceptClick() },
                     maxLines = 5,
                     minLines = 5,
                     roundCornerPercent = 10

@@ -2,6 +2,8 @@ package com.example.ollamaui.ui.screen.home
 
 import android.app.Activity
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -131,7 +133,9 @@ fun HomeScreen(
                 .padding(paddingValues)
         ){
             AnimatedVisibility(
-                visible = (tagError != null) && !isSettingDialogVisible
+                visible = (tagError != null) && !isSettingDialogVisible,
+                enter = scaleIn(),
+                exit = scaleOut(),
             ) {
                 NetworkErrorDialog(
                     statusError = statusError,
@@ -146,7 +150,9 @@ fun HomeScreen(
                 )
             }
             AnimatedVisibility(
-                visible = isNewChatDialogVisible
+                visible = isNewChatDialogVisible,
+                enter = scaleIn(),
+                exit = scaleOut(),
             ) {
                 NewChatDialog(
                     userName = userName,
@@ -178,14 +184,18 @@ fun HomeScreen(
                 )
             }
             AnimatedVisibility(
-                visible = isAboutDialogVisible
+                visible = isAboutDialogVisible,
+                enter = scaleIn(),
+                exit = scaleOut(),
             ) {
                 AboutDialog(
                     onCloseClick = { isAboutDialogVisible = false}
                 )
             }
             AnimatedVisibility(
-                visible = isSettingDialogVisible
+                visible = isSettingDialogVisible,
+                enter = scaleIn(),
+                exit = scaleOut(),
             ) {
                 SettingDialog(
                     httpValue = httpValue,
@@ -199,7 +209,9 @@ fun HomeScreen(
                 )
             }
             AnimatedVisibility(
-                visible = isDeleteDialogVisible
+                visible = isDeleteDialogVisible,
+                enter = scaleIn(),
+                exit = scaleOut(),
             ) {
                 selectedChat.let { chatItem ->
                     DeleteDialog(

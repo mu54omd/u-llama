@@ -2,6 +2,8 @@ package com.example.ollamaui.ui.screen.chat.components
 
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -84,7 +86,11 @@ fun ChatTopBar(
                 Spacer(modifier = Modifier.width(10.dp))
                 ChatTitle(title = chatTitle, botName = botName)
             }
-            AnimatedVisibility(visible = isCopyButtonEnabled) {
+            AnimatedVisibility(
+                visible = isCopyButtonEnabled,
+                enter = scaleIn(),
+                exit = scaleOut(),
+                ) {
                 CustomButton(
                     description = "Copy Icon",
                     onButtonClick = onCopyClick,
