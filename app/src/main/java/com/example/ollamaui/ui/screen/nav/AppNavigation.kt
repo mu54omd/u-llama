@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -42,7 +43,7 @@ fun AppNavigation(
         modifier = Modifier
     ) {
         NavHost(
-            navController = ,
+            navController = navController,
             startDestination = Screens.LoadingScreen.route,
             modifier = Modifier
                 .background( color = MaterialTheme.colorScheme.background )
