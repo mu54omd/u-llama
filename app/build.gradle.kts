@@ -5,6 +5,8 @@ plugins {
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
     id("org.jetbrains.kotlin.plugin.serialization")
+    id("androidx.navigation.safeargs")
+
 
 }
 
@@ -98,6 +100,10 @@ dependencies {
 //    implementation(libs.richtext.ui.material3)
 //    implementation(libs.richtext.markdown)
 //    implementation(libs.richtext.commonmark)
+
+    //Navigation-compose
+    implementation(libs.navigaion.compose)
+    implementation(libs.navigaion.ui)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

@@ -20,6 +20,7 @@ richtext= "1.0.0-alpha01"
 roomRuntime = "2.6.1"
 datastorePreferences = "1.1.1"
 constraintlayoutCompose = "1.0.1"
+nav_version = "2.8.2"
 
 
 
@@ -58,6 +59,9 @@ androidx-datastore-preferences = { module = "androidx.datastore:datastore-prefer
 richtext-ui-material3 = { module = "com.halilibo.compose-richtext:richtext-ui-material3", version.ref = "richtext" }
 richtext-markdown = { module = "com.halilibo.compose-richtext:richtext-markdown", version.ref = "richtext" }
 richtext-commonmark = { module = "com.halilibo.compose-richtext:richtext-commonmark", version.ref = "richtext" }
+navigaion-compose = { module = "androidx.navigation:navigation-compose", version.ref ="nav_version"}
+navigaion-ui = { module = "androidx.navigation:navigation-ui", version.ref ="nav_version"}
+
 
 
 [plugins]

@@ -2,8 +2,6 @@ package com.example.ollamaui.ui.screen.nav
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -11,7 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -45,7 +42,7 @@ fun AppNavigation(
         modifier = Modifier
     ) {
         NavHost(
-            navController = navController,
+            navController = ,
             startDestination = Screens.LoadingScreen.route,
             modifier = Modifier
                 .background( color = MaterialTheme.colorScheme.background )
