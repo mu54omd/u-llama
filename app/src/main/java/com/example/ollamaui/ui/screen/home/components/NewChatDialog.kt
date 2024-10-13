@@ -74,6 +74,7 @@ fun NewChatDialog(
             modifier = modifier
                 .clip(shape = MaterialTheme.shapes.large)
                 .size(300.dp, 500.dp)
+                .padding(top = 2.dp, bottom = 2.dp)
                 .background(color = MaterialTheme.colorScheme.surfaceVariant),
             contentAlignment = Alignment.Center
         ) {
@@ -88,7 +89,7 @@ fun NewChatDialog(
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize().padding(top = 20.dp)
             ) {
                 val focusManager = LocalFocusManager.current
                 CustomTextField(

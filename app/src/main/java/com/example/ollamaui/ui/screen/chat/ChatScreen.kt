@@ -60,9 +60,7 @@ fun ChatScreen(
                 chatIcon = chatState.chatModel.chatIcon,
                 onBackClick = onBackClick,
                 onCopyClick = {
-                    Log.d("cTAG", "$selectedDialogs")
                     clipboard.setText(AnnotatedString(text = messageModelToText(selectedDialogs)))
-                    Log.d("cTAG", clipboard.toString())
                     selectedDialogs.clear()
                               },
                 isCopyButtonEnabled = selectedDialogs.isNotEmpty()
