@@ -65,6 +65,9 @@ class HomeViewModel @Inject constructor(
             ollamaRepository.deleteFromDbById(chatId)
         }
     }
+    fun findChat(chatId: Int): ChatModel?{
+        return chatsList.value.items.find { item -> item.chatId == chatId }
+    }
 
     //Private methods
     /*---------------------------------------------------------------------------------------------*/
