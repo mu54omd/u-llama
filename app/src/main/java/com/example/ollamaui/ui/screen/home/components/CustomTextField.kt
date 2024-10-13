@@ -16,10 +16,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun CustomTextField(
@@ -28,14 +30,15 @@ fun CustomTextField(
     label: String,
     roundCornerPercent: Int = 30,
     onValueChange: (String) -> Unit,
-    onDone: () -> Unit,
+    onDone: () -> Unit = {},
+    trailingIcon: @Composable() (() -> Unit)? = null,
     maxChar: Int,
     maxLines: Int = 1,
     minLines: Int = 1
 ) {
     TextField(
         value = value,
-        label = { Text(text = label) },
+        label = { Text(text = label, style = MaterialTheme.typography.bodySmall) },
         onValueChange = onValueChange,
         shape = RoundedCornerShape(roundCornerPercent),
         colors = TextFieldDefaults.colors(
@@ -53,6 +56,7 @@ fun CustomTextField(
         keyboardActions = KeyboardActions(
             onDone = { onDone() }
         ),
+        trailingIcon = trailingIcon,
         modifier = modifier
             .fillMaxWidth()
             .padding(start = 10.dp, end = 10.dp)
@@ -70,7 +74,9 @@ fun CustomTextField(
                 text = "${value.length}/$maxChar",
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.End,
+                style = MaterialTheme.typography.bodySmall.copy(fontSize = 10.sp)
             )
-        }
+        },
+        textStyle = MaterialTheme.typography.bodySmall
     )
 }

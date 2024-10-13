@@ -11,44 +11,43 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.ollamaui.R
 import com.example.ollamaui.ui.screen.common.CustomButton
-import com.example.ollamaui.ui.screen.common.CustomDropUpMenu
 
 @Composable
 fun CustomFabButton(
     modifier: Modifier = Modifier,
     isModelListLoaded: Boolean = false,
-    modelList: List<String> = emptyList(),
-    fabListVisible: Boolean,
-    onItemClick: (String) -> Unit,
+    isNewChatDialogVisible: Boolean,
     onButtonClick: () -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.End,
         modifier = modifier
     ) {
-        AnimatedVisibility(fabListVisible) {
-            CustomDropUpMenu(
-                listItems = modelList,
-                onItemClick = onItemClick
-            )
-        }
         Spacer(Modifier.height(5.dp))
-        Crossfade(targetState = isModelListLoaded, label = "Fab Cross fade") { isModelListLoaded ->
-            when(isModelListLoaded){
-                true -> CustomButton(
+        AnimatedVisibility(
+            visible = !isNewChatDialogVisible
+        ) {
+            Crossfade(
+                targetState = isModelListLoaded,
+                label = "Fab Cross fade"
+            ) { isModelListLoaded ->
+                when (isModelListLoaded) {
+                    true -> CustomButton(
                         description = "New Chat",
                         onButtonClick = onButtonClick,
-                        icon = if(fabListVisible) R.drawable.baseline_expand_more_24 else R.drawable.baseline_add_24,
+                        icon = R.drawable.baseline_add_24,
                         iconSize = 40,
                         buttonSize = 60,
                     )
-                false -> CustomButton(
+
+                    false -> CustomButton(
                         description = "New Chat",
                         onButtonClick = onButtonClick,
                         icon = R.drawable.baseline_refresh_24,
                         iconSize = 40,
                         buttonSize = 60,
                     )
+                }
             }
         }
     }

@@ -1,9 +1,13 @@
 package com.example.ollamaui.ui.screen.common
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -28,7 +32,7 @@ import com.example.ollamaui.ui.theme.OllamaUITheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DropDownList(
+fun CustomDropDownList(
     modifier: Modifier = Modifier,
     listItems: List<String>,
     onItemClick: (String) -> Unit,
@@ -39,8 +43,9 @@ fun DropDownList(
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
-        .fillMaxWidth()
-        .padding(20.dp)){
+            .fillMaxWidth()
+            .padding(top = 5.dp, bottom = 5.dp)
+    ){
         ExposedDropdownMenuBox(
             expanded = isExpanded,
             onExpandedChange = { isExpanded = !isExpanded}
@@ -52,16 +57,21 @@ fun DropDownList(
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded) },
                 modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).width(200.dp),
                 textStyle = MaterialTheme.typography.bodySmall.copy(textAlign = TextAlign.Center),
-                shape = MaterialTheme.shapes.medium,
+                shape = MaterialTheme.shapes.extraLarge,
                 colors = TextFieldDefaults.colors(
-                    unfocusedIndicatorColor = Color.Transparent,
                     focusedIndicatorColor = Color.Transparent,
-                )
+                    unfocusedIndicatorColor = Color.Transparent,
+                    focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer
+                ),
+                label = { Text("Selected Model") }
             )
             ExposedDropdownMenu(
                 expanded = isExpanded,
                 onDismissRequest = { isExpanded = false},
                 shape = MaterialTheme.shapes.medium,
+                modifier = Modifier.height(100.dp),
+                containerColor = MaterialTheme.colorScheme.surfaceContainer
             ) {
                 listItems.forEach { item ->
                     DropdownMenuItem(
@@ -89,9 +99,11 @@ fun DropDownList(
 @Composable
 private fun DropDownListPreview() {
     OllamaUITheme {
-        DropDownList(
-            listItems = listOf("a", "b", "c", "d"),
-            onItemClick = {}
-        )
+        Column(modifier = Modifier.fillMaxSize()) {
+            CustomDropDownList(
+                listItems = listOf("a", "b", "c", "d", "b", "c", "d", "b", "c", "d"),
+                onItemClick = {}
+            )
+        }
     }
 }

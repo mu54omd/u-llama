@@ -131,7 +131,7 @@ fun ChatScreen(
                 verticalArrangement = Arrangement.Center,
                 modifier = Modifier.height(20.dp)
             ) {
-                AnimatedVisibility(visible = chatState.isRespondingList.contains(chatState.chatModel.chatId)) {
+                AnimatedVisibility(visible = chatState.isRespondingList.contains(chatState.chatModel.chatId) && !chatState.isSendingFailed) {
                     DotsPulsing()
                 }
                 AnimatedVisibility(visible = chatState.isSendingFailed) {
