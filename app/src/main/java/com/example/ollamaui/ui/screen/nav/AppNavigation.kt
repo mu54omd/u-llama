@@ -55,7 +55,8 @@ fun AppNavigation(
                     mainViewModel = mainViewModel,
                     chatsList = chatsList,
                     onChatClick = {
-                        chatViewModel.loadStates(chatModel = it, url = ollamaAddress)
+                        val chatModel = homeViewModel.findChat(chatId = it.chatId)?:it
+                        chatViewModel.loadStates(chatModel = chatModel, url = ollamaAddress)
                         navigateToTab(
                             navController = navController,
                             route = Screens.ChatScreen.route
