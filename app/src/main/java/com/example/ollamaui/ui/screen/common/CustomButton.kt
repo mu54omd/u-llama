@@ -26,6 +26,7 @@ fun CustomButton(
     description: String,
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainer,
     contentColor: Color = MaterialTheme.colorScheme.tertiaryContainer,
+    elevation: Int = 0,
     @DrawableRes icon: Int,
 ) {
     Button(
@@ -38,7 +39,8 @@ fun CustomButton(
             contentColor = contentColor,
             disabledContainerColor = containerColor,
             disabledContentColor = contentColor
-        )
+        ),
+        elevation = ButtonDefaults.elevatedButtonElevation(defaultElevation = elevation.dp)
     ){
         Icon(
             painter = painterResource(icon),
@@ -59,7 +61,8 @@ private fun SendButtonPreview() {
             icon = R.drawable.baseline_send_24,
             iconSize = 25,
             buttonSize = 50,
-            isButtonEnabled = true
+            isButtonEnabled = true,
+            elevation = 9
         )
     }
 }

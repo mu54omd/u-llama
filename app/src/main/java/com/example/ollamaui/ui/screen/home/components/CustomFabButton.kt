@@ -18,7 +18,7 @@ import com.example.ollamaui.ui.screen.common.CustomButton
 fun CustomFabButton(
     modifier: Modifier = Modifier,
     isModelListLoaded: Boolean = false,
-    isNewChatDialogVisible: Boolean,
+    isFabVisible: Boolean,
     onButtonClick: () -> Unit
 ) {
     Column(
@@ -27,7 +27,7 @@ fun CustomFabButton(
     ) {
         Spacer(Modifier.height(5.dp))
         AnimatedVisibility(
-            visible = !isNewChatDialogVisible,
+            visible = isFabVisible,
             enter = scaleIn(),
             exit = scaleOut(),
         ) {

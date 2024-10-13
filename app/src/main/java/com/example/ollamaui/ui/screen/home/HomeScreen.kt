@@ -110,16 +110,16 @@ fun HomeScreen(
         floatingActionButton = {
             CustomFabButton(
                 isModelListLoaded = isModelListLoaded,
-                isNewChatDialogVisible = isNewChatDialogVisible,
+                isFabVisible = !isNewChatDialogVisible,
                 onButtonClick = {
+                    userName = ""
+                    chatTitle = ""
+                    botName = ""
+                    systemPrompt = ""
                     if(!isModelListLoaded){
                         mainViewModel.refresh()
                     }
                     else {
-                        userName = ""
-                        chatTitle = ""
-                        botName = ""
-                        systemPrompt = ""
                         isNewChatDialogVisible = true
                     }
                 }

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
@@ -28,11 +29,8 @@ fun Conversation(
     onItemClick: (MessageModel) -> Unit,
     onLongPressItem: (MessageModel) -> Unit,
     onSelectedItemClick: (MessageModel) -> Unit,
+    listState: LazyListState,
 ) {
-    val listState = rememberLazyListState()
-    LaunchedEffect(messagesModel.messageModels.size) {
-        listState.animateScrollToItem(messagesModel.messageModels.size)
-    }
     LazyColumn(
         modifier = modifier.padding(bottom = 10.dp),
         verticalArrangement = Arrangement.Bottom,
