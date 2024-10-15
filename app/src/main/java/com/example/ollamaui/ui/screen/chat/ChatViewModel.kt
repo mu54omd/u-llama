@@ -71,6 +71,9 @@ class ChatViewModel @Inject constructor(
             chatError = ApiError.UnknownError.message,
             chatModel = chatState.value.chatModel.copy(newMessageStatus = 2)
         ) }
+        viewModelScope.launch {
+            dieOllama()
+        }
     }
 
     fun removeLastDialogFromDatabase(){
@@ -137,6 +140,7 @@ class ChatViewModel @Inject constructor(
                 chatInputModel = ChatInputModel(
                     model = chatState.value.chatModel.modelName,
                     messages = messages.messageModels,
+                    keepAlive = 3600,
                     stream = false,
                 )
             ).onRight { response ->
@@ -190,5 +194,18 @@ class ChatViewModel @Inject constructor(
 
     private suspend fun uploadChatToDatabase(chatModel: ChatModel){
         ollamaRepository.updateDbItem(chatModel = chatModel)
+    }
+
+    private suspend fun dieOllama(){
+        ollamaRepository.postOllamaChat(
+            baseUrl = chatState.value.ollamaBaseAddress,
+            chatEndpoint = OLLAMA_CHAT_ENDPOINT,
+            chatInputModel = ChatInputModel(
+                model = chatState.value.chatModel.modelName,
+                messages = emptyList(),
+                stream = false,
+                keepAlive = 0
+            )
+        )
     }
 }
