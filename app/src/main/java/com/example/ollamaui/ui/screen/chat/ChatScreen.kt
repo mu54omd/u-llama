@@ -27,6 +27,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -59,8 +60,8 @@ fun ChatScreen(
 ) {
     var textValue by rememberSaveable { mutableStateOf("") }
     var textValueBackup by rememberSaveable { mutableStateOf("") }
-    val selectedDialogs = remember { mutableStateListOf<MessageModel>() }
-    val visibleDetails = remember { mutableStateListOf<MessageModel>() }
+    val selectedDialogs = remember { mutableStateMapOf<Int, MessageModel>() }
+    val visibleDetails = remember { mutableStateMapOf<Int, MessageModel>() }
     val clipboard: ClipboardManager = LocalClipboardManager.current
     val focusRequester = remember { FocusRequester() }
     val listState = rememberLazyListState(
@@ -145,25 +146,25 @@ fun ChatScreen(
                 modifier = Modifier.weight(1f),
                 botName = chatState.chatModel.botName,
                 userName = chatState.chatModel.userName,
-                onItemClick = {
+                onItemClick = {index, message ->
                     if(selectedDialogs.isEmpty()) {
-                        if(visibleDetails.contains(it)){
-                            visibleDetails.remove(it)
+                        if(visibleDetails.contains(index)){
+                            visibleDetails.remove(index)
                         }else{
-                            visibleDetails.add(it)
+                            visibleDetails[index] = message
                         }
                     }else{
-                        if(selectedDialogs.contains(it)) {
-                            selectedDialogs.remove(it)
+                        if(selectedDialogs.contains(index)) {
+                            selectedDialogs.remove(index)
                         }else {
-                            selectedDialogs.add(it)
+                            selectedDialogs[index] = message
                         }
                 }
                               },
-                onSelectedItemClick = { selectedDialogs.remove(it) },
-                onLongPressItem = { if(selectedDialogs.contains(it)) selectedDialogs.remove(it) else selectedDialogs.add(it) },
-                isSelected = { selectedDialogs.contains(it) },
-                isVisible = { visibleDetails.contains(it) },
+                onSelectedItemClick = { index, _ -> selectedDialogs.remove(index) },
+                onLongPressItem = { index, message -> if(selectedDialogs.contains(index)) selectedDialogs.remove(index) else selectedDialogs[index] = message },
+                isSelected = { index, _ -> selectedDialogs.contains(index) },
+                isVisible = { index, _ -> visibleDetails.contains(index) },
                 listState = listState
             )
             Column (

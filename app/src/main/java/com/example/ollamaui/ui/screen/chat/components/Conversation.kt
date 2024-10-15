@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -24,11 +25,11 @@ fun Conversation(
     userName: String,
     messagesModel: MessagesModel,
     modifier: Modifier = Modifier,
-    isSelected: (MessageModel) -> Boolean,
-    isVisible: (MessageModel) -> Boolean,
-    onItemClick: (MessageModel) -> Unit,
-    onLongPressItem: (MessageModel) -> Unit,
-    onSelectedItemClick: (MessageModel) -> Unit,
+    isSelected: (Int, MessageModel) -> Boolean,
+    isVisible: (Int, MessageModel) -> Boolean,
+    onItemClick: (Int, MessageModel) -> Unit,
+    onLongPressItem: (Int, MessageModel) -> Unit,
+    onSelectedItemClick: (Int, MessageModel) -> Unit,
     listState: LazyListState,
 ) {
     LazyColumn(
@@ -37,20 +38,21 @@ fun Conversation(
         state = listState,
         contentPadding = PaddingValues(start = 10.dp, end = 10.dp)
     ) {
-        items(
+        itemsIndexed(
             items = messagesModel.messageModels,
-        ){ message ->
+            key = { index, _ ->  index}
+        ){ index, message ->
             if (message.role != SYSTEM_ROLE) {
                 ChatDialog(
                     messageModel = message,
                     modifier = Modifier.animateItem(),
                     botName = botName,
                     userName = userName,
-                    isSelected = isSelected(message),
-                    isVisible = isVisible(message),
-                    onLongPressItem = { onLongPressItem(message) },
-                    onItemClick = { onItemClick(message) },
-                    onSelectedItemClick = { onSelectedItemClick(message) },
+                    isSelected = isSelected(index, message),
+                    isVisible = isVisible(index, message),
+                    onLongPressItem = { onLongPressItem(index, message) },
+                    onItemClick = { onItemClick(index, message) },
+                    onSelectedItemClick = { onSelectedItemClick(index, message) },
                 )
             }
         }
