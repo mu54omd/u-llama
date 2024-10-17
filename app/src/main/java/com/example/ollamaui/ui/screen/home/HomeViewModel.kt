@@ -2,7 +2,7 @@ package com.example.ollamaui.ui.screen.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.ollamaui.domain.model.ChatModel
+import com.example.ollamaui.domain.model.chat.ChatModel
 import com.example.ollamaui.domain.model.MessageModel
 import com.example.ollamaui.domain.model.MessagesModel
 import com.example.ollamaui.domain.repository.OllamaRepository

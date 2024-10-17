@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import com.example.ollamaui.R
 import com.example.ollamaui.domain.model.MessageModel
 import com.example.ollamaui.ui.common.messageModelToText
+import com.example.ollamaui.ui.screen.chat.components.AttachDocs
 import com.example.ollamaui.ui.screen.chat.components.ChatBottomBar
 import com.example.ollamaui.ui.screen.chat.components.ChatTopBar
 import com.example.ollamaui.ui.screen.chat.components.Conversation
@@ -68,6 +69,7 @@ fun ChatScreen(
             listState.canScrollForward
         }
     }
+    var isEnabled by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -99,7 +101,10 @@ fun ChatScreen(
                     }
                 },
                 onClearClick = { textValue = "" },
-                onAttachClick = {},
+                onAttachClick = {
+                    isEnabled = true
+                    chatViewModel.ollamaPostPull("all-minilm")
+                                },
                 isModelSelected = chatState.chatModel.modelName != "",
                 isSendingFailed = chatState.isSendingFailed,
                 isResponding = chatState.isRespondingList.contains(chatState.chatModel.chatId),
@@ -204,6 +209,17 @@ fun ChatScreen(
                 }
             }
             Spacer(modifier = Modifier.height(2.dp))
+            AttachDocs(
+                isEnabled = isEnabled,
+                onDispose = {isEnabled = false},
+                onSelectClick = { result, error, documentType ->
+                    if(documentType in listOf("png", "jpg", "jpeg")) {
+                        chatViewModel.attachImageToChat(attachImageResult = result, attachImageError = error)
+                    }else{
+                        chatViewModel.attachDocumentToChat(attachDocResult = result?:"", attachDocError = error)
+                    }
+                }
+            )
         }
 
         BackHandler {

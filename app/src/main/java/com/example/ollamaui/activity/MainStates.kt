@@ -1,7 +1,7 @@
 package com.example.ollamaui.activity
 
-import com.example.ollamaui.domain.model.EmptyTagResponse
-import com.example.ollamaui.domain.model.TagResponse
+import com.example.ollamaui.domain.model.tag.EmptyTagResponse
+import com.example.ollamaui.domain.model.tag.TagResponse
 
 data class MainStates(
     val launchAppGetStatusTry: Int = 0,

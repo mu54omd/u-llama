@@ -5,5 +5,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class MessageModel(
     val content: String,
-    val role: String
+    val role: String,
+    val images: List<String>? = null
 )

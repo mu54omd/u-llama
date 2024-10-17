@@ -1,10 +1,8 @@
 package com.example.ollamaui.activity
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import arrow.core.recover
-import com.example.ollamaui.domain.model.EmptyTagResponse
+import com.example.ollamaui.domain.model.tag.EmptyTagResponse
 import com.example.ollamaui.domain.preferences.LocalUserManager
 import com.example.ollamaui.domain.repository.OllamaRepository
 import com.example.ollamaui.utils.Constants.OLLAMA_BASE_ENDPOINT

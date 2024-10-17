@@ -1,4 +1,4 @@
-package com.example.ollamaui.domain.model
+package com.example.ollamaui.domain.model.tag
 
 data class TagResponse(
     val models: List<TagModel>

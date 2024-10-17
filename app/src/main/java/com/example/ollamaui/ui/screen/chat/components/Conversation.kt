@@ -32,6 +32,9 @@ fun Conversation(
     onSelectedItemClick: (Int, MessageModel) -> Unit,
     listState: LazyListState,
 ) {
+    LaunchedEffect(messagesModel.messageModels.size) {
+        listState.scrollToItem(index = messagesModel.messageModels.size)
+    }
     LazyColumn(
         modifier = modifier.padding(bottom = 10.dp),
         verticalArrangement = Arrangement.Bottom,

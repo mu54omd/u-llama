@@ -3,11 +3,15 @@ package com.example.ollamaui.data.repository
 import arrow.core.Either
 import com.example.ollamaui.data.local.ChatDao
 import com.example.ollamaui.data.remote.OllamaApi
-import com.example.ollamaui.domain.model.ChatInputModel
-import com.example.ollamaui.domain.model.ChatModel
-import com.example.ollamaui.domain.model.ChatResponse
+import com.example.ollamaui.domain.model.chat.ChatInputModel
+import com.example.ollamaui.domain.model.chat.ChatModel
+import com.example.ollamaui.domain.model.chat.ChatResponse
+import com.example.ollamaui.domain.model.embed.EmbedInputModel
+import com.example.ollamaui.domain.model.embed.EmbedResponse
 import com.example.ollamaui.domain.model.NetworkError
-import com.example.ollamaui.domain.model.TagResponse
+import com.example.ollamaui.domain.model.pull.PullInputModel
+import com.example.ollamaui.domain.model.pull.PullResponse
+import com.example.ollamaui.domain.model.tag.TagResponse
 import com.example.ollamaui.domain.repository.OllamaRepository
 import com.example.ollamaui.mapper.toNetworkError
 import kotlinx.coroutines.flow.Flow
@@ -30,6 +34,22 @@ class OllamaRepositoryImpl @Inject constructor(
         chatInputModel: ChatInputModel?
     ): Either<NetworkError, ChatResponse> {
         return Either.catch { ollamaApi.ollamaChat(fullUrl = baseUrl + chatEndpoint, chatInputModel = chatInputModel) }.mapLeft { it.toNetworkError() }
+    }
+
+    override suspend fun postOllamaEmbed(
+        baseUrl: String,
+        embedEndpoint: String,
+        embedInputModel: EmbedInputModel
+    ): Either<NetworkError, EmbedResponse> {
+        return Either.catch { ollamaApi.ollamaEmbed(fullUrl = baseUrl + embedEndpoint, embedInputModel = embedInputModel) }.mapLeft { it.toNetworkError() }
+    }
+
+    override suspend fun postOllamaPull(
+        baseUrl: String,
+        pullEndpoint: String,
+        pullInputModel: PullInputModel
+    ): Either<NetworkError, PullResponse> {
+        return Either.catch { ollamaApi.ollamaPull(fullUrl = baseUrl + pullEndpoint, pullInputModel = pullInputModel) }.mapLeft { it.toNetworkError() }
     }
 
     override suspend fun insertToDb(chatModel: ChatModel) {

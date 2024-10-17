@@ -1,16 +1,21 @@
 package com.example.ollamaui.ui.screen.chat
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ollamaui.domain.model.ApiError
-import com.example.ollamaui.domain.model.ChatInputModel
-import com.example.ollamaui.domain.model.ChatModel
-import com.example.ollamaui.domain.model.EmptyChatModel
-import com.example.ollamaui.domain.model.EmptyChatResponse
+import com.example.ollamaui.domain.model.chat.ChatInputModel
+import com.example.ollamaui.domain.model.chat.ChatModel
+import com.example.ollamaui.domain.model.embed.EmbedInputModel
+import com.example.ollamaui.domain.model.chat.EmptyChatModel
+import com.example.ollamaui.domain.model.chat.EmptyChatResponse
 import com.example.ollamaui.domain.model.MessageModel
 import com.example.ollamaui.domain.model.MessagesModel
+import com.example.ollamaui.domain.model.pull.PullInputModel
 import com.example.ollamaui.domain.repository.OllamaRepository
 import com.example.ollamaui.utils.Constants.OLLAMA_CHAT_ENDPOINT
+import com.example.ollamaui.utils.Constants.OLLAMA_EMBED_ENDPOINT
+import com.example.ollamaui.utils.Constants.OLLAMA_PULL_ENDPOINT
 import com.example.ollamaui.utils.Constants.USER_ROLE
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -37,7 +42,11 @@ class ChatViewModel @Inject constructor(
     fun sendButton(text: String){
         val messages = chatState.value.chatModel.chatMessages.messageModels.toMutableList()
         val oldChatModel = chatState.value.chatModel
-        messages.add(MessageModel(content = text, role = USER_ROLE))
+        if(chatState.value.attachImageResult != null){
+            messages.add(MessageModel(content = text, role = USER_ROLE, images = listOf(chatState.value.attachImageResult!!)))
+        }else {
+            messages.add(MessageModel(content = text, role = USER_ROLE))
+        }
         _chatState.update { it.copy(
             chatModel = ChatModel(
                 chatId = oldChatModel.chatId,
@@ -72,7 +81,7 @@ class ChatViewModel @Inject constructor(
             chatModel = chatState.value.chatModel.copy(newMessageStatus = 2)
         ) }
         viewModelScope.launch {
-            dieOllama()
+            killOllama()
         }
     }
 
@@ -119,6 +128,19 @@ class ChatViewModel @Inject constructor(
                     isDatabaseChanged = false
                 )
             }
+        }
+    }
+
+    fun attachImageToChat(attachImageResult: String?, attachImageError: String?){
+        _chatState.update { it.copy(attachImageResult = attachImageResult, attachImageError = attachImageError) }
+    }
+
+    fun attachDocumentToChat(attachDocResult: String, attachDocError: String?){
+
+        //TODO("this is temporarily. perhaps it must move to database")
+        _chatState.update { it.copy(attachDocResult = attachDocResult, attachDocError = attachDocError) }
+        if(attachDocError == null){
+            ollamaPostEmbed(text = listOf(attachDocResult))
         }
     }
 
@@ -191,12 +213,46 @@ class ChatViewModel @Inject constructor(
             }
         }
     }
+    private fun ollamaPostEmbed(text: List<String>){
+        viewModelScope.launch {
+            ollamaRepository.postOllamaEmbed(
+                baseUrl = chatState.value.ollamaBaseAddress,
+                embedEndpoint = OLLAMA_EMBED_ENDPOINT,
+                embedInputModel = EmbedInputModel(
+                    model = chatState.value.chatModel.modelName,
+                    input = text
+                )
+            )
+                .onRight { response ->
+                    //TODO("Upload to Database")
+                    _chatState.update { it.copy(embedResponse = response) }
+                }
+                .onLeft { error ->
+                    _chatState.update { it.copy(embedError = error.error.message) }
+                }
+        }
+    }
+
+    fun ollamaPostPull(modelName: String){
+        viewModelScope.launch {
+            ollamaRepository.postOllamaPull(
+                baseUrl = chatState.value.ollamaBaseAddress,
+                pullEndpoint = OLLAMA_PULL_ENDPOINT,
+                pullInputModel = PullInputModel(
+                    name = modelName,
+                    stream = false
+                )
+            )
+                .onRight { response -> _chatState.update { it.copy(pullResponse = response) }}
+                .onLeft { error -> _chatState.update { it.copy(pullError = error.error.message) } }
+        }
+    }
 
     private suspend fun uploadChatToDatabase(chatModel: ChatModel){
         ollamaRepository.updateDbItem(chatModel = chatModel)
     }
 
-    private suspend fun dieOllama(){
+    private suspend fun killOllama(){
         ollamaRepository.postOllamaChat(
             baseUrl = chatState.value.ollamaBaseAddress,
             chatEndpoint = OLLAMA_CHAT_ENDPOINT,
