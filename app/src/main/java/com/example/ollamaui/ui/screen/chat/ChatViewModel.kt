@@ -219,7 +219,7 @@ class ChatViewModel @Inject constructor(
                 baseUrl = chatState.value.ollamaBaseAddress,
                 embedEndpoint = OLLAMA_EMBED_ENDPOINT,
                 embedInputModel = EmbedInputModel(
-                    model = chatState.value.chatModel.modelName,
+                    model = "all-minilm",
                     input = text
                 )
             )
@@ -233,20 +233,7 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    fun ollamaPostPull(modelName: String){
-        viewModelScope.launch {
-            ollamaRepository.postOllamaPull(
-                baseUrl = chatState.value.ollamaBaseAddress,
-                pullEndpoint = OLLAMA_PULL_ENDPOINT,
-                pullInputModel = PullInputModel(
-                    name = modelName,
-                    stream = false
-                )
-            )
-                .onRight { response -> _chatState.update { it.copy(pullResponse = response) }}
-                .onLeft { error -> _chatState.update { it.copy(pullError = error.error.message) } }
-        }
-    }
+
 
     private suspend fun uploadChatToDatabase(chatModel: ChatModel){
         ollamaRepository.updateDbItem(chatModel = chatModel)

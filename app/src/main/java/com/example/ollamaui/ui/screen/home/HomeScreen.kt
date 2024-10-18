@@ -33,6 +33,7 @@ import com.example.ollamaui.ui.screen.home.components.NetworkErrorDialog
 import com.example.ollamaui.ui.screen.home.components.NewChatDialog
 import com.example.ollamaui.ui.screen.home.components.NewChatItem
 import com.example.ollamaui.ui.screen.home.components.SettingDialog
+import com.example.ollamaui.utils.Constants.OLLAMA_IS_RUNNING
 
 @Composable
 fun HomeScreen(
@@ -42,7 +43,12 @@ fun HomeScreen(
     chatsList: ChatsList,
     isOllamaAddressSet: Boolean,
     ollamaAddress: String,
-    onSaveOllamaAddressClick: (String) -> Unit,
+    embeddingModel: String,
+    isEmbeddingModelPulling: Boolean,
+    isEmbeddingModelPulled: Boolean,
+    ollamaStatus: String,
+    onCheckAddressClick: (String) -> Unit,
+    onPullEmbeddingModel: (String) -> Unit,
     isModelListLoaded: Boolean,
     modelList: List<String>,
     tagError: Int?,
@@ -59,6 +65,7 @@ fun HomeScreen(
     var chatTitle by remember { mutableStateOf("") }
     var systemPrompt by remember { mutableStateOf("") }
     var httpValue by remember { mutableStateOf(ollamaAddress) }
+    var embeddingModelName by remember { mutableStateOf(embeddingModel) }
 
     var selectedChat by remember { mutableStateOf(EmptyChatModel.empty) }
     val selectedChats = remember { mutableStateListOf<Int>() }
@@ -194,13 +201,15 @@ fun HomeScreen(
             ) {
                 SettingDialog(
                     httpValue = httpValue,
-                    onAcceptClick = {
-                        onSaveOllamaAddressClick(httpValue)
-                        mainViewModel.refresh()
-                        isSettingDialogVisible = false
-                    },
-                    onCloseClick = { isSettingDialogVisible = false},
-                    onValueChange = { httpValue = it}
+                    embeddingModel = embeddingModelName,
+                    onClose = { isSettingDialogVisible = false },
+                    onHttpValueChange = { httpValue = it },
+                    onEmbeddingModelValueChange = { embeddingModelName = it },
+                    onCheckAddressClick = { address -> onCheckAddressClick(address) },
+                    onPullEmbeddingModelClick = { modelName -> onPullEmbeddingModel(modelName) },
+                    isOllamaAddressCorrect = ollamaStatus == OLLAMA_IS_RUNNING,
+                    isEmbeddingModelPulled = isEmbeddingModelPulled,
+                    isEmbeddingModelPulling = isEmbeddingModelPulling
                 )
             }
             AnimatedVisibility(

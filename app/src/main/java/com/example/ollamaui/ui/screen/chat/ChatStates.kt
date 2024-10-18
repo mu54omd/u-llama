@@ -26,7 +26,4 @@ data class ChatStates(
 
     val embedResponse: EmbedResponse = EmptyEmbedResponse.empty,
     val embedError: Int? = null,
-
-    val pullResponse: PullResponse = EmptyPullResponse.empty,
-    val pullError: Int? = null
 )

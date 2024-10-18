@@ -103,7 +103,6 @@ fun ChatScreen(
                 onClearClick = { textValue = "" },
                 onAttachClick = {
                     isEnabled = true
-                    chatViewModel.ollamaPostPull("all-minilm")
                                 },
                 isModelSelected = chatState.chatModel.modelName != "",
                 isSendingFailed = chatState.isSendingFailed,

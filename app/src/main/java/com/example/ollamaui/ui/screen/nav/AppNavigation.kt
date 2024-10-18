@@ -28,6 +28,8 @@ fun AppNavigation(
     mainState: MainStates,
     isOllamaAddressSet: Boolean,
     ollamaAddress: String,
+    isEmbeddingModelSet: Boolean,
+    embeddingModel: String,
     isLocalSettingsLoaded: Boolean
 ) {
     val navController = rememberNavController()
@@ -64,14 +66,17 @@ fun AppNavigation(
                     },
                     isOllamaAddressSet = isOllamaAddressSet,
                     ollamaAddress = ollamaAddress,
-                    onSaveOllamaAddressClick = {
-                        mainViewModel.saveLocalSetting(it)
-                    },
+                    embeddingModel = embeddingModel,
                     isModelListLoaded = mainState.isModelListLoaded,
                     modelList = mainState.modelList,
                     tagError = mainState.tagError,
                     statusError = mainState.statusError,
                     statusThrowable = mainState.statusThrowable,
+                    onCheckAddressClick = { address -> mainViewModel.checkOllamaAddress(address) },
+                    onPullEmbeddingModel = { modelName -> mainViewModel.pullEmbeddingModel(modelName) },
+                    ollamaStatus = mainState.ollamaStatus,
+                    isEmbeddingModelPulling = mainState.isEmbeddingModelPulling,
+                    isEmbeddingModelPulled = mainState.isEmbeddingModelPulled
                 )
             }
 

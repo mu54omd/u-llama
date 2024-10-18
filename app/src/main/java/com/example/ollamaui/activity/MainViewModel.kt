@@ -2,14 +2,18 @@ package com.example.ollamaui.activity
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ollamaui.domain.model.pull.EmptyPullResponse
+import com.example.ollamaui.domain.model.pull.PullInputModel
 import com.example.ollamaui.domain.model.tag.EmptyTagResponse
 import com.example.ollamaui.domain.preferences.LocalUserManager
 import com.example.ollamaui.domain.repository.OllamaRepository
 import com.example.ollamaui.utils.Constants.OLLAMA_BASE_ENDPOINT
 import com.example.ollamaui.utils.Constants.OLLAMA_LIST_ENDPOINT
+import com.example.ollamaui.utils.Constants.OLLAMA_PULL_ENDPOINT
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
@@ -36,7 +40,20 @@ class MainViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5000L),
             initialValue = BaseAddress()
         )
-
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    private val _embeddingModel = userLocalUserManager.readOllamaEmbeddingModel().map {
+        EmbeddingModel(
+            isEmbeddingModelSet = it.isEmbeddingModelSet,
+            embeddingModelName = it.embeddingModelName
+        )
+    }
+    val embeddingModel = _embeddingModel
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = EmbeddingModel()
+        )
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
     private val _mainState = MutableStateFlow(MainStates())
     val mainState = _mainState
         .onStart {
@@ -47,46 +64,72 @@ class MainViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5000L),
             initialValue = MainStates()
         )
-
-
     //Public methods
     /*---------------------------------------------------------------------------------------------*/
     /*---------------------------------------------------------------------------------------------*/
     /*---------------------------------------------------------------------------------------------*/
-    fun saveLocalSetting(url: String){
-        viewModelScope.launch {
-            userLocalUserManager.saveOllamaUrl(url = url)
-            refresh()
-        }
-    }
 
     fun refresh(){
         ollamaStatus()
+    }
+
+    fun checkOllamaAddress(url: String){
+        _mainState.update { it.copy(ollamaStatus = "", statusError = null) }
+        viewModelScope.launch {
+            getOllamaStatus(url = url)
+        }
+    }
+    fun pullEmbeddingModel(modelName: String){
+        _mainState.update { it.copy(pullResponse = EmptyPullResponse.empty, pullError = null) }
+        val modelList = mainState.value.modelList.map { it.split(":")[0] }
+        if(modelName !in modelList) {
+            viewModelScope.launch {
+                ollamaPostPull(modelName = modelName)
+            }
+        }else{
+            _mainState.update { it.copy(isEmbeddingModelPulled = true) }
+            saveOllamaEmbeddingModel(modelName = modelName)
+        }
     }
 
     //Private methods
     /*---------------------------------------------------------------------------------------------*/
     /*---------------------------------------------------------------------------------------------*/
     /*---------------------------------------------------------------------------------------------*/
-
+    private fun saveOllamaAddress(url: String){
+        viewModelScope.launch {
+            userLocalUserManager.saveOllamaUrl(url = url)
+        }
+    }
+    private fun saveOllamaEmbeddingModel(modelName: String){
+        viewModelScope.launch {
+            userLocalUserManager.saveOllamaEmbeddingModel(modelName = modelName)
+        }
+    }
     private fun ollamaStatus(){
         viewModelScope.launch {
             _mainState.update { it.copy(isModelListLoaded = false) }
             if(mainState.value.launchAppGetStatusTry == 0) {
                 for (retryCount in 1..2) {
-                    getOllamaStatus()
+                    getOllamaStatus(baseAddress.value.ollamaBaseAddress)
                     _mainState.update { it.copy(launchAppGetStatusTry = mainState.value.launchAppGetStatusTry.plus(1)) }
                 }
             }else{
-                getOllamaStatus()
+                getOllamaStatus(baseAddress.value.ollamaBaseAddress)
             }
             getOllamaModelsList()
+            val modelList = mainState.value.modelList.map { it.split(":")[0] }
+            if(embeddingModel.value.embeddingModelName !in modelList) {
+                ollamaPostPull(modelName = embeddingModel.value.embeddingModelName)
+            }else{
+                _mainState.update { it.copy(isEmbeddingModelPulled = true) }
+            }
         }
     }
 
-    private suspend fun getOllamaStatus(){
+    private suspend fun getOllamaStatus(url: String){
         ollamaRepository.getOllamaStatus(
-            baseUrl = baseAddress.value.ollamaBaseAddress,
+            baseUrl = url,
             baseEndpoint = OLLAMA_BASE_ENDPOINT
         )
             .onRight { response ->
@@ -94,8 +137,11 @@ class MainViewModel @Inject constructor(
                     it.copy(
                         ollamaStatus = response,
                         statusError = null,
-                        statusThrowable = null
+                        statusThrowable = null,
                     )
+                }
+                if(baseAddress.value.ollamaBaseAddress != url) {
+                    saveOllamaAddress(url = url)
                 }
             }
             .onLeft { error ->
@@ -131,6 +177,27 @@ class MainViewModel @Inject constructor(
                         tagThrowable = error.t.message
                     )
                 }
+            }
+    }
+    private suspend fun ollamaPostPull(modelName: String){
+
+        _mainState.update { it.copy(isEmbeddingModelPulling = true, isEmbeddingModelPulled = false) }
+        ollamaRepository.postOllamaPull(
+            baseUrl = baseAddress.value.ollamaBaseAddress,
+            pullEndpoint = OLLAMA_PULL_ENDPOINT,
+            pullInputModel = PullInputModel(
+                name = modelName,
+                stream = false
+            )
+        )
+            .onRight { response ->
+                _mainState.update { it.copy(pullResponse = response, isEmbeddingModelPulling = false, isEmbeddingModelPulled = true) }
+                if(embeddingModel.value.embeddingModelName != modelName) {
+                    saveOllamaEmbeddingModel(modelName = modelName)
+                }
+            }
+            .onLeft { error ->
+                _mainState.update { it.copy(pullError = error.error.message, embeddingModelName = "", isEmbeddingModelPulling = false) }
             }
     }
 }
