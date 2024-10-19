@@ -19,5 +19,4 @@ data class MainStates(
     val isEmbeddingModelPulling: Boolean = false,
     val isEmbeddingModelPulled: Boolean = false,
     val pullError: NetworkError? = null,
-    val embeddingModelName: String = ""
 )

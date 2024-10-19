@@ -84,6 +84,8 @@ fun AppNavigation(
                 ChatScreen(
                     chatViewModel = chatViewModel,
                     chatState = chatState,
+                    embeddingModel = embeddingModel,
+                    isEmbeddingModelSet = isEmbeddingModelSet,
                     onBackClick = {
                         chatViewModel.clearStates()
                         navigateToTab(

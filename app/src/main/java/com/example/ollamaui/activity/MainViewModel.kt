@@ -120,10 +120,12 @@ class MainViewModel @Inject constructor(
             }
             getOllamaModelsList()
             val modelList = mainState.value.modelList.map { it.split(":")[0] }
-            if(embeddingModel.value.embeddingModelName !in modelList) {
-                ollamaPostPull(modelName = embeddingModel.value.embeddingModelName)
-            }else{
-                _mainState.update { it.copy(isEmbeddingModelPulled = true) }
+            if(embeddingModel.value.isEmbeddingModelSet) {
+                if (embeddingModel.value.embeddingModelName !in modelList) {
+                    ollamaPostPull(modelName = embeddingModel.value.embeddingModelName)
+                } else {
+                    _mainState.update { it.copy(isEmbeddingModelPulled = true) }
+                }
             }
         }
     }
@@ -197,7 +199,6 @@ class MainViewModel @Inject constructor(
                 _mainState.update {
                     it.copy(
                         pullError = pullError,
-                        embeddingModelName = "",
                         isEmbeddingModelPulling = false)
                 }
             }

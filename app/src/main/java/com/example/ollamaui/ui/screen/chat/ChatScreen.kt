@@ -52,6 +52,8 @@ import kotlinx.coroutines.launch
 fun ChatScreen(
     chatViewModel: ChatViewModel,
     chatState: ChatStates,
+    embeddingModel: String,
+    isEmbeddingModelSet: Boolean,
     onBackClick: () -> Unit
 ) {
     var textValue by rememberSaveable { mutableStateOf("") }
@@ -101,9 +103,7 @@ fun ChatScreen(
                     }
                 },
                 onClearClick = { textValue = "" },
-                onAttachClick = {
-                    isEnabled = true
-                                },
+                onAttachClick = { isEnabled = true },
                 isModelSelected = chatState.chatModel.modelName != "",
                 isSendingFailed = chatState.isSendingFailed,
                 isResponding = chatState.isRespondingList.contains(chatState.chatModel.chatId),
@@ -213,9 +213,24 @@ fun ChatScreen(
                 onDispose = {isEnabled = false},
                 onSelectClick = { result, error, documentType ->
                     if(documentType in listOf("png", "jpg", "jpeg")) {
-                        chatViewModel.attachImageToChat(attachImageResult = result, attachImageError = error)
+                        chatViewModel.attachImageToChat(
+                            attachImageResult = result,
+                            attachImageError = error
+                        )
                     }else{
-                        chatViewModel.attachDocumentToChat(attachDocResult = result?:"", attachDocError = error)
+                        if(isEmbeddingModelSet) {
+                            chatViewModel.attachDocumentToChat(
+                                attachDocResult = result ?: "",
+                                attachDocError = error,
+                                embeddingModel = embeddingModel
+                            )
+                        }else{
+                            chatViewModel.attachDocumentToChat(
+                                attachDocResult = result ?: "",
+                                attachDocError = error,
+                                embeddingModel = chatState.chatModel.modelName
+                            )
+                        }
                     }
                 }
             )

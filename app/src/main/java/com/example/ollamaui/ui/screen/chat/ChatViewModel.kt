@@ -133,12 +133,13 @@ class ChatViewModel @Inject constructor(
         _chatState.update { it.copy(attachImageResult = attachImageResult, attachImageError = attachImageError) }
     }
 
-    fun attachDocumentToChat(attachDocResult: String, attachDocError: String?){
+    fun attachDocumentToChat(attachDocResult: String, attachDocError: String?, embeddingModel: String){
 
         //TODO("this is temporarily. perhaps it must move to database")
         _chatState.update { it.copy(attachDocResult = attachDocResult, attachDocError = attachDocError) }
-        if(attachDocError == null){
-            ollamaPostEmbed(text = listOf(attachDocResult))
+
+        if(attachDocError == null && embeddingModel != ""){
+            ollamaPostEmbed(text = listOf(attachDocResult), embeddingModel = embeddingModel)
         }
     }
 
@@ -211,13 +212,13 @@ class ChatViewModel @Inject constructor(
             }
         }
     }
-    private fun ollamaPostEmbed(text: List<String>){
+    private fun ollamaPostEmbed(text: List<String>, embeddingModel: String){
         viewModelScope.launch {
             ollamaRepository.postOllamaEmbed(
                 baseUrl = chatState.value.ollamaBaseAddress,
                 embedEndpoint = OLLAMA_EMBED_ENDPOINT,
                 embedInputModel = EmbedInputModel(
-                    model = "all-minilm",
+                    model = embeddingModel,
                     input = text
                 )
             )

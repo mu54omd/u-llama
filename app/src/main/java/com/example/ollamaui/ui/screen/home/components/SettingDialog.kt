@@ -2,7 +2,9 @@ package com.example.ollamaui.ui.screen.home.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.foundation.MarqueeSpacing
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,10 +37,13 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.ollamaui.R
+import com.example.ollamaui.domain.model.ApiError
 import com.example.ollamaui.domain.model.NetworkError
 import com.example.ollamaui.ui.screen.common.CustomButton
 import com.example.ollamaui.ui.theme.OllamaUITheme
@@ -71,6 +76,7 @@ fun SettingDialog(
         targetValue = when{
             (isAddressIncorrect && isPullFailed) -> 400
             (isAddressIncorrect xor isPullFailed) -> 250
+            (!isPullFailed && embeddingModel == "") -> 250
             else -> 200
         },
         label = "Animated Height"
@@ -103,9 +109,10 @@ fun SettingDialog(
                     colors = TextFieldDefaults.colors(
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
+                        disabledIndicatorColor = Color.Transparent,
+                        errorIndicatorColor = Color.Transparent,
                         focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
                         unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-                        errorIndicatorColor = Color.Transparent,
                     ),
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Uri,
@@ -150,7 +157,7 @@ fun SettingDialog(
                         }
                     }
                 )
-                AnimatedVisibility(visible = isAddressIncorrect) {
+                AnimatedVisibility(visible = isAddressIncorrect && httpValue != "") {
                     Box(
                         modifier = Modifier.fillMaxWidth().padding(10.dp),
                         contentAlignment = Alignment.Center
@@ -169,7 +176,9 @@ fun SettingDialog(
                                     text = "${it.t.message}",
                                     textAlign = TextAlign.Center,
                                     color = MaterialTheme.colorScheme.error,
-                                    fontSize = 12.sp
+                                    fontSize = 12.sp,
+                                    modifier = Modifier.basicMarquee(spacing = MarqueeSpacing(3.dp), velocity = 100.dp, repeatDelayMillis = 0),
+                                    maxLines = 1
                                 )
                             }
                         }
@@ -189,6 +198,7 @@ fun SettingDialog(
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
                         errorIndicatorColor = Color.Transparent,
+                        disabledIndicatorColor = Color.Transparent,
                         focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
                         unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer
                     ),
@@ -249,10 +259,22 @@ fun SettingDialog(
                                     text = "${it.t.message}",
                                     textAlign = TextAlign.Center,
                                     color = MaterialTheme.colorScheme.error,
-                                    fontSize = 12.sp
+                                    fontSize = 12.sp,
+                                    modifier = Modifier.basicMarquee(spacing = MarqueeSpacing(3.dp), velocity = 30.dp),
+                                    maxLines = 1
                                 )
                             }
                         }
+                    }
+                }
+                AnimatedVisibility(visible = !isPullFailed && embeddingModel == "" && isOllamaAddressCorrect) {
+                    Box(modifier = Modifier.fillMaxWidth().padding(10.dp), contentAlignment = Alignment.Center) {
+                        Text(
+                            text = "If you leave this box empty, we use each chat model as embedding model.",
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.error,
+                            fontSize = 12.sp
+                        )
                     }
                 }
             }
@@ -265,8 +287,8 @@ fun SettingDialog(
 private fun SettingDialogPreview() {
     OllamaUITheme {
         SettingDialog(
-            httpValue = "ss",
-            embeddingModel = "all-minilm",
+            httpValue = "http://localhost:11434",
+            embeddingModel = "",
             onHttpValueChange = {},
             onEmbeddingModelValueChange = {},
             isOllamaAddressCorrect = true,
