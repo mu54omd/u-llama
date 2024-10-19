@@ -77,6 +77,7 @@ class MainViewModel @Inject constructor(
         _mainState.update { it.copy(ollamaStatus = "", statusError = null) }
         viewModelScope.launch {
             getOllamaStatus(url = url)
+            getOllamaModelsList()
         }
     }
     fun pullEmbeddingModel(modelName: String){
@@ -137,19 +138,17 @@ class MainViewModel @Inject constructor(
                     it.copy(
                         ollamaStatus = response,
                         statusError = null,
-                        statusThrowable = null,
                     )
                 }
                 if(baseAddress.value.ollamaBaseAddress != url) {
                     saveOllamaAddress(url = url)
                 }
             }
-            .onLeft { error ->
+            .onLeft { statusError ->
                 _mainState.update {
                     it.copy(
                         ollamaStatus = "",
-                        statusError = error.error.message,
-                        statusThrowable = error.t.message
+                        statusError = statusError,
                     )
                 }
             }
@@ -165,16 +164,14 @@ class MainViewModel @Inject constructor(
                         modelList = modelList,
                         isModelListLoaded = true,
                         tagError = null,
-                        tagThrowable = null
                     )
                 }
             }
-            .onLeft { error ->
+            .onLeft { tagError ->
                 _mainState.update {
                     it.copy(
                         tagResponse = EmptyTagResponse.emptyTagResponse,
-                        tagError = error.error.message,
-                        tagThrowable = error.t.message
+                        tagError = tagError,
                     )
                 }
             }
@@ -196,8 +193,13 @@ class MainViewModel @Inject constructor(
                     saveOllamaEmbeddingModel(modelName = modelName)
                 }
             }
-            .onLeft { error ->
-                _mainState.update { it.copy(pullError = error.error.message, embeddingModelName = "", isEmbeddingModelPulling = false) }
+            .onLeft { pullError ->
+                _mainState.update {
+                    it.copy(
+                        pullError = pullError,
+                        embeddingModelName = "",
+                        isEmbeddingModelPulling = false)
+                }
             }
     }
 }

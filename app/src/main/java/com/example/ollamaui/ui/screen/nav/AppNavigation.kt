@@ -71,7 +71,7 @@ fun AppNavigation(
                     modelList = mainState.modelList,
                     tagError = mainState.tagError,
                     statusError = mainState.statusError,
-                    statusThrowable = mainState.statusThrowable,
+                    pullError = mainState.pullError,
                     onCheckAddressClick = { address -> mainViewModel.checkOllamaAddress(address) },
                     onPullEmbeddingModel = { modelName -> mainViewModel.pullEmbeddingModel(modelName) },
                     ollamaStatus = mainState.ollamaStatus,

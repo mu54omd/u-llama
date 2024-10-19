@@ -23,13 +23,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.example.ollamaui.R
 import com.example.ollamaui.activity.MainViewModel
+import com.example.ollamaui.domain.model.NetworkError
 import com.example.ollamaui.domain.model.chat.ChatModel
 import com.example.ollamaui.domain.model.chat.EmptyChatModel
 import com.example.ollamaui.ui.screen.home.components.AboutDialog
 import com.example.ollamaui.ui.screen.home.components.CustomFabButton
 import com.example.ollamaui.ui.screen.home.components.DeleteDialog
 import com.example.ollamaui.ui.screen.home.components.HomeTopBar
-import com.example.ollamaui.ui.screen.home.components.NetworkErrorDialog
 import com.example.ollamaui.ui.screen.home.components.NewChatDialog
 import com.example.ollamaui.ui.screen.home.components.NewChatItem
 import com.example.ollamaui.ui.screen.home.components.SettingDialog
@@ -51,9 +51,9 @@ fun HomeScreen(
     onPullEmbeddingModel: (String) -> Unit,
     isModelListLoaded: Boolean,
     modelList: List<String>,
-    tagError: Int?,
-    statusError: Int?,
-    statusThrowable: String?,
+    tagError: NetworkError?,
+    statusError: NetworkError?,
+    pullError: NetworkError?,
 ) {
     var isNewChatDialogVisible by remember { mutableStateOf(false) }
     var isAboutDialogVisible by remember { mutableStateOf(false) }
@@ -135,23 +135,6 @@ fun HomeScreen(
                 .padding(paddingValues)
         ){
             AnimatedVisibility(
-                visible = (tagError != null) && !isSettingDialogVisible,
-                enter = scaleIn(),
-                exit = scaleOut(),
-            ) {
-                NetworkErrorDialog(
-                    statusError = statusError,
-                    statusThrowable = statusThrowable,
-                    onSettingClick = {
-                        isSettingDialogVisible = true
-                                     },
-                    onRetryClick = {
-                        mainViewModel.refresh()
-                                   },
-                    onCloseClick = { activity?.finish() }
-                )
-            }
-            AnimatedVisibility(
                 visible = isNewChatDialogVisible,
                 enter = scaleIn(),
                 exit = scaleOut(),
@@ -209,7 +192,10 @@ fun HomeScreen(
                     onPullEmbeddingModelClick = { modelName -> onPullEmbeddingModel(modelName) },
                     isOllamaAddressCorrect = ollamaStatus == OLLAMA_IS_RUNNING,
                     isEmbeddingModelPulled = isEmbeddingModelPulled,
-                    isEmbeddingModelPulling = isEmbeddingModelPulling
+                    isEmbeddingModelPulling = isEmbeddingModelPulling,
+                    pullError = pullError,
+                    tagError = tagError,
+                    statusError = statusError
                 )
             }
             AnimatedVisibility(

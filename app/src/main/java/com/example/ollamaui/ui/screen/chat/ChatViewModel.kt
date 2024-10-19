@@ -1,21 +1,19 @@
 package com.example.ollamaui.ui.screen.chat
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ollamaui.domain.model.ApiError
-import com.example.ollamaui.domain.model.chat.ChatInputModel
-import com.example.ollamaui.domain.model.chat.ChatModel
-import com.example.ollamaui.domain.model.embed.EmbedInputModel
-import com.example.ollamaui.domain.model.chat.EmptyChatModel
-import com.example.ollamaui.domain.model.chat.EmptyChatResponse
 import com.example.ollamaui.domain.model.MessageModel
 import com.example.ollamaui.domain.model.MessagesModel
-import com.example.ollamaui.domain.model.pull.PullInputModel
+import com.example.ollamaui.domain.model.NetworkError
+import com.example.ollamaui.domain.model.chat.ChatInputModel
+import com.example.ollamaui.domain.model.chat.ChatModel
+import com.example.ollamaui.domain.model.chat.EmptyChatModel
+import com.example.ollamaui.domain.model.chat.EmptyChatResponse
+import com.example.ollamaui.domain.model.embed.EmbedInputModel
 import com.example.ollamaui.domain.repository.OllamaRepository
 import com.example.ollamaui.utils.Constants.OLLAMA_CHAT_ENDPOINT
 import com.example.ollamaui.utils.Constants.OLLAMA_EMBED_ENDPOINT
-import com.example.ollamaui.utils.Constants.OLLAMA_PULL_ENDPOINT
 import com.example.ollamaui.utils.Constants.USER_ROLE
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -77,7 +75,7 @@ class ChatViewModel @Inject constructor(
             isSendingFailed = true,
             isRespondingList = isRespondingList,
             isDatabaseChanged = true,
-            chatError = ApiError.UnknownError.message,
+            chatError = NetworkError(error = ApiError.UnknownError, t = Throwable("The request has been cancelled by user")),
             chatModel = chatState.value.chatModel.copy(newMessageStatus = 2)
         ) }
         viewModelScope.launch {
@@ -204,7 +202,7 @@ class ChatViewModel @Inject constructor(
                 if(chatState.value.chatModel.chatId == oldChatModel.chatId) {
                     _chatState.update {
                         it.copy(
-                            chatError = error.error.message,
+                            chatError = error,
                             chatResponse = EmptyChatResponse.empty
                         )
                     }
@@ -228,7 +226,7 @@ class ChatViewModel @Inject constructor(
                     _chatState.update { it.copy(embedResponse = response) }
                 }
                 .onLeft { error ->
-                    _chatState.update { it.copy(embedError = error.error.message) }
+                    _chatState.update { it.copy(embedError = error) }
                 }
         }
     }
