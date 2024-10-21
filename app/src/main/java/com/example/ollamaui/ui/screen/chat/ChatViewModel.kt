@@ -1,7 +1,10 @@
 package com.example.ollamaui.ui.screen.chat
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ollamaui.data.local.objectbox.ChunkDatabase
+import com.example.ollamaui.data.local.objectbox.DocumentDatabase
 import com.example.ollamaui.domain.model.ApiError
 import com.example.ollamaui.domain.model.MessageModel
 import com.example.ollamaui.domain.model.MessagesModel
@@ -11,6 +14,9 @@ import com.example.ollamaui.domain.model.chat.ChatModel
 import com.example.ollamaui.domain.model.chat.EmptyChatModel
 import com.example.ollamaui.domain.model.chat.EmptyChatResponse
 import com.example.ollamaui.domain.model.embed.EmbedInputModel
+import com.example.ollamaui.domain.model.objectbox.Chunk
+import com.example.ollamaui.domain.model.objectbox.Document
+import com.example.ollamaui.domain.objectbox.Splitter
 import com.example.ollamaui.domain.repository.OllamaRepository
 import com.example.ollamaui.utils.Constants.OLLAMA_CHAT_ENDPOINT
 import com.example.ollamaui.utils.Constants.OLLAMA_EMBED_ENDPOINT
@@ -26,6 +32,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ChatViewModel @Inject constructor(
     private val ollamaRepository: OllamaRepository,
+    private val chunkDatabase: ChunkDatabase,
+    private val documentDatabase: DocumentDatabase
 ):ViewModel() {
 
     private val _chatState = MutableStateFlow(ChatStates())
@@ -129,17 +137,53 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    fun attachImageToChat(attachImageResult: String?, attachImageError: String?){
+    fun attachFileToChat(attachResult: String?, attachError: String?, embeddingModel: String, fileName: String, documentType: String, isEmbeddingModelSet: Boolean){
+        if(documentType in listOf("png", "jpg", "jpeg")) {
+            attachImageToChat(
+                attachImageResult = attachResult,
+                attachImageError = attachError
+            )
+        }else{
+            if(isEmbeddingModelSet) {
+                attachDocumentToChat(
+                    attachDocResult = attachResult,
+                    attachDocError = attachError,
+                    embeddingModel = embeddingModel,
+                    fileName = fileName
+                )
+            }else{
+                attachDocumentToChat(
+                    attachDocResult = attachResult,
+                    attachDocError = attachError,
+                    embeddingModel = chatState.value.chatModel.modelName,
+                    fileName = fileName
+                )
+            }
+        }
+    }
+
+    private fun attachImageToChat(attachImageResult: String?, attachImageError: String?){
         _chatState.update { it.copy(attachImageResult = attachImageResult, attachImageError = attachImageError) }
     }
 
-    fun attachDocumentToChat(attachDocResult: String, attachDocError: String?, embeddingModel: String){
+    private fun attachDocumentToChat(attachDocResult: String?, attachDocError: String?, embeddingModel: String, fileName: String){
 
-        //TODO("this is temporarily. perhaps it must move to database")
         _chatState.update { it.copy(attachDocResult = attachDocResult, attachDocError = attachDocError) }
-
-        if(attachDocError == null && embeddingModel != ""){
-            ollamaPostEmbed(text = listOf(attachDocResult), embeddingModel = embeddingModel)
+        attachDocResult?.let { text ->
+            val docId = documentDatabase.addDocument(
+                document = Document(
+                    docText = text,
+                    docFileName = fileName,
+                    docAddedTime = System.currentTimeMillis()
+                )
+            )
+            val chunks = Splitter.createChunks(docText = text, chunkSize = 500, chunkOverlap = 50)
+            ollamaPostEmbed(
+                text = chunks,
+                embeddingModel = embeddingModel,
+                docId = docId,
+                fileName = fileName
+            )
         }
     }
 
@@ -212,7 +256,7 @@ class ChatViewModel @Inject constructor(
             }
         }
     }
-    private fun ollamaPostEmbed(text: List<String>, embeddingModel: String){
+    private fun ollamaPostEmbed(text: List<String>, embeddingModel: String, docId: Long, fileName: String){
         viewModelScope.launch {
             ollamaRepository.postOllamaEmbed(
                 baseUrl = chatState.value.ollamaBaseAddress,
@@ -223,8 +267,17 @@ class ChatViewModel @Inject constructor(
                 )
             )
                 .onRight { response ->
-                    //TODO("Upload to Database")
                     _chatState.update { it.copy(embedResponse = response) }
+                    response.embeddings.forEachIndexed { index, chunkedEmbedding ->
+                        chunkDatabase.addChunk(
+                            chunk = Chunk(
+                                docId = docId,
+                                docFileName = fileName,
+                                chunkData = text[index],
+                                chunkEmbedding = chunkedEmbedding,
+                            )
+                        )
+                    }
                 }
                 .onLeft { error ->
                     _chatState.update { it.copy(embedError = error) }

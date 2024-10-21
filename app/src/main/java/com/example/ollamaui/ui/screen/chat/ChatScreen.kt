@@ -211,27 +211,15 @@ fun ChatScreen(
             AttachDocs(
                 isEnabled = isEnabled,
                 onDispose = {isEnabled = false},
-                onSelectClick = { result, error, documentType ->
-                    if(documentType in listOf("png", "jpg", "jpeg")) {
-                        chatViewModel.attachImageToChat(
-                            attachImageResult = result,
-                            attachImageError = error
+                onSelectClick = { result, error, documentType, fileName ->
+                    chatViewModel.attachFileToChat(
+                        attachResult = result,
+                        attachError = error,
+                        documentType = documentType,
+                        fileName = fileName,
+                        embeddingModel = embeddingModel,
+                        isEmbeddingModelSet = isEmbeddingModelSet
                         )
-                    }else{
-                        if(isEmbeddingModelSet) {
-                            chatViewModel.attachDocumentToChat(
-                                attachDocResult = result ?: "",
-                                attachDocError = error,
-                                embeddingModel = embeddingModel
-                            )
-                        }else{
-                            chatViewModel.attachDocumentToChat(
-                                attachDocResult = result ?: "",
-                                attachDocError = error,
-                                embeddingModel = chatState.chatModel.modelName
-                            )
-                        }
-                    }
                 }
             )
         }

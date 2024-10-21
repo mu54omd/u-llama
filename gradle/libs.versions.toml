@@ -8,8 +8,8 @@ junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 lifecycleRuntimeKtx = "2.8.6"
-activityCompose = "1.9.2"
-composeBom = "2024.09.03"
+activityCompose = "1.9.3"
+composeBom = "2024.10.00"
 okhttpBom = "4.12.0"
 retrofit = "2.11.0"
 converterGson = "2.11.0"
@@ -20,6 +20,7 @@ richtext= "1.0.0-alpha01"
 roomRuntime = "2.6.1"
 datastorePreferences = "1.1.1"
 constraintlayoutCompose = "1.0.1"
+objectbox = "4.0.2"
 
 
 
@@ -58,6 +59,10 @@ androidx-datastore-preferences = { module = "androidx.datastore:datastore-prefer
 richtext-ui-material3 = { module = "com.halilibo.compose-richtext:richtext-ui-material3", version.ref = "richtext" }
 richtext-markdown = { module = "com.halilibo.compose-richtext:richtext-markdown", version.ref = "richtext" }
 richtext-commonmark = { module = "com.halilibo.compose-richtext:richtext-commonmark", version.ref = "richtext" }
+objectbox = { module = "io.objectbox:objectbox-gradle-plugin", version.ref = "objectbox" }
+objectbox-android-objectbrowser = { module = "io.objectbox:objectbox-android-objectbrowser", version.ref = "objectbox" }
+objectbox-android = { module = "io.objectbox:objectbox-android", version.ref = "objectbox" }
+
 
 
 

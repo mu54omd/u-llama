@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
-fun AttachDocs(isEnabled: Boolean, onDispose: () -> Unit, onSelectClick: (String?, String?, String) -> Unit) {
+fun AttachDocs(isEnabled: Boolean, onDispose: () -> Unit, onSelectClick: (String?, String?, String, String) -> Unit) {
     val context = LocalContext.current
     val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { activityResult ->
         activityResult.data?.data?.let { uri ->
@@ -44,7 +44,7 @@ fun AttachDocs(isEnabled: Boolean, onDispose: () -> Unit, onSelectClick: (String
                     val (result, error) = Readers.getReaderForDocType(documentType = documentType).readFromInputStream(inputStream)
 
                     withContext(Dispatchers.IO){
-                        onSelectClick(result, error, documentType)
+                        onSelectClick(result, error, documentType, fileName)
                         inputStream.close()
                     }
                 }
