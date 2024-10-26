@@ -3,7 +3,6 @@ package com.example.ollamaui.ui.screen.chat.components
 import android.content.Intent
 import android.os.Build
 import android.provider.OpenableColumns
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable

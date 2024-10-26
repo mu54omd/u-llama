@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,8 +16,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -33,14 +39,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import com.example.ollamaui.R
 import com.example.ollamaui.domain.model.MessageModel
+import com.example.ollamaui.ui.common.base64ToBitmap
 import com.example.ollamaui.ui.common.messageModelToText
 import com.example.ollamaui.ui.screen.chat.components.AttachDocs
+import com.example.ollamaui.ui.screen.chat.components.AttachedFiles
 import com.example.ollamaui.ui.screen.chat.components.ChatBottomBar
 import com.example.ollamaui.ui.screen.chat.components.ChatTopBar
 import com.example.ollamaui.ui.screen.chat.components.Conversation
@@ -140,6 +150,16 @@ fun ChatScreen(
                     bottom = contentPadding.calculateBottomPadding()
                 )
         ) {
+            AttachedFiles(
+                isVisible = chatState.attachedImages.isNotEmpty(),
+                items = chatState.attachedImages,
+                onRemoveClick = { index, isImage -> chatViewModel.removeAttachedFile(index, isImage) }
+            )
+            AttachedFiles(
+                isVisible = chatState.attachedDocs.isNotEmpty(),
+                items = chatState.attachedDocs,
+                onRemoveClick = { index, isImage -> chatViewModel.removeAttachedFile(index, isImage) }
+            )
             Conversation(
                 messagesModel = chatState.chatModel.chatMessages ,
                 modifier = Modifier.weight(1f),

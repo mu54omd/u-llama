@@ -1,11 +1,12 @@
 package com.example.ollamaui.ui.screen.chat
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ollamaui.data.local.objectbox.ChunkDatabase
 import com.example.ollamaui.data.local.objectbox.DocumentDatabase
+import com.example.ollamaui.data.local.objectbox.ImageDatabase
 import com.example.ollamaui.domain.model.ApiError
+import com.example.ollamaui.domain.model.AttachedFileModel
 import com.example.ollamaui.domain.model.MessageModel
 import com.example.ollamaui.domain.model.MessagesModel
 import com.example.ollamaui.domain.model.NetworkError
@@ -16,6 +17,7 @@ import com.example.ollamaui.domain.model.chat.EmptyChatResponse
 import com.example.ollamaui.domain.model.embed.EmbedInputModel
 import com.example.ollamaui.domain.model.objectbox.Chunk
 import com.example.ollamaui.domain.model.objectbox.Document
+import com.example.ollamaui.domain.model.objectbox.Image
 import com.example.ollamaui.domain.objectbox.Splitter
 import com.example.ollamaui.domain.repository.OllamaRepository
 import com.example.ollamaui.utils.Constants.OLLAMA_CHAT_ENDPOINT
@@ -33,7 +35,8 @@ import javax.inject.Inject
 class ChatViewModel @Inject constructor(
     private val ollamaRepository: OllamaRepository,
     private val chunkDatabase: ChunkDatabase,
-    private val documentDatabase: DocumentDatabase
+    private val documentDatabase: DocumentDatabase,
+    private val imageDatabase: ImageDatabase
 ):ViewModel() {
 
     private val _chatState = MutableStateFlow(ChatStates())
@@ -48,8 +51,9 @@ class ChatViewModel @Inject constructor(
     fun sendButton(text: String){
         val messages = chatState.value.chatModel.chatMessages.messageModels.toMutableList()
         val oldChatModel = chatState.value.chatModel
-        if(chatState.value.attachImageResult != null){
-            messages.add(MessageModel(content = text, role = USER_ROLE, images = listOf(chatState.value.attachImageResult!!)))
+
+        if(chatState.value.attachedImages.isNotEmpty()){
+            messages.add(MessageModel(content = text, role = USER_ROLE, images = listOf(chatState.value.attachedImages.first().attachResult!!)))
         }else {
             messages.add(MessageModel(content = text, role = USER_ROLE))
         }
@@ -137,11 +141,20 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    fun attachFileToChat(attachResult: String?, attachError: String?, embeddingModel: String, fileName: String, documentType: String, isEmbeddingModelSet: Boolean){
+    fun attachFileToChat(
+        attachResult: String?,
+        attachError: String?,
+        embeddingModel: String,
+        fileName: String,
+        documentType: String,
+        isEmbeddingModelSet: Boolean
+    ){
         if(documentType in listOf("png", "jpg", "jpeg")) {
             attachImageToChat(
                 attachImageResult = attachResult,
-                attachImageError = attachError
+                attachImageError = attachError,
+                fileName = fileName,
+                documentType = documentType
             )
         }else{
             if(isEmbeddingModelSet) {
@@ -149,48 +162,129 @@ class ChatViewModel @Inject constructor(
                     attachDocResult = attachResult,
                     attachDocError = attachError,
                     embeddingModel = embeddingModel,
-                    fileName = fileName
+                    fileName = fileName,
+                    documentType = documentType
                 )
             }else{
                 attachDocumentToChat(
                     attachDocResult = attachResult,
                     attachDocError = attachError,
                     embeddingModel = chatState.value.chatModel.modelName,
-                    fileName = fileName
+                    fileName = fileName,
+                    documentType = documentType
                 )
             }
         }
     }
 
-    private fun attachImageToChat(attachImageResult: String?, attachImageError: String?){
-        _chatState.update { it.copy(attachImageResult = attachImageResult, attachImageError = attachImageError) }
-    }
-
-    private fun attachDocumentToChat(attachDocResult: String?, attachDocError: String?, embeddingModel: String, fileName: String){
-
-        _chatState.update { it.copy(attachDocResult = attachDocResult, attachDocError = attachDocError) }
-        attachDocResult?.let { text ->
-            val docId = documentDatabase.addDocument(
-                document = Document(
-                    docText = text,
-                    docFileName = fileName,
-                    docAddedTime = System.currentTimeMillis()
+    fun removeAttachedFile(index: Int, isImage: Boolean){
+        if(!isImage) {
+            chatState.value.attachedDocs[index].id.let {
+                documentDatabase.removeDocument(docId = it)
+                chunkDatabase.removeChunk(docId = it)
+            }
+            val attachedDocs = chatState.value.attachedDocs.toMutableList()
+            attachedDocs.removeAt(index)
+            _chatState.update {
+                it.copy(
+                    attachedDocs = attachedDocs
                 )
-            )
-            val chunks = Splitter.createChunks(docText = text, chunkSize = 500, chunkOverlap = 50)
-            ollamaPostEmbed(
-                text = chunks,
-                embeddingModel = embeddingModel,
-                docId = docId,
-                fileName = fileName
-            )
+            }
+        }else{
+            chatState.value.attachedImages[index].id.let {
+                imageDatabase.removeImage(imageId = it)
+            }
+            val attachedImages = chatState.value.attachedImages.toMutableList()
+            attachedImages.removeAt(index)
+            _chatState.update {
+                it.copy(
+                    attachedImages = attachedImages
+                )
+            }
         }
     }
-
     //Private methods
     /*---------------------------------------------------------------------------------------------*/
     /*---------------------------------------------------------------------------------------------*/
     /*---------------------------------------------------------------------------------------------*/
+
+    private fun attachImageToChat(attachImageResult: String?, attachImageError: String?, fileName: String, documentType: String){
+        attachImageResult?.let { image ->
+            val attachedImages = chatState.value.attachedImages.toMutableList()
+            val filteredImages = attachedImages.filter { (it.attachResult == attachImageResult) && (it.attachError == attachImageError) && (it.fileName == fileName) && (it.fileType == documentType) }
+            if(filteredImages.isEmpty()) {
+                val imageId = imageDatabase.addImage(
+                    image = Image(
+                        imageBase64 = image,
+                        imageFileName = fileName,
+                        imageAddedTime = System.currentTimeMillis(),
+                        chatId = chatState.value.chatModel.chatId
+                    )
+                )
+
+                attachedImages.add(
+                    AttachedFileModel(
+                        fileName = fileName,
+                        fileType = documentType,
+                        attachResult = attachImageResult,
+                        attachError = attachImageError,
+                        isImage = true,
+                        id = imageId
+                    )
+                )
+                _chatState.update {
+                    it.copy(
+                        attachedImages = attachedImages
+                    )
+                }
+            }
+        }
+    }
+
+    private fun attachDocumentToChat(attachDocResult: String?, attachDocError: String?, embeddingModel: String, fileName: String, documentType: String){
+
+        attachDocResult?.let { text ->
+            val attachedDocs = chatState.value.attachedDocs.toMutableList()
+            val filteredList = attachedDocs.filter { (it.attachResult == attachDocResult) && (it.attachError == attachDocError) && (it.fileName == fileName) && (it.fileType == documentType) }
+            if(filteredList.isEmpty()) {
+                val docId = documentDatabase.addDocument(
+                    document = Document(
+                        docText = text,
+                        chatId = chatState.value.chatModel.chatId,
+                        docFileName = fileName,
+                        docAddedTime = System.currentTimeMillis()
+                    )
+                )
+                val chunks =
+                    Splitter.createChunks(docText = text, chunkSize = 500, chunkOverlap = 50)
+                ollamaPostEmbed(
+                    text = chunks,
+                    embeddingModel = embeddingModel,
+                    docId = docId,
+                    fileName = fileName
+                )
+
+                attachedDocs.add(
+                    AttachedFileModel(
+                        fileName = fileName,
+                        fileType = documentType,
+                        attachResult = attachDocResult,
+                        attachError = attachDocError,
+                        id = docId,
+                        isImage = false
+                    )
+                )
+                _chatState.update {
+                    it.copy(
+                        attachedDocs = attachedDocs
+                    )
+                }
+            }
+
+        }
+    }
+
+
     private fun ollamaPostMessage(messages: MessagesModel, chatId: Int){
         val oldMessages = chatState.value.chatModel.chatMessages.messageModels.toMutableList()
         val oldChatModel = chatState.value.chatModel
@@ -243,12 +337,17 @@ class ChatViewModel @Inject constructor(
                 )
             }.onLeft { error ->
                 isRespondingList.remove(chatId)
-                _chatState.update { it.copy(isRespondingList = isRespondingList, isSendingFailed = true) }
+                _chatState.update { it.copy(
+                    isRespondingList = isRespondingList,
+                    isSendingFailed = true,
+                    isDatabaseChanged = true,
+                ) }
                 if(chatState.value.chatModel.chatId == oldChatModel.chatId) {
                     _chatState.update {
                         it.copy(
                             chatError = error,
-                            chatResponse = EmptyChatResponse.empty
+                            chatResponse = EmptyChatResponse.empty,
+                            chatModel = chatState.value.chatModel.copy(newMessageStatus = 2)
                         )
                     }
                 }

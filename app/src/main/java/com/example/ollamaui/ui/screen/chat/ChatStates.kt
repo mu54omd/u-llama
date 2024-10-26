@@ -1,5 +1,6 @@
 package com.example.ollamaui.ui.screen.chat
 
+import com.example.ollamaui.domain.model.AttachedFileModel
 import com.example.ollamaui.domain.model.NetworkError
 import com.example.ollamaui.domain.model.chat.ChatModel
 import com.example.ollamaui.domain.model.chat.ChatResponse
@@ -20,10 +21,8 @@ data class ChatStates(
     val isSendingFailed: Boolean = false,
     val isDatabaseChanged: Boolean = false,
 
-    val attachImageResult: String? = null,
-    val attachImageError: String? = null,
-    val attachDocResult: String? = null,
-    val attachDocError: String? = null,
+    val attachedDocs: List<AttachedFileModel> = emptyList(),
+    val attachedImages: List<AttachedFileModel> = emptyList(),
 
     val embedResponse: EmbedResponse = EmptyEmbedResponse.empty,
     val embedError: NetworkError? = null,

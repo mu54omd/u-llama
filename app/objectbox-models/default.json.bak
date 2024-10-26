@@ -40,9 +40,67 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "2:1883999539185832377",
+      "lastPropertyId": "5:6211152473660129065",
+      "name": "Document",
+      "properties": [
+        {
+          "id": "1:3517755974992953303",
+          "name": "docId",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:4466243995213441617",
+          "name": "docText",
+          "type": 9
+        },
+        {
+          "id": "3:4035165117434687144",
+          "name": "docFileName",
+          "type": 9
+        },
+        {
+          "id": "5:6211152473660129065",
+          "name": "chatId",
+          "type": 5
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "3:6891484496465247065",
+      "lastPropertyId": "5:1815499880776418715",
+      "name": "Image",
+      "properties": [
+        {
+          "id": "1:7895891454985083661",
+          "name": "imageId",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:6053360830184176093",
+          "name": "chatId",
+          "type": 5
+        },
+        {
+          "id": "3:4459179256332931735",
+          "name": "imageBase64",
+          "type": 9
+        },
+        {
+          "id": "4:8308118114519410362",
+          "name": "imageFileName",
+          "type": 9
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "1:1049250556367054369",
+  "lastEntityId": "3:6891484496465247065",
   "lastIndexId": "2:1189714503797245299",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
@@ -50,7 +108,10 @@
   "modelVersionParserMinimum": 5,
   "retiredEntityUids": [],
   "retiredIndexUids": [],
-  "retiredPropertyUids": [],
+  "retiredPropertyUids": [
+    1815499880776418715,
+    544254492154363220
+  ],
   "retiredRelationUids": [],
   "version": 1
 }
