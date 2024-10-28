@@ -1,10 +1,10 @@
 package com.example.ollamaui.ui.screen.chat
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,19 +16,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,22 +37,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import com.example.ollamaui.R
+import com.example.ollamaui.domain.model.AttachedFileModel
+import com.example.ollamaui.domain.model.EmptyAttachedFileModel
 import com.example.ollamaui.domain.model.MessageModel
-import com.example.ollamaui.ui.common.base64ToBitmap
 import com.example.ollamaui.ui.common.messageModelToText
 import com.example.ollamaui.ui.screen.chat.components.AttachDocs
-import com.example.ollamaui.ui.screen.chat.components.AttachedFiles
+import com.example.ollamaui.ui.screen.chat.components.AttachedFilesItem
 import com.example.ollamaui.ui.screen.chat.components.ChatBottomBar
 import com.example.ollamaui.ui.screen.chat.components.ChatTopBar
 import com.example.ollamaui.ui.screen.chat.components.Conversation
 import com.example.ollamaui.ui.screen.chat.components.DotsPulsing
+import com.example.ollamaui.ui.screen.chat.components.FileDetails
 import com.example.ollamaui.ui.screen.common.CustomButton
 import kotlinx.coroutines.launch
 
@@ -82,6 +80,11 @@ fun ChatScreen(
         }
     }
     var isEnabled by remember { mutableStateOf(false) }
+    var isFileDetailsVisible by remember { mutableStateOf(false) }
+    val file = remember { mutableStateOf(EmptyAttachedFileModel.empty) }
+    val selectedImages = remember { mutableStateListOf<AttachedFileModel>() }
+    val selectedDocs = remember { mutableStateListOf<AttachedFileModel>() }
+
 
     Scaffold(
         topBar = {
@@ -106,7 +109,7 @@ fun ChatScreen(
                      chatState.isSendingFailed -> { chatViewModel.retry() }
                      chatState.isRespondingList.contains(chatState.chatModel.chatId) -> { chatViewModel.stop(chatId = chatState.chatModel.chatId) }
                      else -> {
-                         chatViewModel.sendButton(textValue)
+                         chatViewModel.sendButton(text = textValue, selectedImages = selectedImages)
                          textValue = ""
                          textValueBackup = textValue
                      }
@@ -150,16 +153,69 @@ fun ChatScreen(
                     bottom = contentPadding.calculateBottomPadding()
                 )
         ) {
-            AttachedFiles(
-                isVisible = chatState.attachedImages.isNotEmpty(),
-                items = chatState.attachedImages,
-                onRemoveClick = { index, isImage -> chatViewModel.removeAttachedFile(index, isImage) }
-            )
-            AttachedFiles(
-                isVisible = chatState.attachedDocs.isNotEmpty(),
-                items = chatState.attachedDocs,
-                onRemoveClick = { index, isImage -> chatViewModel.removeAttachedFile(index, isImage) }
-            )
+            AnimatedVisibility(
+                visible = chatState.attachedImages.isNotEmpty(), enter = scaleIn(), exit = scaleOut()
+            ) {
+                LazyRow(modifier = Modifier.height(32.dp)) {
+                    itemsIndexed(chatState.attachedImages){ index, item ->
+                        AttachedFilesItem(
+                            item = item,
+                            index = index,
+                            onFilesLongPress = {
+                                if(!selectedImages.contains(it)) {
+                                    selectedImages.add(it)
+                                }
+                            },
+                            onFilesClick = {
+                                if(selectedImages.isEmpty()) {
+                                    isFileDetailsVisible = true
+                                    file.value = it
+                                }else{
+                                    if(selectedImages.contains(it)){
+                                        selectedImages.remove(it)
+                                    }else{
+                                        selectedImages.add(it)
+                                    }
+                                }
+                            },
+                            onRemoveClick = { _, isImage -> chatViewModel.removeAttachedFile(index, isImage) },
+                            isSelected = selectedImages.contains(item)
+                        )
+                    }
+                }
+                Log.d("cTAG", selectedImages.size.toString())
+            }
+            AnimatedVisibility(
+                visible = chatState.attachedDocs.isNotEmpty(), enter = scaleIn(), exit = scaleOut()
+            ) {
+                LazyRow(modifier = Modifier.height(32.dp)) {
+                    itemsIndexed(chatState.attachedDocs){ index, item ->
+                        AttachedFilesItem(
+                            item =item,
+                            index = index,
+                            onFilesLongPress = {
+                                if(!selectedDocs.contains(it)) {
+                                    selectedDocs.add(it)
+                                }
+                            },
+                            onFilesClick = {
+                                if(selectedDocs.isEmpty()) {
+                                    isFileDetailsVisible = true
+                                    file.value = it
+                                }else{
+                                    if(selectedDocs.contains(it)){
+                                        selectedDocs.remove(it)
+                                    }else{
+                                        selectedDocs.add(it)
+                                    }
+                                }
+                            },
+                            onRemoveClick = { _, isImage -> chatViewModel.removeAttachedFile(index, isImage) },
+                            isSelected = selectedDocs.contains(item)
+                        )
+                    }
+                }
+            }
             Conversation(
                 messagesModel = chatState.chatModel.chatMessages ,
                 modifier = Modifier.weight(1f),
@@ -242,6 +298,14 @@ fun ChatScreen(
                         )
                 }
             )
+            AnimatedVisibility(
+                visible = isFileDetailsVisible
+            ) {
+                FileDetails(
+                    onDismissRequest = { isFileDetailsVisible = false},
+                    file = file.value
+                )
+            }
         }
 
         BackHandler {

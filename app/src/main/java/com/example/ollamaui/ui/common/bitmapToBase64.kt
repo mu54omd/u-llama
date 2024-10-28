@@ -9,7 +9,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 fun bitmapToBase64(bitmap: Bitmap): String{
     val resizedBitmap = Bitmap.createScaledBitmap(bitmap, 400, 400, true) // Smaller size
     val byteArrayOutputStream = ByteArrayOutputStream()
-    resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 10, byteArrayOutputStream) // Higher compression
+    resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream) // Higher compression
     val byteArray = byteArrayOutputStream.toByteArray()
     return Base64.encode(byteArray)
 }

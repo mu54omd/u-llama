@@ -48,13 +48,14 @@ class ChatViewModel @Inject constructor(
     /*---------------------------------------------------------------------------------------------*/
     /*---------------------------------------------------------------------------------------------*/
     /*---------------------------------------------------------------------------------------------*/
-    fun sendButton(text: String){
+    fun sendButton(text: String, selectedImages: List<AttachedFileModel>){
         val messages = chatState.value.chatModel.chatMessages.messageModels.toMutableList()
         val oldChatModel = chatState.value.chatModel
+        val imageList = selectedImages.filter { it.attachResult != null }.map { it.attachResult!! }
 
-        if(chatState.value.attachedImages.isNotEmpty()){
-            messages.add(MessageModel(content = text, role = USER_ROLE, images = listOf(chatState.value.attachedImages.first().attachResult!!)))
-        }else {
+        if(selectedImages.isNotEmpty()){
+            messages.add(MessageModel(content = text, role = USER_ROLE, images = imageList))
+        }else{
             messages.add(MessageModel(content = text, role = USER_ROLE))
         }
         _chatState.update { it.copy(

@@ -8,3 +8,14 @@ data class AttachedFileModel(
     val attachError: String?,
     val isImage: Boolean = false
 )
+
+object EmptyAttachedFileModel{
+    val empty = AttachedFileModel(
+        id = 0,
+        fileName = "",
+        fileType = "",
+        attachResult = null,
+        attachError = null,
+        isImage = false
+    )
+}
