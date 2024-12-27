@@ -1,6 +1,5 @@
 package com.example.ollamaui.ui.screen.chat
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
@@ -42,9 +41,8 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import com.example.ollamaui.R
-import com.example.ollamaui.domain.model.AttachedFileModel
-import com.example.ollamaui.domain.model.EmptyAttachedFileModel
 import com.example.ollamaui.domain.model.MessageModel
+import com.example.ollamaui.domain.model.objectbox.File
 import com.example.ollamaui.ui.common.messageModelToText
 import com.example.ollamaui.ui.screen.chat.components.AttachDocs
 import com.example.ollamaui.ui.screen.chat.components.AttachedFilesItem
@@ -60,6 +58,8 @@ import kotlinx.coroutines.launch
 fun ChatScreen(
     chatViewModel: ChatViewModel,
     chatState: ChatStates,
+    attachedImagesList: AttachedFilesList,
+    attachedFilesList: AttachedFilesList,
     embeddingModel: String,
     isEmbeddingModelSet: Boolean,
     onBackClick: () -> Unit
@@ -81,9 +81,9 @@ fun ChatScreen(
     }
     var isEnabled by remember { mutableStateOf(false) }
     var isFileDetailsVisible by remember { mutableStateOf(false) }
-    val file = remember { mutableStateOf(EmptyAttachedFileModel.empty) }
-    val selectedImages = remember { mutableStateListOf<AttachedFileModel>() }
-    val selectedDocs = remember { mutableStateListOf<AttachedFileModel>() }
+    val file = remember { mutableStateOf(File()) }
+    val selectedImages = remember { mutableStateListOf<File>() }
+    val selectedDocs = remember { mutableStateListOf<File>() }
 
 
     Scaffold(
@@ -109,7 +109,7 @@ fun ChatScreen(
                      chatState.isSendingFailed -> { chatViewModel.retry() }
                      chatState.isRespondingList.contains(chatState.chatModel.chatId) -> { chatViewModel.stop(chatId = chatState.chatModel.chatId) }
                      else -> {
-                         chatViewModel.sendButton(text = textValue, selectedImages = selectedImages)
+                         chatViewModel.sendButton(text = textValue, selectedImages = selectedImages, selectedDocs = selectedDocs, embeddingModel = embeddingModel)
                          textValue = ""
                          textValueBackup = textValue
                      }
@@ -154,10 +154,10 @@ fun ChatScreen(
                 )
         ) {
             AnimatedVisibility(
-                visible = chatState.attachedImages.isNotEmpty(), enter = scaleIn(), exit = scaleOut()
+                visible = attachedImagesList.item.any { it.chatId == chatState.chatModel.chatId }, enter = scaleIn(), exit = scaleOut()
             ) {
                 LazyRow(modifier = Modifier.height(32.dp)) {
-                    itemsIndexed(chatState.attachedImages){ index, item ->
+                    itemsIndexed(attachedImagesList.item.filter { it.chatId == chatState.chatModel.chatId }){ index, item ->
                         AttachedFilesItem(
                             item = item,
                             index = index,
@@ -178,18 +178,20 @@ fun ChatScreen(
                                     }
                                 }
                             },
+                            onSelectedItemClick = {
+                                selectedImages.remove(it)
+                            },
                             onRemoveClick = { _, isImage -> chatViewModel.removeAttachedFile(index, isImage) },
                             isSelected = selectedImages.contains(item)
                         )
                     }
                 }
-                Log.d("cTAG", selectedImages.size.toString())
             }
             AnimatedVisibility(
-                visible = chatState.attachedDocs.isNotEmpty(), enter = scaleIn(), exit = scaleOut()
+                visible = attachedFilesList.item.any { it.chatId == chatState.chatModel.chatId }, enter = scaleIn(), exit = scaleOut()
             ) {
                 LazyRow(modifier = Modifier.height(32.dp)) {
-                    itemsIndexed(chatState.attachedDocs){ index, item ->
+                    itemsIndexed(attachedFilesList.item.filter { it.chatId == chatState.chatModel.chatId }){ index, item ->
                         AttachedFilesItem(
                             item =item,
                             index = index,
@@ -209,6 +211,9 @@ fun ChatScreen(
                                         selectedDocs.add(it)
                                     }
                                 }
+                            },
+                            onSelectedItemClick = {
+                                selectedImages.remove(it)
                             },
                             onRemoveClick = { _, isImage -> chatViewModel.removeAttachedFile(index, isImage) },
                             isSelected = selectedDocs.contains(item)

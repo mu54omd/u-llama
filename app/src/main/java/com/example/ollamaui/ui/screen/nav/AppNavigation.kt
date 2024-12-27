@@ -37,6 +37,8 @@ fun AppNavigation(
     val chatsList = homeViewModel.chatsList.collectAsStateWithLifecycle().value
     val chatViewModel: ChatViewModel = hiltViewModel()
     val chatState = chatViewModel.chatState.collectAsStateWithLifecycle().value
+    val attachedDocsList = chatViewModel.attachedDocs.collectAsStateWithLifecycle().value
+    val attachedImagesList = chatViewModel.attachedImages.collectAsStateWithLifecycle().value
 
     Scaffold(
         topBar = {},
@@ -84,6 +86,8 @@ fun AppNavigation(
                 ChatScreen(
                     chatViewModel = chatViewModel,
                     chatState = chatState,
+                    attachedFilesList = attachedDocsList,
+                    attachedImagesList = attachedImagesList,
                     embeddingModel = embeddingModel,
                     isEmbeddingModelSet = isEmbeddingModelSet,
                     onBackClick = {

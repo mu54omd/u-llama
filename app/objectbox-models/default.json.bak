@@ -43,7 +43,7 @@
     },
     {
       "id": "2:1883999539185832377",
-      "lastPropertyId": "5:6211152473660129065",
+      "lastPropertyId": "6:2335962827771912206",
       "name": "Document",
       "properties": [
         {
@@ -66,13 +66,18 @@
           "id": "5:6211152473660129065",
           "name": "chatId",
           "type": 5
+        },
+        {
+          "id": "6:2335962827771912206",
+          "name": "docAddedTime",
+          "type": 6
         }
       ],
       "relations": []
     },
     {
       "id": "3:6891484496465247065",
-      "lastPropertyId": "5:1815499880776418715",
+      "lastPropertyId": "6:2307618426907758378",
       "name": "Image",
       "properties": [
         {
@@ -95,6 +100,11 @@
           "id": "4:8308118114519410362",
           "name": "imageFileName",
           "type": 9
+        },
+        {
+          "id": "6:2307618426907758378",
+          "name": "imageAddedTime",
+          "type": 6
         }
       ],
       "relations": []

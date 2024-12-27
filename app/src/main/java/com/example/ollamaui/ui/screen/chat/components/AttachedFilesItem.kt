@@ -12,8 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,17 +24,18 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.example.ollamaui.R
-import com.example.ollamaui.domain.model.AttachedFileModel
+import com.example.ollamaui.domain.model.objectbox.File
 import com.example.ollamaui.ui.common.base64ToBitmap
 import com.example.ollamaui.ui.screen.common.CustomButton
 
 @Composable
 fun AttachedFilesItem(
-    item: AttachedFileModel,
+    item: File,
     index: Int,
-    onFilesClick: (AttachedFileModel) -> Unit,
-    onFilesLongPress: (AttachedFileModel) -> Unit,
+    onFilesClick: (File) -> Unit,
+    onFilesLongPress: (File) -> Unit,
     onRemoveClick: (Int, Boolean) -> Unit,
+    onSelectedItemClick: (File) -> Unit,
     isSelected: Boolean
 ) {
     val animateColor by animateColorAsState(
@@ -53,7 +52,14 @@ fun AttachedFilesItem(
                     onFilesLongPress(item)
                 },
                 onTap = {
-                    onFilesClick(item)
+                    when{
+                        isSelected -> {
+                            onSelectedItemClick(item)
+                        }
+                        !isSelected -> {
+                            onFilesClick(item)
+                        }
+                    }
                 }
             ) },
     ) {
@@ -63,7 +69,7 @@ fun AttachedFilesItem(
         ) {
             Spacer(modifier = Modifier.width(10.dp))
             if(item.isImage) {
-                item.attachResult?.let {
+                item.attachResult.let {
                     Box(
                         contentAlignment = Alignment.Center,
                         modifier = Modifier.size(32.dp).clip(RoundedCornerShape(100))

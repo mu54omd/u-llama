@@ -1,6 +1,5 @@
 package com.example.ollamaui.ui.screen.chat
 
-import com.example.ollamaui.domain.model.AttachedFileModel
 import com.example.ollamaui.domain.model.NetworkError
 import com.example.ollamaui.domain.model.chat.ChatModel
 import com.example.ollamaui.domain.model.chat.ChatResponse
@@ -8,8 +7,6 @@ import com.example.ollamaui.domain.model.chat.EmptyChatModel
 import com.example.ollamaui.domain.model.chat.EmptyChatResponse
 import com.example.ollamaui.domain.model.embed.EmbedResponse
 import com.example.ollamaui.domain.model.embed.EmptyEmbedResponse
-import com.example.ollamaui.domain.model.pull.EmptyPullResponse
-import com.example.ollamaui.domain.model.pull.PullResponse
 
 data class ChatStates(
     val ollamaBaseAddress: String = "",
@@ -21,9 +18,9 @@ data class ChatStates(
     val isSendingFailed: Boolean = false,
     val isDatabaseChanged: Boolean = false,
 
-    val attachedDocs: List<AttachedFileModel> = emptyList(),
-    val attachedImages: List<AttachedFileModel> = emptyList(),
-
     val embedResponse: EmbedResponse = EmptyEmbedResponse.empty,
     val embedError: NetworkError? = null,
+
+    val retrievedContext: String = "",
+    val isRetrievedContextReady: Boolean = false
 )

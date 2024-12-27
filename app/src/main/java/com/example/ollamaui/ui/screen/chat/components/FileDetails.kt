@@ -2,18 +2,13 @@ package com.example.ollamaui.ui.screen.chat.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.rememberScrollableState
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -28,13 +23,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.example.ollamaui.domain.model.AttachedFileModel
+import com.example.ollamaui.domain.model.objectbox.File
 import com.example.ollamaui.ui.common.base64ToBitmap
 
 @Composable
 fun FileDetails(
     onDismissRequest: () -> Unit,
-    file: AttachedFileModel
+    file: File
 ) {
     Dialog(
         onDismissRequest = onDismissRequest
@@ -52,7 +47,7 @@ fun FileDetails(
                 verticalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.padding(10.dp).fillMaxWidth()
             ) {
-                file.attachResult?.let {
+                file.attachResult.let {
                     Box(
                         modifier = Modifier
                             .clip(shape = RoundedCornerShape(10))
