@@ -1,6 +1,7 @@
 package com.example.ollamaui.ui.screen.home
 
 import android.app.Activity
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
@@ -233,13 +234,22 @@ fun HomeScreen(
                                 isDeleteDialogVisible = true
                             },
                             onItemClick = {
-                                if(selectedChats.isEmpty()){
-                                    onChatClick(chatItem)
-                                }else{
-                                    if(selectedChats.contains(chatItem.chatId)){
+                                when {
+                                    selectedChats.contains(chatItem.chatId) -> {
                                         selectedChats.remove(chatItem.chatId)
-                                    }else {
-                                        selectedChats.add(chatItem.chatId)
+                                    }
+
+                                    else -> {
+
+                                        if (selectedChats.isEmpty()) {
+                                            onChatClick(chatItem)
+                                        } else {
+                                            if (selectedChats.contains(chatItem.chatId)) {
+                                                selectedChats.remove(chatItem.chatId)
+                                            } else {
+                                                selectedChats.add(chatItem.chatId)
+                                            }
+                                        }
                                     }
                                 }
                             },

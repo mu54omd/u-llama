@@ -1,5 +1,7 @@
 package com.example.ollamaui.ui.screen.chat
 
+import android.util.Log
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ollamaui.data.local.objectbox.ChunkDatabase
@@ -21,7 +23,12 @@ import com.example.ollamaui.utils.Constants.OLLAMA_CHAT_ENDPOINT
 import com.example.ollamaui.utils.Constants.OLLAMA_EMBED_ENDPOINT
 import com.example.ollamaui.utils.Constants.USER_ROLE
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -68,41 +75,49 @@ class ChatViewModel @Inject constructor(
         val messages = chatState.value.chatModel.chatMessages.messageModels.toMutableList()
         val oldChatModel = chatState.value.chatModel
         val imageList = selectedImages.map { it.attachResult }
+        val job = getSimilarChunk(
+                query = text,
+                n = 5,
+                embeddingModel = if (embeddingModel != "") embeddingModel else chatState.value.chatModel.modelName,
+            )
+        job.invokeOnCompletion {
+            when {
+                selectedImages.isNotEmpty() -> {
+                    messages.add(MessageModel(content = text, role = USER_ROLE, images = imageList))
+                }
 
-        if(selectedImages.isNotEmpty()){
-            messages.add(MessageModel(content = text, role = USER_ROLE, images = imageList))
-        }else if(selectedDocs.isNotEmpty()) {
-            viewModelScope.launch {
-                getSimilarChunk(
-                    query = text,
-                    n = 5,
-                    embeddingModel = if (embeddingModel != "") embeddingModel else chatState.value.chatModel.modelName
-                )
-
-                messages.add(
-                    MessageModel(
-                        content = "Using this data: ${chatState.value.retrievedContext}. Respond to this prompt: ${text}.",
-                        role = USER_ROLE
+                selectedDocs.isNotEmpty() -> {
+                    messages.add(
+                        MessageModel(
+                            content = "Using this data: {${chatState.value.retrievedContext}}. Respond to this prompt: {${text}}.",
+                            role = USER_ROLE
+                        )
                     )
+                }
+                else -> {
+                    messages.add(MessageModel(content = text, role = USER_ROLE))
+                }
+            }
+            _chatState.update {
+                it.copy(
+                    chatModel = ChatModel(
+                        chatId = oldChatModel.chatId,
+                        chatIcon = oldChatModel.chatIcon,
+                        chatTitle = oldChatModel.chatTitle,
+                        chatMessages = MessagesModel(messageModels = messages),
+                        modelName = oldChatModel.modelName,
+                        userName = oldChatModel.userName,
+                        botName = oldChatModel.botName,
+                    ),
+                    isDatabaseChanged = true
                 )
             }
-        }else{
-            messages.add(MessageModel(content = text, role = USER_ROLE))
+            ollamaPostMessage(
+                messages = MessagesModel(messageModels = messages),
+                chatId = oldChatModel.chatId
+            )
         }
-        _chatState.update { it.copy(
-            chatModel = ChatModel(
-                chatId = oldChatModel.chatId,
-                chatIcon = oldChatModel.chatIcon,
-                chatTitle = oldChatModel.chatTitle,
-                chatMessages = MessagesModel( messageModels = messages),
-                modelName = oldChatModel.modelName,
-                userName = oldChatModel.userName,
-                botName = oldChatModel.botName,
-            ),
-            isDatabaseChanged = true
-        )
-        }
-        ollamaPostMessage(messages = MessagesModel(messageModels = messages), chatId = oldChatModel.chatId)
+
     }
     fun retry(){
         if(!isRespondingList.contains(chatState.value.chatModel.chatId)) {
@@ -381,8 +396,8 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun getSimilarChunk(query: String, n: Int, embeddingModel: String){
-        viewModelScope.launch {
+    private fun getSimilarChunk(query: String, n: Int, embeddingModel: String):Job{
+        val job = viewModelScope.launch {
             _chatState.update { it.copy(isRetrievedContextReady = false) }
             ollamaRepository.postOllamaEmbed(
                 baseUrl = chatState.value.ollamaBaseAddress,
@@ -394,7 +409,7 @@ class ChatViewModel @Inject constructor(
             )
                 .onRight { response ->
                     _chatState.update { it.copy(embedResponse = response) }
-                    response.embeddings.forEachIndexed { index, queryEmbedding ->
+                    response.embeddings.forEachIndexed { _, queryEmbedding ->
                         var jointContext = ""
                         chunkDatabase.getSimilarChunks(queryEmbedding = queryEmbedding, n = n).forEach {
                             jointContext += " " + it.second.chunkData
@@ -406,6 +421,7 @@ class ChatViewModel @Inject constructor(
                     _chatState.update { it.copy(embedError = error, retrievedContext = "", isRetrievedContextReady = false) }
                 }
         }
+        return job
     }
 
 

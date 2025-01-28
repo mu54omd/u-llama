@@ -1,5 +1,6 @@
 package com.example.ollamaui.data.local.objectbox
 
+import android.util.Log
 import com.example.ollamaui.domain.model.objectbox.Chunk
 import com.example.ollamaui.domain.model.objectbox.Chunk_
 import javax.inject.Inject
@@ -23,12 +24,13 @@ class ChunkDatabase @Inject constructor() {
         that are of potentially better quality than just passing in 10 for maxResultCount
         (quality/performance tradeoff).
          */
-        return chunksBox
-            .query(Chunk_.chunkEmbedding.nearestNeighbors(queryEmbedding, 25))
-            .build()
-            .findWithScores()
-            .map { Pair(it.score.toFloat(), it.get()) }
-            .subList(0, n)
+        val result = chunksBox
+                        .query(Chunk_.chunkEmbedding.nearestNeighbors(queryEmbedding, 25))
+                        .build()
+                        .findWithScores()
+                        .map { Pair(it.score.toFloat(), it.get()) }
+//                        .subList(0, n)
+        return result.subList(0,n)
     }
 
 }
