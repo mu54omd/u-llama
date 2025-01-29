@@ -75,7 +75,9 @@ class ChatViewModel @Inject constructor(
         val messages = chatState.value.chatModel.chatMessages.messageModels.toMutableList()
         val oldChatModel = chatState.value.chatModel
         val imageList = selectedImages.map { it.attachResult }
-        val job = getSimilarChunk(
+        val job =
+            getSimilarChunk(
+                fileIds = selectedDocs.map{ it.fileId },
                 query = text,
                 n = 5,
                 embeddingModel = if (embeddingModel != "") embeddingModel else chatState.value.chatModel.modelName,
@@ -284,7 +286,7 @@ class ChatViewModel @Inject constructor(
                     )
                 )
                 val chunks =
-                    Splitter.createChunks(docText = text, chunkSize = 500, chunkOverlap = 50)
+                    Splitter.createChunks(docText = text, chunkSize = 100, chunkOverlap = 5)
                 ollamaPostEmbed(
                     text = chunks,
                     embeddingModel = embeddingModel,
@@ -396,7 +398,7 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun getSimilarChunk(query: String, n: Int, embeddingModel: String):Job{
+    private fun getSimilarChunk(fileIds: List<Long>, query: String, n: Int, embeddingModel: String):Job{
         val job = viewModelScope.launch {
             _chatState.update { it.copy(isRetrievedContextReady = false) }
             ollamaRepository.postOllamaEmbed(
@@ -411,7 +413,7 @@ class ChatViewModel @Inject constructor(
                     _chatState.update { it.copy(embedResponse = response) }
                     response.embeddings.forEachIndexed { _, queryEmbedding ->
                         var jointContext = ""
-                        chunkDatabase.getSimilarChunks(queryEmbedding = queryEmbedding, n = n).forEach {
+                        chunkDatabase.getSimilarChunks(docIds = fileIds, queryEmbedding = queryEmbedding, n = n).forEach {
                             jointContext += " " + it.second.chunkData
                         }
                         _chatState.update { it.copy(retrievedContext = jointContext, isRetrievedContextReady = true) }
