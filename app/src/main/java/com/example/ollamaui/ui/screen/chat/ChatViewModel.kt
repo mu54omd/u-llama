@@ -1,7 +1,5 @@
 package com.example.ollamaui.ui.screen.chat
 
-import android.util.Log
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ollamaui.data.local.objectbox.ChunkDatabase
@@ -23,12 +21,7 @@ import com.example.ollamaui.utils.Constants.OLLAMA_CHAT_ENDPOINT
 import com.example.ollamaui.utils.Constants.OLLAMA_EMBED_ENDPOINT
 import com.example.ollamaui.utils.Constants.USER_ROLE
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -231,6 +224,7 @@ class ChatViewModel @Inject constructor(
             attachedDocs.value.item[index].fileId.let {
                 fileDatabase.removeFile(fileId = it)
                 chunkDatabase.removeChunk(docId = it)
+
             }
         }else{
             attachedImages.value.item[index].fileId.let {

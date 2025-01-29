@@ -90,6 +90,7 @@ fun AttachedFilesItem(
                 onButtonClick = { onRemoveClick(index, item.isImage) },
                 icon = R.drawable.baseline_clear_24,
                 description = "Remove Attached File",
+                containerColor = animateColor,
                 iconSize = 20
             )
         }

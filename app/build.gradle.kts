@@ -102,6 +102,10 @@ dependencies {
     debugImplementation(libs.objectbox.android.objectbrowser)
     releaseImplementation(libs.objectbox.android)
 
+    //itextpdf
+    implementation(libs.itextpdf)
+
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

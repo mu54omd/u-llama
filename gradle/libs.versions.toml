@@ -21,6 +21,7 @@ roomRuntime = "2.6.1"
 datastorePreferences = "1.1.1"
 constraintlayoutCompose = "1.0.1"
 objectbox = "4.0.2"
+itextpdf = "5.5.13.4"
 
 
 
@@ -62,6 +63,7 @@ richtext-commonmark = { module = "com.halilibo.compose-richtext:richtext-commonm
 objectbox = { module = "io.objectbox:objectbox-gradle-plugin", version.ref = "objectbox" }
 objectbox-android-objectbrowser = { module = "io.objectbox:objectbox-android-objectbrowser", version.ref = "objectbox" }
 objectbox-android = { module = "io.objectbox:objectbox-android", version.ref = "objectbox" }
+itextpdf = { module = "com.itextpdf:itextpdf", version.ref = "itextpdf" }
 
 
 

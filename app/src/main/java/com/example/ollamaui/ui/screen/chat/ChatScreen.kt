@@ -181,7 +181,10 @@ fun ChatScreen(
                             onSelectedItemClick = {
                                 selectedImages.remove(it)
                             },
-                            onRemoveClick = { _, isImage -> chatViewModel.removeAttachedFile(index, isImage) },
+                            onRemoveClick = { _, isImage ->
+                                selectedImages.remove(item)
+                                chatViewModel.removeAttachedFile(index, isImage)
+                                            },
                             isSelected = selectedImages.contains(item)
                         )
                     }
@@ -213,9 +216,12 @@ fun ChatScreen(
                                 }
                             },
                             onSelectedItemClick = {
-                                selectedImages.remove(it)
+                                selectedDocs.remove(it)
                             },
-                            onRemoveClick = { _, isImage -> chatViewModel.removeAttachedFile(index, isImage) },
+                            onRemoveClick = { _, isImage ->
+                                selectedDocs.remove(item)
+                                chatViewModel.removeAttachedFile(index, isImage)
+                                            },
                             isSelected = selectedDocs.contains(item)
                         )
                     }
