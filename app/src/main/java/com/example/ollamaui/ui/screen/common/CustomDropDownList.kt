@@ -1,5 +1,6 @@
 package com.example.ollamaui.ui.screen.common
 
+import android.icu.text.ListFormatter.Width
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,16 +36,18 @@ import com.example.ollamaui.ui.theme.OllamaUITheme
 @Composable
 fun CustomDropDownList(
     modifier: Modifier = Modifier,
+    label: String = "Selected Model",
+    defaultValue: String = "",
+    width: Int = 200,
     listItems: List<String>,
     onItemClick: (String) -> Unit,
 ) {
     var isExpanded by remember{ mutableStateOf(false) }
-    var selectedItem by remember { mutableStateOf("") }
+    var selectedItem by remember { mutableStateOf(defaultValue) }
 
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
-            .fillMaxWidth()
             .padding(top = 5.dp, bottom = 5.dp)
     ){
         ExposedDropdownMenuBox(
@@ -55,7 +59,7 @@ fun CustomDropDownList(
                 onValueChange = {},
                 readOnly = true,
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded) },
-                modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).width(200.dp),
+                modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).width(width.dp),
                 textStyle = MaterialTheme.typography.bodySmall.copy(textAlign = TextAlign.Center),
                 shape = MaterialTheme.shapes.extraLarge,
                 colors = TextFieldDefaults.colors(
@@ -64,7 +68,7 @@ fun CustomDropDownList(
                     focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
                     unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer
                 ),
-                label = { Text("Selected Model") }
+                label = { Text(label) }
             )
             ExposedDropdownMenu(
                 expanded = isExpanded,
@@ -101,6 +105,7 @@ private fun DropDownListPreview() {
     OllamaUITheme {
         Column(modifier = Modifier.fillMaxSize()) {
             CustomDropDownList(
+                defaultValue = "a",
                 listItems = listOf("a", "b", "c", "d", "b", "c", "d", "b", "c", "d"),
                 onItemClick = {}
             )

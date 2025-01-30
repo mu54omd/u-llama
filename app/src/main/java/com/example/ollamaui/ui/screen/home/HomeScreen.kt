@@ -42,6 +42,7 @@ fun HomeScreen(
     homeViewModel: HomeViewModel,
     mainViewModel: MainViewModel,
     chatsList: ChatsList,
+    embeddingModelList: List<String>,
     isOllamaAddressSet: Boolean,
     ollamaAddress: String,
     embeddingModel: String,
@@ -186,6 +187,7 @@ fun HomeScreen(
                 SettingDialog(
                     httpValue = httpValue,
                     embeddingModel = embeddingModelName,
+                    embeddingModelList = embeddingModelList,
                     onClose = { isSettingDialogVisible = false },
                     onHttpValueChange = { httpValue = it },
                     onEmbeddingModelValueChange = { embeddingModelName = it },

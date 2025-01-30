@@ -8,6 +8,7 @@ import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -37,15 +38,13 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.ollamaui.R
-import com.example.ollamaui.domain.model.ApiError
 import com.example.ollamaui.domain.model.NetworkError
 import com.example.ollamaui.ui.screen.common.CustomButton
+import com.example.ollamaui.ui.screen.common.CustomDropDownList
 import com.example.ollamaui.ui.theme.OllamaUITheme
 import kotlinx.coroutines.delay
 
@@ -54,6 +53,7 @@ fun SettingDialog(
     modifier: Modifier = Modifier,
     httpValue: String,
     embeddingModel: String,
+    embeddingModelList: List<String>,
     onHttpValueChange: (String) -> Unit,
     onEmbeddingModelValueChange: (String) -> Unit,
     onCheckAddressClick: (String) -> Unit,
@@ -184,65 +184,107 @@ fun SettingDialog(
                         }
                     }
                 }
-                TextField(
-                    value = embeddingModel,
-                    onValueChange = {
-                        onEmbeddingModelValueChange(it)
-                        isEmbeddingModelChanged = true
-                    },
-                    modifier = Modifier.fillMaxWidth().padding(10.dp),
-                    label = { Text(text = "Embedding Model") },
-                    isError = isPullFailed,
-                    shape = RoundedCornerShape(30),
-                    colors = TextFieldDefaults.colors(
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        errorIndicatorColor = Color.Transparent,
-                        disabledIndicatorColor = Color.Transparent,
-                        focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer
-                    ),
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Uri,
-                        imeAction = ImeAction.Done
-                    ),
-                    singleLine = true,
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            onPullEmbeddingModelClick(embeddingModel)
-                            isEmbeddingModelChanged = false
-                        }
-                    ),
-                    trailingIcon = {
-                        if(isOllamaAddressCorrect && embeddingModel != ""){
-                            if(!isEmbeddingModelPulled || isEmbeddingModelChanged) {
-                                if(!isEmbeddingModelPulling) {
-                                    CustomButton(
-                                        onButtonClick = {
-                                            onPullEmbeddingModelClick(embeddingModel)
-                                            isEmbeddingModelChanged = false
-                                        },
-                                        description = "Pull Model",
-                                        icon = R.drawable.baseline_cloud_download_24,
-                                        buttonSize = 38
-                                    )
-                                }else{
-                                    CircularProgressIndicator(
-                                        modifier = Modifier.size(20.dp),
-                                        strokeWidth = 2.dp
-                                    )
-                                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    CustomDropDownList(
+                        listItems = embeddingModelList,
+                        label = "Embedding Model",
+                        defaultValue = embeddingModel,
+                        width = 205,
+                        onItemClick = {
+                            onEmbeddingModelValueChange(it)
+                            isEmbeddingModelChanged = true
+                        },
+                    )
+                    if(isOllamaAddressCorrect && embeddingModel != ""){
+                        if(!isEmbeddingModelPulled || isEmbeddingModelChanged) {
+                            if(!isEmbeddingModelPulling) {
+                                CustomButton(
+                                    onButtonClick = {
+                                        onPullEmbeddingModelClick(embeddingModel)
+                                        isEmbeddingModelChanged = false
+                                    },
+                                    description = "Pull Model",
+                                    icon = R.drawable.baseline_cloud_download_24,
+                                    buttonSize = 38
+                                )
                             }else{
-                                Icon(
-                                    painter = painterResource(R.drawable.baseline_check_24),
-                                    contentDescription = "Embedding Model Pulled"
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(20.dp),
+                                    strokeWidth = 2.dp
                                 )
                             }
-
+                        }else{
+                            Icon(
+                                painter = painterResource(R.drawable.baseline_check_24),
+                                contentDescription = "Embedding Model Pulled"
+                            )
                         }
-                    },
-                    enabled = isOllamaAddressCorrect
-                )
+
+                    }
+                }
+//                TextField(
+//                    value = embeddingModel,
+//                    onValueChange = {
+//                        onEmbeddingModelValueChange(it)
+//                        isEmbeddingModelChanged = true
+//                    },
+//                    modifier = Modifier.fillMaxWidth().padding(10.dp),
+//                    label = { Text(text = "Embedding Model") },
+//                    isError = isPullFailed,
+//                    shape = RoundedCornerShape(30),
+//                    colors = TextFieldDefaults.colors(
+//                        focusedIndicatorColor = Color.Transparent,
+//                        unfocusedIndicatorColor = Color.Transparent,
+//                        errorIndicatorColor = Color.Transparent,
+//                        disabledIndicatorColor = Color.Transparent,
+//                        focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+//                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer
+//                    ),
+//                    keyboardOptions = KeyboardOptions(
+//                        keyboardType = KeyboardType.Uri,
+//                        imeAction = ImeAction.Done
+//                    ),
+//                    singleLine = true,
+//                    keyboardActions = KeyboardActions(
+//                        onDone = {
+//                            onPullEmbeddingModelClick(embeddingModel)
+//                            isEmbeddingModelChanged = false
+//                        }
+//                    ),
+//                    trailingIcon = {
+//                        if(isOllamaAddressCorrect && embeddingModel != ""){
+//                            if(!isEmbeddingModelPulled || isEmbeddingModelChanged) {
+//                                if(!isEmbeddingModelPulling) {
+//                                    CustomButton(
+//                                        onButtonClick = {
+//                                            onPullEmbeddingModelClick(embeddingModel)
+//                                            isEmbeddingModelChanged = false
+//                                        },
+//                                        description = "Pull Model",
+//                                        icon = R.drawable.baseline_cloud_download_24,
+//                                        buttonSize = 38
+//                                    )
+//                                }else{
+//                                    CircularProgressIndicator(
+//                                        modifier = Modifier.size(20.dp),
+//                                        strokeWidth = 2.dp
+//                                    )
+//                                }
+//                            }else{
+//                                Icon(
+//                                    painter = painterResource(R.drawable.baseline_check_24),
+//                                    contentDescription = "Embedding Model Pulled"
+//                                )
+//                            }
+//
+//                        }
+//                    },
+//                    enabled = isOllamaAddressCorrect
+//                )
                 AnimatedVisibility(visible = isPullFailed) {
                     Box(modifier = Modifier.fillMaxWidth().padding(10.dp), contentAlignment = Alignment.Center) {
                         pullError?.let {
@@ -288,7 +330,8 @@ private fun SettingDialogPreview() {
     OllamaUITheme {
         SettingDialog(
             httpValue = "http://localhost:11434",
-            embeddingModel = "",
+            embeddingModel = "model1",
+            embeddingModelList = listOf("model1", "model2", "model3", "model4"),
             onHttpValueChange = {},
             onEmbeddingModelValueChange = {},
             isOllamaAddressCorrect = true,

@@ -1,5 +1,6 @@
 package com.example.ollamaui.activity
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ollamaui.domain.model.pull.EmptyPullResponse
@@ -11,14 +12,17 @@ import com.example.ollamaui.utils.Constants.OLLAMA_BASE_ENDPOINT
 import com.example.ollamaui.utils.Constants.OLLAMA_LIST_ENDPOINT
 import com.example.ollamaui.utils.Constants.OLLAMA_PULL_ENDPOINT
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.jsoup.Jsoup
+import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -58,6 +62,7 @@ class MainViewModel @Inject constructor(
     val mainState = _mainState
         .onStart {
             ollamaStatus()
+            loadEmbeddingModelList()
         }
         .stateIn(
             scope = viewModelScope,
@@ -202,5 +207,22 @@ class MainViewModel @Inject constructor(
                         isEmbeddingModelPulling = false)
                 }
             }
+    }
+    private fun loadEmbeddingModelList(){
+        viewModelScope.launch {
+            try{
+                val url = "https://ollama.com/search?c=embedding"
+                withContext(Dispatchers.IO) {
+                    val doc = Jsoup.connect(url).get()
+                    val result = doc
+                        .getElementsByClass("truncate text-xl font-medium underline-offset-2 group-hover:underline md:text-2xl")
+                        .text()
+                        .split(" ")
+                    _mainState.update { it.copy(embeddingModelList = result) }
+                }
+            }catch (e: IOException){
+                Log.d("cTAG", "exception: $e")
+            }
+        }
     }
 }

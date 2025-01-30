@@ -2,9 +2,9 @@ package com.example.ollamaui.ui.screen.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.ollamaui.domain.model.chat.ChatModel
 import com.example.ollamaui.domain.model.MessageModel
 import com.example.ollamaui.domain.model.MessagesModel
+import com.example.ollamaui.domain.model.chat.ChatModel
 import com.example.ollamaui.domain.repository.OllamaRepository
 import com.example.ollamaui.utils.Constants.SYSTEM_ROLE
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -69,9 +69,9 @@ class HomeViewModel @Inject constructor(
         return chatsList.value.items.find { item -> item.chatId == chatId }
     }
 
+
     //Private methods
     /*---------------------------------------------------------------------------------------------*/
     /*---------------------------------------------------------------------------------------------*/
     /*---------------------------------------------------------------------------------------------*/
-
 }

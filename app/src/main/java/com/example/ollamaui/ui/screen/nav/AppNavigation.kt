@@ -78,7 +78,8 @@ fun AppNavigation(
                     onPullEmbeddingModel = { modelName -> mainViewModel.pullEmbeddingModel(modelName) },
                     ollamaStatus = mainState.ollamaStatus,
                     isEmbeddingModelPulling = mainState.isEmbeddingModelPulling,
-                    isEmbeddingModelPulled = mainState.isEmbeddingModelPulled
+                    isEmbeddingModelPulled = mainState.isEmbeddingModelPulled,
+                    embeddingModelList = mainState.embeddingModelList
                 )
             }
 

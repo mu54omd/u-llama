@@ -14,6 +14,7 @@ data class MainStates(
     val tagError: NetworkError? = null,
     val tagResponse: TagResponse = EmptyTagResponse.emptyTagResponse,
     val modelList: List<String> = emptyList(),
+    val embeddingModelList: List<String> = emptyList(),
 
     val pullResponse: PullResponse = EmptyPullResponse.empty,
     val isEmbeddingModelPulling: Boolean = false,
