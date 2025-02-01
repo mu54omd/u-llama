@@ -39,41 +39,27 @@ import com.example.ollamaui.utils.Constants.OLLAMA_IS_RUNNING
 @Composable
 fun HomeScreen(
     onChatClick: (ChatModel) -> Unit,
+    onSettingClick: () -> Unit,
     homeViewModel: HomeViewModel,
     mainViewModel: MainViewModel,
     chatsList: ChatsList,
-    embeddingModelList: List<String>,
-    isOllamaAddressSet: Boolean,
-    ollamaAddress: String,
-    embeddingModel: String,
-    isEmbeddingModelPulling: Boolean,
-    isEmbeddingModelPulled: Boolean,
-    ollamaStatus: String,
-    onCheckAddressClick: (String) -> Unit,
-    onPullEmbeddingModel: (String) -> Unit,
     isModelListLoaded: Boolean,
     modelList: List<String>,
-    tagError: NetworkError?,
-    statusError: NetworkError?,
-    pullError: NetworkError?,
 ) {
     var isNewChatDialogVisible by remember { mutableStateOf(false) }
     var isAboutDialogVisible by remember { mutableStateOf(false) }
-    var isSettingDialogVisible by remember { mutableStateOf(!isOllamaAddressSet) }
     var isDeleteDialogVisible by remember { mutableStateOf(false) }
 
     var userName by remember { mutableStateOf("") }
     var botName by remember { mutableStateOf("") }
     var chatTitle by remember { mutableStateOf("") }
     var systemPrompt by remember { mutableStateOf("") }
-    var httpValue by remember { mutableStateOf(ollamaAddress) }
-    var embeddingModelName by remember { mutableStateOf(embeddingModel) }
 
     var selectedChat by remember { mutableStateOf(EmptyChatModel.empty) }
     val selectedChats = remember { mutableStateListOf<Int>() }
     var selectedModel by remember { mutableStateOf("") }
     val isSelectedChatsEmpty by remember(selectedChats) { derivedStateOf { selectedChats.isEmpty() } }
-    val activity = (LocalContext.current as? Activity)
+//    val activity = (LocalContext.current as? Activity)
 
     val maxChar = 25
 
@@ -86,9 +72,7 @@ fun HomeScreen(
     Scaffold(
         topBar = {
                     HomeTopBar(
-                        onSettingClick = {
-                            isSettingDialogVisible = true
-                                         },
+                        onSettingClick = { onSettingClick() },
                         onAboutClick = {
                             isAboutDialogVisible = true
                         },
@@ -126,6 +110,9 @@ fun HomeScreen(
                     else {
                         isNewChatDialogVisible = true
                     }
+                    mainViewModel.refresh()
+                    isNewChatDialogVisible = true
+
                 }
             )
         },
@@ -177,28 +164,6 @@ fun HomeScreen(
             ) {
                 AboutDialog(
                     onCloseClick = { isAboutDialogVisible = false}
-                )
-            }
-            AnimatedVisibility(
-                visible = isSettingDialogVisible,
-                enter = scaleIn(),
-                exit = scaleOut(),
-            ) {
-                SettingDialog(
-                    httpValue = httpValue,
-                    embeddingModel = embeddingModelName,
-                    embeddingModelList = embeddingModelList,
-                    onClose = { isSettingDialogVisible = false },
-                    onHttpValueChange = { httpValue = it },
-                    onEmbeddingModelValueChange = { embeddingModelName = it },
-                    onCheckAddressClick = { address -> onCheckAddressClick(address) },
-                    onPullEmbeddingModelClick = { modelName -> onPullEmbeddingModel(modelName) },
-                    isOllamaAddressCorrect = ollamaStatus == OLLAMA_IS_RUNNING,
-                    isEmbeddingModelPulled = isEmbeddingModelPulled,
-                    isEmbeddingModelPulling = isEmbeddingModelPulling,
-                    pullError = pullError,
-                    tagError = tagError,
-                    statusError = statusError
                 )
             }
             AnimatedVisibility(

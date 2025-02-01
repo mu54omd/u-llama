@@ -16,7 +16,7 @@ android {
         minSdk = 21
         targetSdk = 34
         versionCode = 5
-        versionName = "1.0.6"
+        versionName = "1.0.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -44,6 +44,7 @@ android {
         jvmTarget = "1.8"
     }
     buildFeatures {
+        buildConfig = true
         compose = true
     }
     composeOptions {

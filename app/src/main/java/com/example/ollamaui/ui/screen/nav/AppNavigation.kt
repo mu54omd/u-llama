@@ -20,6 +20,7 @@ import com.example.ollamaui.ui.screen.chat.ChatViewModel
 import com.example.ollamaui.ui.screen.home.HomeScreen
 import com.example.ollamaui.ui.screen.home.HomeViewModel
 import com.example.ollamaui.ui.screen.loading.LoadingScreen
+import com.example.ollamaui.ui.screen.setting.SettingScreen
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -66,20 +67,14 @@ fun AppNavigation(
                             route = Screens.ChatScreen.route
                         )
                     },
-                    isOllamaAddressSet = isOllamaAddressSet,
-                    ollamaAddress = ollamaAddress,
-                    embeddingModel = embeddingModel,
+                    onSettingClick = {
+                        navigateToTab(
+                            navController = navController,
+                            route = Screens.SettingScreen.route
+                        )
+                    },
                     isModelListLoaded = mainState.isModelListLoaded,
                     modelList = mainState.modelList,
-                    tagError = mainState.tagError,
-                    statusError = mainState.statusError,
-                    pullError = mainState.pullError,
-                    onCheckAddressClick = { address -> mainViewModel.checkOllamaAddress(address) },
-                    onPullEmbeddingModel = { modelName -> mainViewModel.pullEmbeddingModel(modelName) },
-                    ollamaStatus = mainState.ollamaStatus,
-                    isEmbeddingModelPulling = mainState.isEmbeddingModelPulling,
-                    isEmbeddingModelPulled = mainState.isEmbeddingModelPulled,
-                    embeddingModelList = mainState.embeddingModelList
                 )
             }
 
@@ -105,6 +100,16 @@ fun AppNavigation(
                     isLocalSettingLoaded = isLocalSettingsLoaded,
                     onDispose = {
                         navigateToTab(navController = navController , route = Screens.HomeScreen.route)
+                    }
+                )
+            }
+            composable(route = Screens.SettingScreen.route){
+                SettingScreen(
+                    onBackClick = {
+                        navigateToTab(
+                            navController = navController,
+                            route = Screens.HomeScreen.route
+                        )
                     }
                 )
             }

@@ -41,6 +41,7 @@ fun CustomDropDownList(
     width: Int = 200,
     listItems: List<String>,
     onItemClick: (String) -> Unit,
+    isEnable: Boolean = true
 ) {
     var isExpanded by remember{ mutableStateOf(false) }
     var selectedItem by remember { mutableStateOf(defaultValue) }
@@ -58,18 +59,21 @@ fun CustomDropDownList(
                 value = selectedItem,
                 onValueChange = {},
                 readOnly = true,
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded) },
+                trailingIcon = { if(isEnable) ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded) },
                 modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).width(width.dp),
                 textStyle = MaterialTheme.typography.bodySmall.copy(textAlign = TextAlign.Center),
                 shape = MaterialTheme.shapes.extraLarge,
                 colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent,
                     focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
                     unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer
                 ),
-                label = { Text(label) }
+                label = { Text(label) },
+                enabled = isEnable
             )
+            if (isEnable) {
             ExposedDropdownMenu(
                 expanded = isExpanded,
                 onDismissRequest = { isExpanded = false},
@@ -77,22 +81,24 @@ fun CustomDropDownList(
                 modifier = Modifier.height(100.dp),
                 containerColor = MaterialTheme.colorScheme.surfaceContainer
             ) {
-                listItems.forEach { item ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                text = item,
-                                textAlign = TextAlign.Center,
-                                style = MaterialTheme.typography.bodySmall,
-                                modifier = Modifier.fillMaxWidth(),
-                            )
-                        },
-                        onClick = {
-                            selectedItem = item
-                            isExpanded = false
-                            onItemClick(item)
-                        },
-                    )
+
+                    listItems.forEach { item ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = item,
+                                    textAlign = TextAlign.Center,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    modifier = Modifier.fillMaxWidth(),
+                                )
+                            },
+                            onClick = {
+                                selectedItem = item
+                                isExpanded = false
+                                onItemClick(item)
+                            },
+                        )
+                    }
                 }
             }
         }
@@ -107,7 +113,8 @@ private fun DropDownListPreview() {
             CustomDropDownList(
                 defaultValue = "a",
                 listItems = listOf("a", "b", "c", "d", "b", "c", "d", "b", "c", "d"),
-                onItemClick = {}
+                onItemClick = {},
+                isEnable = false
             )
         }
     }

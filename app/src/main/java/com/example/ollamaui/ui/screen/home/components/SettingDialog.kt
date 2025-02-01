@@ -186,13 +186,13 @@ fun SettingDialog(
                 }
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceAround,
-                    modifier = Modifier.fillMaxWidth()
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp)
                 ) {
                     CustomDropDownList(
                         listItems = embeddingModelList,
                         label = "Embedding Model",
-                        defaultValue = embeddingModel,
+                        defaultValue = if(isEmbeddingModelPulled) embeddingModel else "",
                         width = 205,
                         onItemClick = {
                             onEmbeddingModelValueChange(it)

@@ -81,14 +81,15 @@ class MainViewModel @Inject constructor(
     fun checkOllamaAddress(url: String){
         _mainState.update { it.copy(ollamaStatus = "", statusError = null) }
         viewModelScope.launch {
+            Log.d("cTAG", url)
             getOllamaStatus(url = url)
             getOllamaModelsList()
         }
     }
+
     fun pullEmbeddingModel(modelName: String){
         _mainState.update { it.copy(pullResponse = EmptyPullResponse.empty, pullError = null) }
-        val modelList = mainState.value.modelList.map { it.split(":")[0] }
-        if(modelName !in modelList) {
+        if(checkIfEmbeddingModelPulled(modelName)) {
             viewModelScope.launch {
                 ollamaPostPull(modelName = modelName)
             }
@@ -96,6 +97,12 @@ class MainViewModel @Inject constructor(
             _mainState.update { it.copy(isEmbeddingModelPulled = true) }
             saveOllamaEmbeddingModel(modelName = modelName)
         }
+    }
+
+    fun checkIfEmbeddingModelPulled(modelName: String):Boolean{
+        val modelList = mainState.value.modelList.map { it.split(":")[0] }
+        _mainState.update { it.copy(isEmbeddingModelPulled = modelName in modelList) }
+        return modelName in modelList
     }
 
     //Private methods
@@ -107,7 +114,7 @@ class MainViewModel @Inject constructor(
             userLocalUserManager.saveOllamaUrl(url = url)
         }
     }
-    private fun saveOllamaEmbeddingModel(modelName: String){
+    fun saveOllamaEmbeddingModel(modelName: String){
         viewModelScope.launch {
             userLocalUserManager.saveOllamaEmbeddingModel(modelName = modelName)
         }
@@ -164,7 +171,10 @@ class MainViewModel @Inject constructor(
         val modelList = mutableListOf<String>()
         ollamaRepository.getOllamaModelsList(baseUrl = baseAddress.value.ollamaBaseAddress, tagEndpoint = OLLAMA_LIST_ENDPOINT)
             .onRight { response ->
-                response.models.forEach { model -> modelList.add(model.model) }
+                response.models.forEach { model ->
+                    if(model.model.split(":")[0] !in mainState.value.embeddingModelList)
+                        modelList.add(model.model)
+                }
                 _mainState.update {
                     it.copy(
                         tagResponse = response,
@@ -225,4 +235,6 @@ class MainViewModel @Inject constructor(
             }
         }
     }
+
+
 }
