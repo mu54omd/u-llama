@@ -1,2 +1,3 @@
-# A User interface for Ollama (status: UNFINISHED)
+# Ollama-UI
+## A User interface for Ollama (status: UNFINISHED)
 
