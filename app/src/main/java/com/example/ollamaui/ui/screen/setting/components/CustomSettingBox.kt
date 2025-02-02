@@ -31,7 +31,7 @@ fun CustomSettingBox(
             horizontalArrangement = rowHorizontalArrangement,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 5.dp, end = 5.dp, top = 5.dp, bottom = 25.dp)
+                .padding(start = 5.dp, end = 5.dp, top = 5.dp, bottom = 35.dp)
                 .border(
                     width = 1.dp,
                     color = MaterialTheme.colorScheme.primaryContainer,

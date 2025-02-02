@@ -3,7 +3,7 @@ package com.example.ollamaui.utils
 import androidx.compose.ui.unit.dp
 
 object Constants {
-    const val OLLAMA_BASE_URL = "http://localhost:11434"
+    const val OLLAMA_BASE_URL = "http://127.0.0.1:11434"
     const val OLLAMA_BASE_ENDPOINT = "/"
     const val OLLAMA_LIST_ENDPOINT = "/api/tags"
     const val OLLAMA_CHAT_ENDPOINT = "/api/chat"

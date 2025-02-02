@@ -7,17 +7,23 @@ import com.example.ollamaui.domain.model.tag.EmptyTagResponse
 import com.example.ollamaui.domain.model.tag.TagResponse
 
 data class MainStates(
-    val launchAppGetStatusTry: Int = 0,
+
     val isModelListLoaded: Boolean = false,
+
+    val fullModelList: List<String> = emptyList(),
+    val filteredModelList: List<String> = emptyList(),
+    val embeddingModelList: List<String> = emptyList(),
+
     val ollamaStatus: String = "",
     val statusError: NetworkError? = null,
     val tagError: NetworkError? = null,
     val tagResponse: TagResponse = EmptyTagResponse.emptyTagResponse,
-    val modelList: List<String> = emptyList(),
-    val embeddingModelList: List<String> = emptyList(),
+
 
     val pullResponse: PullResponse = EmptyPullResponse.empty,
+    val pullError: NetworkError? = null,
+
     val isEmbeddingModelPulling: Boolean = false,
     val isEmbeddingModelPulled: Boolean = false,
-    val pullError: NetworkError? = null,
+
 )

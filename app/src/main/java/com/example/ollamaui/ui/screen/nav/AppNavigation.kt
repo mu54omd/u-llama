@@ -74,7 +74,7 @@ fun AppNavigation(
                         )
                     },
                     isModelListLoaded = mainState.isModelListLoaded,
-                    modelList = mainState.modelList,
+                    modelList = mainState.filteredModelList,
                 )
             }
 
@@ -105,6 +105,21 @@ fun AppNavigation(
             }
             composable(route = Screens.SettingScreen.route){
                 SettingScreen(
+                    savedParameters = listOf(ollamaAddress, embeddingModel),
+                    embeddingModelList = mainState.embeddingModelList,
+                    isEmbeddingModelPulled = { mainViewModel.checkIfEmbeddingModelPulled(it) },
+                    onSaveClick = { url, embeddingModelName->
+                        mainViewModel.saveOllamaAddress(url = url)
+                        mainViewModel.saveOllamaEmbeddingModel(embeddingModelName)
+                        mainViewModel.refresh()
+                    },
+                    onResetClick = {},
+                    onCheckClick = {url ->
+                        mainViewModel.checkOllamaAddress(url)
+                    },
+                    onFetchEmbeddingModelClick = { mainViewModel.fetchEmbeddingModelList() },
+                    onPullEmbeddingModelClick = {},
+                    ollamaStatus = mainState.ollamaStatus,
                     onBackClick = {
                         navigateToTab(
                             navController = navController,

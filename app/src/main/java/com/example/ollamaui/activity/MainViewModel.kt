@@ -61,8 +61,8 @@ class MainViewModel @Inject constructor(
     private val _mainState = MutableStateFlow(MainStates())
     val mainState = _mainState
         .onStart {
-            ollamaStatus()
-            loadEmbeddingModelList()
+            refresh()
+            fetchEmbeddingModelList()
         }
         .stateIn(
             scope = viewModelScope,
@@ -75,15 +75,25 @@ class MainViewModel @Inject constructor(
     /*---------------------------------------------------------------------------------------------*/
 
     fun refresh(){
-        ollamaStatus()
+        viewModelScope.launch {
+            _mainState.update { it.copy(isModelListLoaded = false) }
+            getOllamaStatus(baseAddress.value.ollamaBaseAddress)
+            getOllamaModelsList()
+//            val modelList = mainState.value.fullModelList.map { it.split(":")[0] }
+//            if(embeddingModel.value.isEmbeddingModelSet) {
+//                if (embeddingModel.value.embeddingModelName !in modelList) {
+//                    ollamaPostPull(modelName = embeddingModel.value.embeddingModelName)
+//                } else {
+//                    _mainState.update { it.copy(isEmbeddingModelPulled = true) }
+//                }
+//            }
+        }
     }
 
     fun checkOllamaAddress(url: String){
         _mainState.update { it.copy(ollamaStatus = "", statusError = null) }
         viewModelScope.launch {
-            Log.d("cTAG", url)
             getOllamaStatus(url = url)
-            getOllamaModelsList()
         }
     }
 
@@ -100,16 +110,12 @@ class MainViewModel @Inject constructor(
     }
 
     fun checkIfEmbeddingModelPulled(modelName: String):Boolean{
-        val modelList = mainState.value.modelList.map { it.split(":")[0] }
+        val modelList = mainState.value.fullModelList.map { it.split(":")[0] }
         _mainState.update { it.copy(isEmbeddingModelPulled = modelName in modelList) }
         return modelName in modelList
     }
 
-    //Private methods
-    /*---------------------------------------------------------------------------------------------*/
-    /*---------------------------------------------------------------------------------------------*/
-    /*---------------------------------------------------------------------------------------------*/
-    private fun saveOllamaAddress(url: String){
+    fun saveOllamaAddress(url: String){
         viewModelScope.launch {
             userLocalUserManager.saveOllamaUrl(url = url)
         }
@@ -119,28 +125,28 @@ class MainViewModel @Inject constructor(
             userLocalUserManager.saveOllamaEmbeddingModel(modelName = modelName)
         }
     }
-    private fun ollamaStatus(){
+
+    fun fetchEmbeddingModelList(){
         viewModelScope.launch {
-            _mainState.update { it.copy(isModelListLoaded = false) }
-            if(mainState.value.launchAppGetStatusTry == 0) {
-                for (retryCount in 1..2) {
-                    getOllamaStatus(baseAddress.value.ollamaBaseAddress)
-                    _mainState.update { it.copy(launchAppGetStatusTry = mainState.value.launchAppGetStatusTry.plus(1)) }
+            try{
+                val url = "https://ollama.com/search?c=embedding"
+                withContext(Dispatchers.IO) {
+                    val doc = Jsoup.connect(url).get()
+                    val result = doc
+                        .getElementsByClass("truncate text-xl font-medium underline-offset-2 group-hover:underline md:text-2xl")
+                        .text()
+                        .split(" ")
+                    _mainState.update { it.copy(embeddingModelList = result) }
                 }
-            }else{
-                getOllamaStatus(baseAddress.value.ollamaBaseAddress)
-            }
-            getOllamaModelsList()
-            val modelList = mainState.value.modelList.map { it.split(":")[0] }
-            if(embeddingModel.value.isEmbeddingModelSet) {
-                if (embeddingModel.value.embeddingModelName !in modelList) {
-                    ollamaPostPull(modelName = embeddingModel.value.embeddingModelName)
-                } else {
-                    _mainState.update { it.copy(isEmbeddingModelPulled = true) }
-                }
+            }catch (e: IOException){
+                Log.d("cTAG", "exception: $e")
             }
         }
     }
+    //Private methods
+    /*---------------------------------------------------------------------------------------------*/
+    /*---------------------------------------------------------------------------------------------*/
+    /*---------------------------------------------------------------------------------------------*/
 
     private suspend fun getOllamaStatus(url: String){
         ollamaRepository.getOllamaStatus(
@@ -154,31 +160,32 @@ class MainViewModel @Inject constructor(
                         statusError = null,
                     )
                 }
-                if(baseAddress.value.ollamaBaseAddress != url) {
-                    saveOllamaAddress(url = url)
-                }
             }
             .onLeft { statusError ->
                 _mainState.update {
                     it.copy(
-                        ollamaStatus = "",
+                        ollamaStatus = "Ollama is not running!",
                         statusError = statusError,
                     )
                 }
             }
     }
+
     private suspend fun getOllamaModelsList(){
-        val modelList = mutableListOf<String>()
+        val fullModelList = mutableListOf<String>()
+        val filteredModelList = mutableListOf<String>()
         ollamaRepository.getOllamaModelsList(baseUrl = baseAddress.value.ollamaBaseAddress, tagEndpoint = OLLAMA_LIST_ENDPOINT)
             .onRight { response ->
                 response.models.forEach { model ->
+                    fullModelList.add(model.name)
                     if(model.model.split(":")[0] !in mainState.value.embeddingModelList)
-                        modelList.add(model.model)
+                        filteredModelList.add(model.model)
                 }
                 _mainState.update {
                     it.copy(
                         tagResponse = response,
-                        modelList = modelList,
+                        fullModelList = fullModelList,
+                        filteredModelList = filteredModelList,
                         isModelListLoaded = true,
                         tagError = null,
                     )
@@ -189,6 +196,7 @@ class MainViewModel @Inject constructor(
                     it.copy(
                         tagResponse = EmptyTagResponse.emptyTagResponse,
                         tagError = tagError,
+                        isModelListLoaded = false
                     )
                 }
             }
@@ -218,23 +226,4 @@ class MainViewModel @Inject constructor(
                 }
             }
     }
-    private fun loadEmbeddingModelList(){
-        viewModelScope.launch {
-            try{
-                val url = "https://ollama.com/search?c=embedding"
-                withContext(Dispatchers.IO) {
-                    val doc = Jsoup.connect(url).get()
-                    val result = doc
-                        .getElementsByClass("truncate text-xl font-medium underline-offset-2 group-hover:underline md:text-2xl")
-                        .text()
-                        .split(" ")
-                    _mainState.update { it.copy(embeddingModelList = result) }
-                }
-            }catch (e: IOException){
-                Log.d("cTAG", "exception: $e")
-            }
-        }
-    }
-
-
 }

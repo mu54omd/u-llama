@@ -29,7 +29,7 @@ class LocalUserManagerImpl (
 
     override fun readOllamaUrl(): Flow<BaseAddress> {
         return context.dataStore.data.map { preferences ->
-            val address = preferences[PreferencesKeys.OLLAMA_ADDRESS]?:"http://localhost:11434"
+            val address = preferences[PreferencesKeys.OLLAMA_ADDRESS]?:"http://127.0.0.1:11434"
             val isSet = preferences[PreferencesKeys.IS_OLLAMA_ADDRESS_SET]?:false
             BaseAddress(address, isSet)
         }
