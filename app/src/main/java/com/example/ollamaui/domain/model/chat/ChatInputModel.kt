@@ -1,5 +1,6 @@
-package com.example.ollamaui.domain.model
+package com.example.ollamaui.domain.model.chat
 
+import com.example.ollamaui.domain.model.MessageModel
 import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.Serializable
 

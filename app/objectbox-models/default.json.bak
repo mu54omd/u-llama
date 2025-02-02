@@ -1,0 +1,127 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "1:1049250556367054369",
+      "lastPropertyId": "5:6669906511897200817",
+      "name": "Chunk",
+      "properties": [
+        {
+          "id": "1:424501133171945906",
+          "name": "chunkId",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:3177822106202576308",
+          "name": "docId",
+          "indexId": "1:6263062225631572173",
+          "type": 6,
+          "flags": 8
+        },
+        {
+          "id": "3:6723719895616623008",
+          "name": "docFileName",
+          "type": 9
+        },
+        {
+          "id": "4:631151923539230150",
+          "name": "chunkData",
+          "type": 9
+        },
+        {
+          "id": "5:6669906511897200817",
+          "name": "chunkEmbedding",
+          "indexId": "2:1189714503797245299",
+          "type": 28,
+          "flags": 8
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "2:1883999539185832377",
+      "lastPropertyId": "6:2335962827771912206",
+      "name": "Document",
+      "properties": [
+        {
+          "id": "1:3517755974992953303",
+          "name": "docId",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:4466243995213441617",
+          "name": "docText",
+          "type": 9
+        },
+        {
+          "id": "3:4035165117434687144",
+          "name": "docFileName",
+          "type": 9
+        },
+        {
+          "id": "5:6211152473660129065",
+          "name": "chatId",
+          "type": 5
+        },
+        {
+          "id": "6:2335962827771912206",
+          "name": "docAddedTime",
+          "type": 6
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "3:6891484496465247065",
+      "lastPropertyId": "6:2307618426907758378",
+      "name": "Image",
+      "properties": [
+        {
+          "id": "1:7895891454985083661",
+          "name": "imageId",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:6053360830184176093",
+          "name": "chatId",
+          "type": 5
+        },
+        {
+          "id": "3:4459179256332931735",
+          "name": "imageBase64",
+          "type": 9
+        },
+        {
+          "id": "4:8308118114519410362",
+          "name": "imageFileName",
+          "type": 9
+        },
+        {
+          "id": "6:2307618426907758378",
+          "name": "imageAddedTime",
+          "type": 6
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "3:6891484496465247065",
+  "lastIndexId": "2:1189714503797245299",
+  "lastRelationId": "0:0",
+  "lastSequenceId": "0:0",
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
+  "retiredEntityUids": [],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [
+    1815499880776418715,
+    544254492154363220
+  ],
+  "retiredRelationUids": [],
+  "version": 1
+}

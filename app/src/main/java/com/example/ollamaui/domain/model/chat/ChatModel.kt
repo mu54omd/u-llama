@@ -1,7 +1,9 @@
-package com.example.ollamaui.domain.model
+package com.example.ollamaui.domain.model.chat
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.ollamaui.domain.model.EmptyMessageModel
+import com.example.ollamaui.domain.model.MessagesModel
 
 @Entity
 data class ChatModel(

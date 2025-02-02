@@ -1,4 +1,4 @@
-package com.example.ollamaui.domain.model
+package com.example.ollamaui.domain.model.tag
 
 import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.Serializable

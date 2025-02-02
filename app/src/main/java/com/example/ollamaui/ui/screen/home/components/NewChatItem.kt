@@ -84,14 +84,15 @@ fun NewChatItem(
                         onItemLongPress()
                     } ,
                     onTap = {
-                        when{
-                            isSelected -> {
-                                onSelectedItemClick()
-                            }
-                            !isSelected -> {
-                                onItemClick()
-                            }
-                        }
+//                        when{
+//                            isSelected -> {
+//                                onSelectedItemClick()
+//                            }
+//                            !isSelected -> {
+//                                onItemClick()
+//                            }
+//                        }
+                        onItemClick()
                     }
                 )
             }

@@ -6,7 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.example.ollamaui.domain.model.ChatModel
+import com.example.ollamaui.domain.model.chat.ChatModel
 import kotlinx.coroutines.flow.Flow
 
 @Dao

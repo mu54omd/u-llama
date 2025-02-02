@@ -11,8 +11,6 @@ import com.example.ollamaui.data.repository.OllamaRepositoryImpl
 import com.example.ollamaui.domain.preferences.LocalUserManager
 import com.example.ollamaui.domain.repository.OllamaRepository
 import com.example.ollamaui.utils.Constants.CHAT_DATABASE
-import com.example.ollamaui.utils.Constants.CHAT_STATUS_DATABASE
-import com.example.ollamaui.utils.Constants.OLLAMA_ADDRESS
 import com.example.ollamaui.utils.Constants.OLLAMA_BASE_URL
 import com.google.gson.GsonBuilder
 import dagger.Module
