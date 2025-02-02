@@ -1,6 +1,5 @@
 package com.example.ollamaui.ui.screen.home.components
 
-import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.example.ollamaui.BuildConfig
 import com.example.ollamaui.ui.theme.OllamaUITheme
 
 @Composable
@@ -39,7 +39,7 @@ fun AboutDialog(
             ) {
                 Text(text = "Ollama UI", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text(text = "A simple interface for Ollama", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(text = "Version: 1.0.0", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(text = "Version: ${BuildConfig.VERSION_NAME}", color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     }

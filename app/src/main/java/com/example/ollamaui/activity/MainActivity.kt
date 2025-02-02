@@ -20,13 +20,16 @@ class MainActivity : ComponentActivity() {
             val mainViewModel: MainViewModel = hiltViewModel()
             val mainState = mainViewModel.mainState.collectAsStateWithLifecycle().value
             val baseAddress = mainViewModel.baseAddress.collectAsStateWithLifecycle().value
+            val embeddingModel = mainViewModel.embeddingModel.collectAsStateWithLifecycle().value
             OllamaUITheme {
                 AppNavigation(
                     mainViewModel = mainViewModel,
                     mainState = mainState,
                     isOllamaAddressSet = baseAddress.isOllamaAddressSet,
                     ollamaAddress = baseAddress.ollamaBaseAddress,
-                    isLocalSettingsLoaded = baseAddress.isLocalSettingsLoaded
+                    isLocalSettingsLoaded = baseAddress.isLocalSettingsLoaded,
+                    isEmbeddingModelSet = embeddingModel.isEmbeddingModelSet,
+                    embeddingModel = embeddingModel.embeddingModelName
                 )
             }
         }

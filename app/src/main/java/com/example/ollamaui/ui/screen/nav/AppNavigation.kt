@@ -20,6 +20,7 @@ import com.example.ollamaui.ui.screen.chat.ChatViewModel
 import com.example.ollamaui.ui.screen.home.HomeScreen
 import com.example.ollamaui.ui.screen.home.HomeViewModel
 import com.example.ollamaui.ui.screen.loading.LoadingScreen
+import com.example.ollamaui.ui.screen.setting.SettingScreen
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -28,6 +29,8 @@ fun AppNavigation(
     mainState: MainStates,
     isOllamaAddressSet: Boolean,
     ollamaAddress: String,
+    isEmbeddingModelSet: Boolean,
+    embeddingModel: String,
     isLocalSettingsLoaded: Boolean
 ) {
     val navController = rememberNavController()
@@ -35,6 +38,8 @@ fun AppNavigation(
     val chatsList = homeViewModel.chatsList.collectAsStateWithLifecycle().value
     val chatViewModel: ChatViewModel = hiltViewModel()
     val chatState = chatViewModel.chatState.collectAsStateWithLifecycle().value
+    val attachedDocsList = chatViewModel.attachedDocs.collectAsStateWithLifecycle().value
+    val attachedImagesList = chatViewModel.attachedImages.collectAsStateWithLifecycle().value
 
     Scaffold(
         topBar = {},
@@ -62,16 +67,14 @@ fun AppNavigation(
                             route = Screens.ChatScreen.route
                         )
                     },
-                    isOllamaAddressSet = isOllamaAddressSet,
-                    ollamaAddress = ollamaAddress,
-                    onSaveOllamaAddressClick = {
-                        mainViewModel.saveLocalSetting(it)
+                    onSettingClick = {
+                        navigateToTab(
+                            navController = navController,
+                            route = Screens.SettingScreen.route
+                        )
                     },
                     isModelListLoaded = mainState.isModelListLoaded,
-                    modelList = mainState.modelList,
-                    tagError = mainState.tagError,
-                    statusError = mainState.statusError,
-                    statusThrowable = mainState.statusThrowable,
+                    modelList = mainState.filteredModelList,
                 )
             }
 
@@ -79,6 +82,10 @@ fun AppNavigation(
                 ChatScreen(
                     chatViewModel = chatViewModel,
                     chatState = chatState,
+                    attachedFilesList = attachedDocsList,
+                    attachedImagesList = attachedImagesList,
+                    embeddingModel = embeddingModel,
+                    isEmbeddingModelSet = isEmbeddingModelSet,
                     onBackClick = {
                         chatViewModel.clearStates()
                         navigateToTab(
@@ -93,6 +100,31 @@ fun AppNavigation(
                     isLocalSettingLoaded = isLocalSettingsLoaded,
                     onDispose = {
                         navigateToTab(navController = navController , route = Screens.HomeScreen.route)
+                    }
+                )
+            }
+            composable(route = Screens.SettingScreen.route){
+                SettingScreen(
+                    savedParameters = listOf(ollamaAddress, embeddingModel),
+                    embeddingModelList = mainState.embeddingModelList,
+                    isEmbeddingModelPulled = { mainViewModel.checkIfEmbeddingModelPulled(it) },
+                    onSaveClick = { url, embeddingModelName->
+                        mainViewModel.saveOllamaAddress(url = url)
+                        mainViewModel.saveOllamaEmbeddingModel(embeddingModelName)
+                        mainViewModel.refresh()
+                    },
+                    onResetClick = {},
+                    onCheckClick = {url ->
+                        mainViewModel.checkOllamaAddress(url)
+                    },
+                    onFetchEmbeddingModelClick = { mainViewModel.fetchEmbeddingModelList() },
+                    onPullEmbeddingModelClick = {},
+                    ollamaStatus = mainState.ollamaStatus,
+                    onBackClick = {
+                        navigateToTab(
+                            navController = navController,
+                            route = Screens.HomeScreen.route
+                        )
                     }
                 )
             }

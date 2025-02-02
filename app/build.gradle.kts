@@ -16,7 +16,7 @@ android {
         minSdk = 21
         targetSdk = 34
         versionCode = 5
-        versionName = "1.0.5"
+        versionName = "1.0.8"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -44,6 +44,7 @@ android {
         jvmTarget = "1.8"
     }
     buildFeatures {
+        buildConfig = true
         compose = true
     }
     composeOptions {
@@ -98,6 +99,16 @@ dependencies {
 //    implementation(libs.richtext.markdown)
 //    implementation(libs.richtext.commonmark)
 
+    //ObjectBox
+    debugImplementation(libs.objectbox.android.objectbrowser)
+    releaseImplementation(libs.objectbox.android)
+
+    //itextpdf
+    implementation(libs.itextpdf)
+
+    implementation(libs.jsoup)
+
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -114,3 +125,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }
+
+apply(plugin = "io.objectbox")
+
+
