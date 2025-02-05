@@ -2,6 +2,7 @@ package com.example.ollamaui.ui.screen.setting.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,16 +10,17 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -32,19 +34,21 @@ import com.example.ollamaui.R
 import com.example.ollamaui.ui.screen.common.CustomButton
 import com.example.ollamaui.ui.theme.OllamaUITheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TuningSlider(
+    sliderPosition: Float,
+    onSliderChange: (Float) -> Unit,
     modifier: Modifier = Modifier,
     title: String = "Parameter",
     explanation: String = "Parameter explanation",
     decimalFilter: String = "%.2f",
-    defaultValue: Float = 0f,
     isInteger: Boolean = true,
     startPosition: Float = 0f,
     endPosition: Float = 1f,
 ) {
     var isExplanationShowed by remember { mutableStateOf(false) }
-    var sliderPosition by remember { mutableFloatStateOf( defaultValue ) }
+    val interactionSource = remember { MutableInteractionSource() }
     Column(
         verticalArrangement = Arrangement.spacedBy(1.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -120,16 +124,40 @@ fun TuningSlider(
         if(isInteger) {
             Slider(
                 value = sliderPosition,
-                onValueChange = { sliderPosition = it.toInt().toFloat() },
+                onValueChange = { onSliderChange(it) },
                 valueRange = startPosition..endPosition,
                 modifier = Modifier.weight(0.5f),
+                interactionSource = interactionSource,
+                thumb = {
+                    Spacer(
+                        modifier = Modifier
+                            .background(
+                                color = MaterialTheme.colorScheme.primary,
+                                shape = RoundedCornerShape(100)
+                            )
+                            .size(25.dp)
+
+                    )
+                },
             )
         }else{
             Slider(
                 value = sliderPosition,
-                onValueChange = { sliderPosition = it },
+                onValueChange = { onSliderChange(it) },
                 valueRange = startPosition..endPosition,
-                modifier = Modifier.weight(0.5f)
+                modifier = Modifier.weight(0.5f),
+                interactionSource = interactionSource,
+                thumb = {
+                    Spacer(
+                        modifier = Modifier
+                            .background(
+                                color = MaterialTheme.colorScheme.primary,
+                                shape = RoundedCornerShape(100)
+                            )
+                            .size(30.dp)
+
+                    )
+                },
             )
         }
     }
@@ -141,6 +169,8 @@ fun TuningSlider(
 private fun TuningSliderPreview() {
     OllamaUITheme {
         TuningSlider(
+            sliderPosition = 4f,
+            onSliderChange = {},
             title = "Parameter",
             startPosition = -10.0f,
             endPosition = 10.0f,

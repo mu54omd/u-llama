@@ -3,6 +3,7 @@ package com.example.ollamaui.activity
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ollamaui.domain.model.chat.ModelParameters
 import com.example.ollamaui.domain.model.pull.EmptyPullResponse
 import com.example.ollamaui.domain.model.pull.PullInputModel
 import com.example.ollamaui.domain.model.tag.EmptyTagResponse
@@ -56,6 +57,24 @@ class MainViewModel @Inject constructor(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000L),
             initialValue = EmbeddingModel()
+        )
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    private val _tuningParameters = userLocalUserManager.readTuningParameters().map {
+        ModelParameters(
+            topK = it.topK,
+            topP = it.topP,
+            minP = it.minP,
+            temperature = it.temperature,
+            presencePenalty = it.presencePenalty,
+            frequencyPenalty = it.frequencyPenalty,
+            numCtx = it.numCtx
+        )
+    }
+    val tuningParameters = _tuningParameters
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = ModelParameters()
         )
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     private val _mainState = MutableStateFlow(MainStates())
@@ -116,6 +135,11 @@ class MainViewModel @Inject constructor(
             userLocalUserManager.saveOllamaEmbeddingModel(modelName = modelName)
         }
     }
+    fun saveOllamaTuningParameters(modelParameters: ModelParameters){
+        viewModelScope.launch {
+            userLocalUserManager.saveTuningParameters(modelParameters = modelParameters)
+        }
+    }
 
     fun fetchEmbeddingModelList(){
         viewModelScope.launch {
@@ -131,6 +155,7 @@ class MainViewModel @Inject constructor(
                 }
             }catch (e: IOException){
                 _mainState.update { it.copy(fetchEmbeddingModelError = e.message) }
+                e.message?.let { Log.d("cTAG", it) }
             }
         }
     }
