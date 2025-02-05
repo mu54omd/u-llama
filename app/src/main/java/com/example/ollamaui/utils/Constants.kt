@@ -10,7 +10,7 @@ object Constants {
     const val OLLAMA_EMBED_ENDPOINT = "/api/embed"
     const val OLLAMA_PULL_ENDPOINT = "/api/pull"
 
-    const val OLLAMA_IS_RUNNING = "Ollama is running"
+//    const val OLLAMA_IS_RUNNING = "Ollama is running"
 
     const val CHAT_DATABASE = "chat_db"
 
@@ -19,6 +19,13 @@ object Constants {
     const val OLLAMA_ADDRESS = "ollama_address"
     const val IS_OLLAMA_EMBEDDING_MODEL_SET = "is_ollama_embedding_model_set"
     const val OLLAMA_EMBEDDING_MODEL = "ollama_embedding_model"
+    const val TOP_K = "top_k"
+    const val TOP_P = "top_p"
+    const val MIN_P = "min_p"
+    const val TEMPERATURE = "temperature"
+    const val PRESENCE_PENALTY = "presence_penalty"
+    const val FREQUENCY_PENALTY = "frequency_penalty"
+    const val NUM_CTX = "num_ctx"
 
 
     //

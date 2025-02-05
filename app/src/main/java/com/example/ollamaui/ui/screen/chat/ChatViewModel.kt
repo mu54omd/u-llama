@@ -12,6 +12,7 @@ import com.example.ollamaui.domain.model.chat.ChatInputModel
 import com.example.ollamaui.domain.model.chat.ChatModel
 import com.example.ollamaui.domain.model.chat.EmptyChatModel
 import com.example.ollamaui.domain.model.chat.EmptyChatResponse
+import com.example.ollamaui.domain.model.chat.ModelParameters
 import com.example.ollamaui.domain.model.embed.EmbedInputModel
 import com.example.ollamaui.domain.model.objectbox.Chunk
 import com.example.ollamaui.domain.model.objectbox.File
@@ -150,12 +151,13 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    fun loadStates(chatModel: ChatModel, url: String) {
+    fun loadStates(chatModel: ChatModel, url: String, modelParameters: ModelParameters) {
         _chatState.update {
             it.copy(
                 chatModel = chatModel,
                 ollamaBaseAddress = url,
                 isSendingFailed = chatModel.newMessageStatus == 2,
+                chatOptions = modelParameters
             )
         }
         viewModelScope.launch {
@@ -309,6 +311,7 @@ class ChatViewModel @Inject constructor(
                     messages = messages.messageModels,
                     keepAlive = 3600,
                     stream = false,
+                    options = chatState.value.chatOptions
                 )
             ).onRight { response ->
                 oldMessages.add(MessageModel(content = response.message.content, role = response.message.role))
@@ -434,7 +437,7 @@ class ChatViewModel @Inject constructor(
                 model = chatState.value.chatModel.modelName,
                 messages = emptyList(),
                 stream = false,
-                keepAlive = 0
+                keepAlive = 0,
             )
         )
     }

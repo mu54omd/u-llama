@@ -3,6 +3,7 @@ package com.example.ollamaui.activity
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ollamaui.domain.model.chat.ModelParameters
 import com.example.ollamaui.domain.model.pull.EmptyPullResponse
 import com.example.ollamaui.domain.model.pull.PullInputModel
 import com.example.ollamaui.domain.model.tag.EmptyTagResponse
@@ -58,11 +59,28 @@ class MainViewModel @Inject constructor(
             initialValue = EmbeddingModel()
         )
     ////////////////////////////////////////////////////////////////////////////////////////////////////
+    private val _tuningParameters = userLocalUserManager.readTuningParameters().map {
+        ModelParameters(
+            topK = it.topK,
+            topP = it.topP,
+            minP = it.minP,
+            temperature = it.temperature,
+            presencePenalty = it.presencePenalty,
+            frequencyPenalty = it.frequencyPenalty,
+            numCtx = it.numCtx
+        )
+    }
+    val tuningParameters = _tuningParameters
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = ModelParameters()
+        )
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
     private val _mainState = MutableStateFlow(MainStates())
     val mainState = _mainState
         .onStart {
             refresh()
-            fetchEmbeddingModelList()
         }
         .stateIn(
             scope = viewModelScope,
@@ -77,16 +95,9 @@ class MainViewModel @Inject constructor(
     fun refresh(){
         viewModelScope.launch {
             _mainState.update { it.copy(isModelListLoaded = false) }
+            fetchEmbeddingModelList()
             getOllamaStatus(baseAddress.value.ollamaBaseAddress)
             getOllamaModelsList()
-//            val modelList = mainState.value.fullModelList.map { it.split(":")[0] }
-//            if(embeddingModel.value.isEmbeddingModelSet) {
-//                if (embeddingModel.value.embeddingModelName !in modelList) {
-//                    ollamaPostPull(modelName = embeddingModel.value.embeddingModelName)
-//                } else {
-//                    _mainState.update { it.copy(isEmbeddingModelPulled = true) }
-//                }
-//            }
         }
     }
 
@@ -105,7 +116,6 @@ class MainViewModel @Inject constructor(
             }
         }else{
             _mainState.update { it.copy(isEmbeddingModelPulled = true) }
-            saveOllamaEmbeddingModel(modelName = modelName)
         }
     }
 
@@ -125,6 +135,11 @@ class MainViewModel @Inject constructor(
             userLocalUserManager.saveOllamaEmbeddingModel(modelName = modelName)
         }
     }
+    fun saveOllamaTuningParameters(modelParameters: ModelParameters){
+        viewModelScope.launch {
+            userLocalUserManager.saveTuningParameters(modelParameters = modelParameters)
+        }
+    }
 
     fun fetchEmbeddingModelList(){
         viewModelScope.launch {
@@ -136,10 +151,11 @@ class MainViewModel @Inject constructor(
                         .getElementsByClass("truncate text-xl font-medium underline-offset-2 group-hover:underline md:text-2xl")
                         .text()
                         .split(" ")
-                    _mainState.update { it.copy(embeddingModelList = result) }
+                    _mainState.update { it.copy(embeddingModelList = result, fetchEmbeddingModelError = null) }
                 }
             }catch (e: IOException){
-                Log.d("cTAG", "exception: $e")
+                _mainState.update { it.copy(fetchEmbeddingModelError = e.message) }
+                e.message?.let { Log.d("cTAG", it) }
             }
         }
     }
