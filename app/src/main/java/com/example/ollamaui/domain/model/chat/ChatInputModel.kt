@@ -11,4 +11,5 @@ data class ChatInputModel(
     val stream: Boolean,
     @SerializedName("keep_alive")
     val keepAlive: Int,
+    val options: ModelParameters = DefaultModelParameters.default
 )
