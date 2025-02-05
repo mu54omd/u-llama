@@ -27,7 +27,6 @@ import com.example.ollamaui.ui.screen.setting.SettingScreen
 fun AppNavigation(
     mainViewModel: MainViewModel,
     mainState: MainStates,
-    isOllamaAddressSet: Boolean,
     ollamaAddress: String,
     isEmbeddingModelSet: Boolean,
     embeddingModel: String,
@@ -57,7 +56,6 @@ fun AppNavigation(
             composable(route = Screens.HomeScreen.route) {
                 HomeScreen(
                     homeViewModel = homeViewModel,
-                    mainViewModel = mainViewModel,
                     chatsList = chatsList,
                     onChatClick = {
                         val chatModel = homeViewModel.findChat(chatId = it.chatId)?:it
@@ -67,13 +65,14 @@ fun AppNavigation(
                             route = Screens.ChatScreen.route
                         )
                     },
+                    onRefreshClick = { mainViewModel.refresh() },
                     onSettingClick = {
                         navigateToTab(
                             navController = navController,
                             route = Screens.SettingScreen.route
                         )
                     },
-                    isModelListLoaded = mainState.isModelListLoaded,
+                    isChatReady = mainState.isModelListLoaded and (mainState.ollamaStatus == "Ollama is running"),
                     modelList = mainState.filteredModelList,
                 )
             }
@@ -99,6 +98,7 @@ fun AppNavigation(
                 LoadingScreen(
                     isLocalSettingLoaded = isLocalSettingsLoaded,
                     onDispose = {
+                        mainViewModel.refresh()
                         navigateToTab(navController = navController , route = Screens.HomeScreen.route)
                     }
                 )
@@ -113,12 +113,13 @@ fun AppNavigation(
                         mainViewModel.saveOllamaEmbeddingModel(embeddingModelName)
                         mainViewModel.refresh()
                     },
+                    onSetAsDefaultClick = {},
                     onResetClick = {},
                     onCheckClick = {url ->
                         mainViewModel.checkOllamaAddress(url)
                     },
                     onFetchEmbeddingModelClick = { mainViewModel.fetchEmbeddingModelList() },
-                    onPullEmbeddingModelClick = {},
+                    onPullEmbeddingModelClick = { mainViewModel.pullEmbeddingModel(it) },
                     ollamaStatus = mainState.ollamaStatus,
                     onBackClick = {
                         navigateToTab(

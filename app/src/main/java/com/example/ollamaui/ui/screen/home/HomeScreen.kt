@@ -20,7 +20,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.ollamaui.R
-import com.example.ollamaui.activity.MainViewModel
 import com.example.ollamaui.domain.model.chat.ChatModel
 import com.example.ollamaui.domain.model.chat.EmptyChatModel
 import com.example.ollamaui.ui.screen.home.components.AboutDialog
@@ -35,9 +34,9 @@ fun HomeScreen(
     onChatClick: (ChatModel) -> Unit,
     onSettingClick: () -> Unit,
     homeViewModel: HomeViewModel,
-    mainViewModel: MainViewModel,
+    onRefreshClick: () -> Unit,
     chatsList: ChatsList,
-    isModelListLoaded: Boolean,
+    isChatReady: Boolean,
     modelList: List<String>,
 ) {
     var isNewChatDialogVisible by remember { mutableStateOf(false) }
@@ -91,15 +90,15 @@ fun HomeScreen(
         bottomBar = { },
         floatingActionButton = {
             CustomFabButton(
-                isModelListLoaded = isModelListLoaded,
+                isModelListLoaded = isChatReady,
                 isFabVisible = !isNewChatDialogVisible,
                 onButtonClick = {
                     userName = ""
                     chatTitle = ""
                     botName = ""
                     systemPrompt = ""
-                    if(!isModelListLoaded){
-                        mainViewModel.refresh()
+                    if(!isChatReady){
+                        onRefreshClick()
                     }
                     else {
                         isNewChatDialogVisible = true

@@ -25,7 +25,6 @@ class MainActivity : ComponentActivity() {
                 AppNavigation(
                     mainViewModel = mainViewModel,
                     mainState = mainState,
-                    isOllamaAddressSet = baseAddress.isOllamaAddressSet,
                     ollamaAddress = baseAddress.ollamaBaseAddress,
                     isLocalSettingsLoaded = baseAddress.isLocalSettingsLoaded,
                     isEmbeddingModelSet = embeddingModel.isEmbeddingModelSet,

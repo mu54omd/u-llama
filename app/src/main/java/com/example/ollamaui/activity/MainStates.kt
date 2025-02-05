@@ -23,6 +23,8 @@ data class MainStates(
     val pullResponse: PullResponse = EmptyPullResponse.empty,
     val pullError: NetworkError? = null,
 
+    val fetchEmbeddingModelError: String? = null,
+
     val isEmbeddingModelPulling: Boolean = false,
     val isEmbeddingModelPulled: Boolean = false,
 

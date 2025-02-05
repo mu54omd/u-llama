@@ -2,7 +2,6 @@ package com.example.ollamaui.ui.screen.setting
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandIn
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -33,15 +31,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.ollamaui.R
 import com.example.ollamaui.ui.screen.common.CustomButton
 import com.example.ollamaui.ui.screen.common.CustomDropDownList
 import com.example.ollamaui.ui.screen.setting.components.CustomSettingBox
+import com.example.ollamaui.ui.screen.setting.components.TuningSlider
 import com.example.ollamaui.ui.theme.OllamaUITheme
 
 @Composable
@@ -50,6 +46,7 @@ fun SettingScreen(
     ollamaStatus: String,
     embeddingModelList: List<String>,
     isEmbeddingModelPulled: (String) -> Boolean,
+    onSetAsDefaultClick: () -> Unit,
     onResetClick: () -> Unit,
     onSaveClick: (url: String,embeddingModel: String) -> Unit,
     onCheckClick: (url: String) -> Unit,
@@ -64,7 +61,7 @@ fun SettingScreen(
     var port by rememberSaveable { mutableStateOf(savedParameters[0].split("//")[1].split(":")[1]) }
     var selectedEmbeddingModel by rememberSaveable { mutableStateOf(savedParameters[1]) }
     var networkStatus by remember { mutableStateOf("") }
-    var isChecked by remember { mutableStateOf(false) }
+    var isChecked by rememberSaveable { mutableStateOf(false) }
     var isSelectedModelPulled by remember { mutableStateOf(isEmbeddingModelPulled(selectedEmbeddingModel)) }
 
     Column(
@@ -92,9 +89,13 @@ fun SettingScreen(
                     unfocusedContainerColor = Color.Transparent,
                 ),
                 singleLine = true,
-                supportingText = { if(isChecked) Text(text = ollamaStatus) },
+                supportingText = {
+                    if(isChecked) {
+                        Text(text = ollamaStatus)
+                    }
+                },
                 modifier = Modifier
-                    .weight(0.4f)
+                    .weight(0.3f)
                     .padding(start = 10.dp, top = 20.dp, bottom = 20.dp)
             )
             Spacer(modifier = Modifier.width(20.dp))
@@ -121,7 +122,6 @@ fun SettingScreen(
             ) {
                 Text("Check")
             }
-
         }
         CustomSettingBox(
             title = "Embedding Model",
@@ -173,14 +173,81 @@ fun SettingScreen(
         CustomSettingBox(
             title = "Tuning Parameters",
         ) {
-            Text(text = "Under construction", modifier = Modifier.padding(30.dp))
+            Column(
+                modifier = Modifier.padding(top = 20.dp),
+                verticalArrangement = Arrangement.spacedBy(2.dp)
+            ) {
+                TuningSlider(
+                    title = "Temperature",
+                    explanation = "Regulates the unpredictability of output.",
+                    isInteger = false,
+                    startPosition = 0f,
+                    endPosition = 2f,
+                    defaultValue = 0.8f,
+                )
+                TuningSlider(
+                    title = "Context size",
+                    explanation = "Sets the size of the context window\nused to generate the next token.",
+                    isInteger = true,
+                    startPosition = 1f,
+                    endPosition = 8192f,
+                    defaultValue = 2048f,
+                )
+                TuningSlider(
+                    title = "Frequency penalty",
+                    explanation = "Discourages repetition proportionally\nto how frequently they appear.",
+                    isInteger = false,
+                    startPosition = 0f,
+                    endPosition = 2f
+                )
+                TuningSlider(
+                    title = "Presence penalty",
+                    explanation = "Discourages repetition based on\nif they have occurred or not.",
+                    isInteger = false,
+                    startPosition = 0f,
+                    endPosition = 2f
+                )
+                TuningSlider(
+                    title = "Top K",
+                    explanation = "Reduces the probability of generating nonsense.\nHigher value will give more diverse answers",
+                    isInteger = true,
+                    startPosition = 0f,
+                    endPosition = 100f,
+                    defaultValue = 40f
+                )
+                TuningSlider(
+                    title = "Top P ",
+                    explanation = "Manage the randomness of their output.\nHigher value will lead to more diverse text.",
+                    isInteger = false,
+                    startPosition = 0f,
+                    endPosition = 2f,
+                    defaultValue = 0.9f
+                )
+                TuningSlider(
+                    title = "Min P",
+                    explanation = "Aims to ensure a balance of quality and variety.",
+                    isInteger = false,
+                    startPosition = 0f,
+                    endPosition = 2f,
+                    defaultValue = 0f
+                )
+            }
         }
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Button(
-                onClick = {}
+                onClick = {
+                    onSetAsDefaultClick()
+                }
+            ) {
+                Text(text = "Set as default")
+            }
+            Button(
+                onClick = {
+                    onResetClick()
+                }
             ) {
                 Text(text = "Reset")
             }
@@ -205,9 +272,10 @@ private fun SettingScreenPreview() {
     OllamaUITheme {
         SettingScreen(
             savedParameters = listOf("http://127.0.0.1:11434", "al-minilm"),
-            embeddingModelList = listOf("al-minilm", "llama3.2"),
+            embeddingModelList = listOf("all-minilm", "llama3.2"),
             isEmbeddingModelPulled = { true },
             ollamaStatus = "Ollama is Running",
+            onSetAsDefaultClick = {},
             onResetClick = {},
             onSaveClick = {_,_-> },
             onBackClick = {},

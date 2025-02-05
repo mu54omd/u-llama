@@ -62,7 +62,6 @@ class MainViewModel @Inject constructor(
     val mainState = _mainState
         .onStart {
             refresh()
-            fetchEmbeddingModelList()
         }
         .stateIn(
             scope = viewModelScope,
@@ -77,16 +76,9 @@ class MainViewModel @Inject constructor(
     fun refresh(){
         viewModelScope.launch {
             _mainState.update { it.copy(isModelListLoaded = false) }
+            fetchEmbeddingModelList()
             getOllamaStatus(baseAddress.value.ollamaBaseAddress)
             getOllamaModelsList()
-//            val modelList = mainState.value.fullModelList.map { it.split(":")[0] }
-//            if(embeddingModel.value.isEmbeddingModelSet) {
-//                if (embeddingModel.value.embeddingModelName !in modelList) {
-//                    ollamaPostPull(modelName = embeddingModel.value.embeddingModelName)
-//                } else {
-//                    _mainState.update { it.copy(isEmbeddingModelPulled = true) }
-//                }
-//            }
         }
     }
 
@@ -105,7 +97,6 @@ class MainViewModel @Inject constructor(
             }
         }else{
             _mainState.update { it.copy(isEmbeddingModelPulled = true) }
-            saveOllamaEmbeddingModel(modelName = modelName)
         }
     }
 
@@ -136,10 +127,10 @@ class MainViewModel @Inject constructor(
                         .getElementsByClass("truncate text-xl font-medium underline-offset-2 group-hover:underline md:text-2xl")
                         .text()
                         .split(" ")
-                    _mainState.update { it.copy(embeddingModelList = result) }
+                    _mainState.update { it.copy(embeddingModelList = result, fetchEmbeddingModelError = null) }
                 }
             }catch (e: IOException){
-                Log.d("cTAG", "exception: $e")
+                _mainState.update { it.copy(fetchEmbeddingModelError = e.message) }
             }
         }
     }
