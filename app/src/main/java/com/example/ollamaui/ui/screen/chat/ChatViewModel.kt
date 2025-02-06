@@ -69,49 +69,84 @@ class ChatViewModel @Inject constructor(
         val messages = chatState.value.chatModel.chatMessages.messageModels.toMutableList()
         val oldChatModel = chatState.value.chatModel
         val imageList = selectedImages.map { it.attachResult }
-        val job =
-            getSimilarChunk(
-                fileIds = selectedDocs.map{ it.fileId },
-                query = text,
-                n = 5,
-                embeddingModel = if (embeddingModel != "") embeddingModel else chatState.value.chatModel.modelName,
-            )
-        job.invokeOnCompletion {
-            when {
-                selectedImages.isNotEmpty() -> {
-                    messages.add(MessageModel(content = text, role = USER_ROLE, images = imageList))
+        when{
+            selectedImages.isEmpty() && selectedDocs.isEmpty() -> {
+                messages.add(MessageModel(content = text, role = USER_ROLE))
+                _chatState.update {
+                    it.copy(
+                        chatModel = ChatModel(
+                            chatId = oldChatModel.chatId,
+                            chatIcon = oldChatModel.chatIcon,
+                            chatTitle = oldChatModel.chatTitle,
+                            chatMessages = MessagesModel(messageModels = messages),
+                            modelName = oldChatModel.modelName,
+                            userName = oldChatModel.userName,
+                            botName = oldChatModel.botName,
+                        ),
+                        isDatabaseChanged = true
+                    )
                 }
-
-                selectedDocs.isNotEmpty() -> {
+                ollamaPostMessage(
+                    messages = MessagesModel(messageModels = messages),
+                    chatId = oldChatModel.chatId
+                )
+            }
+            selectedImages.isNotEmpty() && selectedDocs.isEmpty() -> {
+                messages.add(MessageModel(content = text, role = USER_ROLE, images = imageList))
+                _chatState.update {
+                    it.copy(
+                        chatModel = ChatModel(
+                            chatId = oldChatModel.chatId,
+                            chatIcon = oldChatModel.chatIcon,
+                            chatTitle = oldChatModel.chatTitle,
+                            chatMessages = MessagesModel(messageModels = messages),
+                            modelName = oldChatModel.modelName,
+                            userName = oldChatModel.userName,
+                            botName = oldChatModel.botName,
+                        ),
+                        isDatabaseChanged = true
+                    )
+                }
+                ollamaPostMessage(
+                    messages = MessagesModel(messageModels = messages),
+                    chatId = oldChatModel.chatId
+                )
+            }
+            selectedImages.isEmpty() -> {
+                val job =
+                    getSimilarChunk(
+                        fileIds = selectedDocs.map{ it.fileId },
+                        query = text,
+                        n = 5,
+                        embeddingModel = if (embeddingModel != "") embeddingModel else chatState.value.chatModel.modelName,
+                    )
+                job.invokeOnCompletion {
                     messages.add(
                         MessageModel(
                             content = "Using this data: {${chatState.value.retrievedContext}}. Respond to this prompt: {${text}}.",
                             role = USER_ROLE
                         )
                     )
-                }
-                else -> {
-                    messages.add(MessageModel(content = text, role = USER_ROLE))
+                    _chatState.update {
+                        it.copy(
+                            chatModel = ChatModel(
+                                chatId = oldChatModel.chatId,
+                                chatIcon = oldChatModel.chatIcon,
+                                chatTitle = oldChatModel.chatTitle,
+                                chatMessages = MessagesModel(messageModels = messages),
+                                modelName = oldChatModel.modelName,
+                                userName = oldChatModel.userName,
+                                botName = oldChatModel.botName,
+                            ),
+                            isDatabaseChanged = true
+                        )
+                    }
+                    ollamaPostMessage(
+                        messages = MessagesModel(messageModels = messages),
+                        chatId = oldChatModel.chatId
+                    )
                 }
             }
-            _chatState.update {
-                it.copy(
-                    chatModel = ChatModel(
-                        chatId = oldChatModel.chatId,
-                        chatIcon = oldChatModel.chatIcon,
-                        chatTitle = oldChatModel.chatTitle,
-                        chatMessages = MessagesModel(messageModels = messages),
-                        modelName = oldChatModel.modelName,
-                        userName = oldChatModel.userName,
-                        botName = oldChatModel.botName,
-                    ),
-                    isDatabaseChanged = true
-                )
-            }
-            ollamaPostMessage(
-                messages = MessagesModel(messageModels = messages),
-                chatId = oldChatModel.chatId
-            )
         }
 
     }
