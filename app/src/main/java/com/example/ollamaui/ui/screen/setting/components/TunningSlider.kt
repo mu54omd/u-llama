@@ -154,7 +154,7 @@ fun TuningSlider(
                                 color = MaterialTheme.colorScheme.primary,
                                 shape = RoundedCornerShape(100)
                             )
-                            .size(30.dp)
+                            .size(25.dp)
 
                     )
                 },

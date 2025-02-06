@@ -126,8 +126,6 @@ fun AppNavigation(
                         mainViewModel.saveOllamaTuningParameters(modelParameters = modelParameters)
                         mainViewModel.refresh()
                     },
-                    onSetAsDefaultClick = {},
-                    onResetClick = {},
                     onCheckClick = {url ->
                         mainViewModel.checkOllamaAddress(url)
                     },
