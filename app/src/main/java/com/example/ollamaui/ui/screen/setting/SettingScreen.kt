@@ -48,8 +48,6 @@ fun SettingScreen(
     ollamaStatus: String,
     embeddingModelList: List<String>,
     isEmbeddingModelPulled: (String) -> Boolean,
-    onSetAsDefaultClick: () -> Unit,
-    onResetClick: () -> Unit,
     onSaveClick: (url: String,embeddingModel: String, tuningParameters: ModelParameters) -> Unit,
     onCheckClick: (url: String) -> Unit,
     onPullEmbeddingModelClick: (String) -> Unit,
@@ -261,13 +259,6 @@ fun SettingScreen(
         ) {
             Button(
                 onClick = {
-                    onSetAsDefaultClick()
-                }
-            ) {
-                Text(text = "Set as default")
-            }
-            Button(
-                onClick = {
                     ipAddress = "127.0.0.1"
                     port = "11434"
                     selectedEmbeddingModel = ""
@@ -318,8 +309,6 @@ private fun SettingScreenPreview() {
             embeddingModelList = listOf("all-minilm", "llama3.2"),
             isEmbeddingModelPulled = { true },
             ollamaStatus = "Ollama is Running",
-            onSetAsDefaultClick = {},
-            onResetClick = {},
             onSaveClick = {_,_,_-> },
             onBackClick = {},
             onCheckClick = {},
