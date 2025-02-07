@@ -13,6 +13,7 @@ object Constants {
 //    const val OLLAMA_IS_RUNNING = "Ollama is running"
 
     const val CHAT_DATABASE = "chat_db"
+    const val LOG_DATABASE = "log_db"
 
     const val USER_SETTING = "user_setting"
     const val IS_OLLAMA_ADDRESS_SET = "is_ollama_address_set"

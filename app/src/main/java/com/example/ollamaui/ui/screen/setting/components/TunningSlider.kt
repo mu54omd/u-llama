@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -87,7 +88,7 @@ fun TuningSlider(
                         style = MaterialTheme.typography.labelSmall,
                         modifier = Modifier
                             .background(
-                                color = Color.White,
+                                color = if(isSystemInDarkTheme()) Color.Gray else Color.White,
                                 shape = RoundedCornerShape(10)
                             )
                             .padding(10.dp)

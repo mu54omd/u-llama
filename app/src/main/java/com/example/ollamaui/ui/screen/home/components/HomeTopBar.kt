@@ -25,7 +25,7 @@ import com.example.ollamaui.utils.Constants.TOP_BAR_HEIGHT
 fun HomeTopBar(
     modifier: Modifier = Modifier,
     onSettingClick: () -> Unit,
-    onAboutClick: () -> Unit,
+    onLogClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onDeselectClick: () -> Unit,
     onSelectClick: () -> Unit,
@@ -99,7 +99,7 @@ fun HomeTopBar(
                                 )
                                 CustomButton(
                                     description = "About Button",
-                                    onButtonClick = onAboutClick,
+                                    onButtonClick = onLogClick,
                                     icon = R.drawable.baseline_info_outline_24,
                                     buttonSize = 50,
                                     containerColor = MaterialTheme.colorScheme.background,
@@ -119,7 +119,7 @@ fun HomeTopBar(
 private fun HomeTopBarPreview() {
     OllamaUITheme {
         HomeTopBar(
-            onAboutClick = {},
+            onLogClick = {},
             onSettingClick = {},
             onDeleteClick = {},
             onDeselectClick = {},

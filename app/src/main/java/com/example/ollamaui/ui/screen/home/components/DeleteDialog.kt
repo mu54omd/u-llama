@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -18,6 +19,7 @@ import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -39,35 +41,23 @@ fun DeleteDialog(
     ) {
         Box(
             modifier = modifier
-                .clip(shape = MaterialTheme.shapes.large)
-                .size(200.dp, 175.dp)
+                .clip(shape = MaterialTheme.shapes.medium)
+                .size(200.dp, 100.dp)
                 .background(color = MaterialTheme.colorScheme.surfaceVariant),
             contentAlignment = Alignment.Center
         ){
-            Box(
-                modifier = Modifier
-                    .clip(shape = RoundedCornerShape(100.dp))
-                    .background(color = MaterialTheme.colorScheme.errorContainer)
-                    .align(alignment = BiasAlignment(0f, -0.85f))
-                    .padding(4.dp)
-                ,
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "Delete confirmation",
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.width(100.dp)
+                modifier = Modifier.width(150.dp).align(Alignment.TopCenter).padding(top = 20.dp)
             ) {
-                Text(text = "Chat title" , style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold), color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(text = chatTitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, overflow = TextOverflow.Ellipsis, maxLines = 1)
-                Text(text = "Author", style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold), color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(text = userName, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, overflow = TextOverflow.Ellipsis, maxLines = 1)
+                Text(text = "Are you sure you want to delete this chat?" ,
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center
+                    ),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
             Row(
                 horizontalArrangement = Arrangement.SpaceAround,
@@ -78,7 +68,8 @@ fun DeleteDialog(
                     description = "Accept",
                     onButtonClick = onAcceptClick,
                     icon = R.drawable.baseline_check_24,
-                    buttonSize = 50,
+                    buttonSize = 25,
+                    iconSize = 20,
                     containerColor = MaterialTheme.colorScheme.errorContainer
                 )
                 Spacer(modifier = Modifier.width(30.dp))
@@ -86,7 +77,8 @@ fun DeleteDialog(
                     description = "Close",
                     onButtonClick = onCloseClick,
                     icon = R.drawable.baseline_clear_24,
-                    buttonSize = 50,
+                    buttonSize = 25,
+                    iconSize = 20
                 )
             }
         }

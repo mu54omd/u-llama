@@ -20,6 +20,7 @@ import com.example.ollamaui.ui.screen.chat.ChatScreen
 import com.example.ollamaui.ui.screen.chat.ChatViewModel
 import com.example.ollamaui.ui.screen.home.HomeScreen
 import com.example.ollamaui.ui.screen.home.HomeViewModel
+import com.example.ollamaui.ui.screen.home.components.LogScreen
 import com.example.ollamaui.ui.screen.loading.LoadingScreen
 import com.example.ollamaui.ui.screen.setting.SettingScreen
 
@@ -72,6 +73,12 @@ fun AppNavigation(
                         navigateToTab(
                             navController = navController,
                             route = Screens.SettingScreen.route
+                        )
+                    },
+                    onLogClick = {
+                        navigateToTab(
+                            navController = navController,
+                            route = Screens.LogScreen.route
                         )
                     },
                     isChatReady = mainState.isModelListLoaded and (mainState.ollamaStatus == "Ollama is running"),
@@ -140,7 +147,16 @@ fun AppNavigation(
                     }
                 )
             }
-
+            composable(route = Screens.LogScreen.route){
+                LogScreen(
+                    onBackClick = {
+                        navigateToTab(
+                            navController = navController,
+                            route = Screens.HomeScreen.route
+                        )
+                    }
+                )
+            }
         }
     }
 }
