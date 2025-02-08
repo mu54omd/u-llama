@@ -22,6 +22,7 @@ import com.example.ollamaui.ui.screen.home.HomeScreen
 import com.example.ollamaui.ui.screen.home.HomeViewModel
 import com.example.ollamaui.ui.screen.home.components.LogScreen
 import com.example.ollamaui.ui.screen.loading.LoadingScreen
+import com.example.ollamaui.ui.screen.log.LogViewModel
 import com.example.ollamaui.ui.screen.setting.SettingScreen
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -42,6 +43,8 @@ fun AppNavigation(
     val chatState = chatViewModel.chatState.collectAsStateWithLifecycle().value
     val attachedDocsList = chatViewModel.attachedDocs.collectAsStateWithLifecycle().value
     val attachedImagesList = chatViewModel.attachedImages.collectAsStateWithLifecycle().value
+    val logViewModel: LogViewModel = hiltViewModel()
+    val logs = logViewModel.logs.collectAsStateWithLifecycle().value
 
     Scaffold(
         topBar = {},
@@ -149,6 +152,12 @@ fun AppNavigation(
             }
             composable(route = Screens.LogScreen.route){
                 LogScreen(
+                    logs = logs,
+                    onClearLogClick = {
+                        logs.forEach {
+                            logViewModel.deleteLogs(it)
+                        }
+                    },
                     onBackClick = {
                         navigateToTab(
                             navController = navController,

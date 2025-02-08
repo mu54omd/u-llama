@@ -32,8 +32,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
-import java.time.LocalTime
-import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
@@ -428,6 +426,13 @@ class ChatViewModel @Inject constructor(
     }
     private fun ollamaPostEmbed(text: List<String>, embeddingModel: String, docId: Long, fileName: String){
         viewModelScope.launch {
+            ollamaRepository.insertLogToDb(
+                LogModel(
+                    date = LocalDateTime.now().toString(),
+                    type = "ollama-embed",
+                    content = "post: ${chatState.value.ollamaBaseAddress}${OLLAMA_EMBED_ENDPOINT}",
+                )
+            )
             ollamaRepository.postOllamaEmbed(
                 baseUrl = chatState.value.ollamaBaseAddress,
                 embedEndpoint = OLLAMA_EMBED_ENDPOINT,
@@ -448,9 +453,23 @@ class ChatViewModel @Inject constructor(
                             )
                         )
                     }
+                    ollamaRepository.insertLogToDb(
+                        LogModel(
+                            date = LocalDateTime.now().toString(),
+                            type = "ollama-embed",
+                            content = "Result: Success",
+                        )
+                    )
                 }
                 .onLeft { error ->
                     _chatState.update { it.copy(embedError = error) }
+                    ollamaRepository.insertLogToDb(
+                        LogModel(
+                            date = LocalDateTime.now().toString(),
+                            type = "ollama-embed",
+                            content = "Result: Failed - ${error.error}",
+                        )
+                    )
                 }
         }
     }
