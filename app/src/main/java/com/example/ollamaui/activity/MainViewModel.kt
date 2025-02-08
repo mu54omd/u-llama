@@ -3,6 +3,7 @@ package com.example.ollamaui.activity
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ollamaui.domain.model.LogModel
 import com.example.ollamaui.domain.model.chat.ModelParameters
 import com.example.ollamaui.domain.model.pull.EmptyPullResponse
 import com.example.ollamaui.domain.model.pull.PullInputModel
@@ -10,6 +11,7 @@ import com.example.ollamaui.domain.model.tag.EmptyTagResponse
 import com.example.ollamaui.domain.preferences.LocalUserManager
 import com.example.ollamaui.domain.repository.OllamaRepository
 import com.example.ollamaui.utils.Constants.OLLAMA_BASE_ENDPOINT
+import com.example.ollamaui.utils.Constants.OLLAMA_EMBED_ENDPOINT
 import com.example.ollamaui.utils.Constants.OLLAMA_LIST_ENDPOINT
 import com.example.ollamaui.utils.Constants.OLLAMA_PULL_ENDPOINT
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,6 +26,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
 import java.io.IOException
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -145,6 +148,13 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             try{
                 val url = "https://ollama.com/search?c=embedding"
+                ollamaRepository.insertLogToDb(
+                    LogModel(
+                        date = LocalDateTime.now().toString(),
+                        type = "ollama-fetch",
+                        content = "fetch: $url",
+                    )
+                )
                 withContext(Dispatchers.IO) {
                     val doc = Jsoup.connect(url).get()
                     val result = doc
@@ -152,10 +162,23 @@ class MainViewModel @Inject constructor(
                         .text()
                         .split(" ")
                     _mainState.update { it.copy(embeddingModelList = result, fetchEmbeddingModelError = null) }
+                    ollamaRepository.insertLogToDb(
+                        LogModel(
+                            date = LocalDateTime.now().toString(),
+                            type = "ollama-fetch",
+                            content = "Result: Success",
+                        )
+                    )
                 }
             }catch (e: IOException){
                 _mainState.update { it.copy(fetchEmbeddingModelError = e.message) }
-                e.message?.let { Log.d("cTAG", it) }
+                ollamaRepository.insertLogToDb(
+                    LogModel(
+                        date = LocalDateTime.now().toString(),
+                        type = "ollama-fetch",
+                        content = "Result: Failed - ${e.message}",
+                    )
+                )
             }
         }
     }
@@ -165,6 +188,13 @@ class MainViewModel @Inject constructor(
     /*---------------------------------------------------------------------------------------------*/
 
     private suspend fun getOllamaStatus(url: String){
+        ollamaRepository.insertLogToDb(
+            LogModel(
+                date = LocalDateTime.now().toString(),
+                type = "ollama-get",
+                content = "get: ${url}${OLLAMA_BASE_ENDPOINT}",
+            )
+        )
         ollamaRepository.getOllamaStatus(
             baseUrl = url,
             baseEndpoint = OLLAMA_BASE_ENDPOINT
@@ -176,6 +206,13 @@ class MainViewModel @Inject constructor(
                         statusError = null,
                     )
                 }
+                ollamaRepository.insertLogToDb(
+                    LogModel(
+                        date = LocalDateTime.now().toString(),
+                        type = "ollama-get",
+                        content = "Result: Success",
+                    )
+                )
             }
             .onLeft { statusError ->
                 _mainState.update {
@@ -184,12 +221,26 @@ class MainViewModel @Inject constructor(
                         statusError = statusError,
                     )
                 }
+                ollamaRepository.insertLogToDb(
+                    LogModel(
+                        date = LocalDateTime.now().toString(),
+                        type = "ollama-embed",
+                        content = "Result: Failed - ${statusError.error}",
+                    )
+                )
             }
     }
 
     private suspend fun getOllamaModelsList(){
         val fullModelList = mutableListOf<String>()
         val filteredModelList = mutableListOf<String>()
+        ollamaRepository.insertLogToDb(
+            LogModel(
+                date = LocalDateTime.now().toString(),
+                type = "ollama-tag",
+                content = "get: ${baseAddress.value.ollamaBaseAddress}${OLLAMA_LIST_ENDPOINT}",
+            )
+        )
         ollamaRepository.getOllamaModelsList(baseUrl = baseAddress.value.ollamaBaseAddress, tagEndpoint = OLLAMA_LIST_ENDPOINT)
             .onRight { response ->
                 response.models.forEach { model ->
@@ -206,6 +257,13 @@ class MainViewModel @Inject constructor(
                         tagError = null,
                     )
                 }
+                ollamaRepository.insertLogToDb(
+                    LogModel(
+                        date = LocalDateTime.now().toString(),
+                        type = "ollama-tag",
+                        content = "Result: Success",
+                    )
+                )
             }
             .onLeft { tagError ->
                 _mainState.update {
@@ -215,11 +273,25 @@ class MainViewModel @Inject constructor(
                         isModelListLoaded = false
                     )
                 }
+                ollamaRepository.insertLogToDb(
+                    LogModel(
+                        date = LocalDateTime.now().toString(),
+                        type = "ollama-tag",
+                        content = "Result: Failed - ${tagError.error}",
+                    )
+                )
             }
     }
     private suspend fun ollamaPostPull(modelName: String){
 
         _mainState.update { it.copy(isEmbeddingModelPulling = true, isEmbeddingModelPulled = false) }
+        ollamaRepository.insertLogToDb(
+            LogModel(
+                date = LocalDateTime.now().toString(),
+                type = "ollama-pull",
+                content = "post: ${baseAddress.value.ollamaBaseAddress}${OLLAMA_PULL_ENDPOINT}",
+            )
+        )
         ollamaRepository.postOllamaPull(
             baseUrl = baseAddress.value.ollamaBaseAddress,
             pullEndpoint = OLLAMA_PULL_ENDPOINT,
@@ -233,6 +305,13 @@ class MainViewModel @Inject constructor(
                 if(embeddingModel.value.embeddingModelName != modelName) {
                     saveOllamaEmbeddingModel(modelName = modelName)
                 }
+                ollamaRepository.insertLogToDb(
+                    LogModel(
+                        date = LocalDateTime.now().toString(),
+                        type = "ollama-pull",
+                        content = "Result: Success",
+                    )
+                )
             }
             .onLeft { pullError ->
                 _mainState.update {
@@ -240,6 +319,13 @@ class MainViewModel @Inject constructor(
                         pullError = pullError,
                         isEmbeddingModelPulling = false)
                 }
+                ollamaRepository.insertLogToDb(
+                    LogModel(
+                        date = LocalDateTime.now().toString(),
+                        type = "ollama-pull",
+                        content = "Result: Failed - ${pullError.error}",
+                    )
+                )
             }
     }
 }

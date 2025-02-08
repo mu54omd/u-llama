@@ -5,4 +5,5 @@ sealed class Screens(val route: String) {
     data object ChatScreen: Screens("ChatScreen")
     data object LoadingScreen: Screens("LoadingScreen")
     data object SettingScreen: Screens("SettingScreen")
+    data object LogScreen: Screens("LogScreen")
 }

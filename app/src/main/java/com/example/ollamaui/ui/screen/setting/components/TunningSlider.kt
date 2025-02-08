@@ -1,8 +1,10 @@
 package com.example.ollamaui.ui.screen.setting.components
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,6 +20,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -78,13 +81,14 @@ fun TuningSlider(
                         buttonSize = 20
                     )
                 }
-                if (isExplanationShowed) {
+                AnimatedVisibility (
+                    visible = isExplanationShowed) {
                     Text(
                         text = explanation,
                         style = MaterialTheme.typography.labelSmall,
                         modifier = Modifier
                             .background(
-                                color = Color.White,
+                                color = if(isSystemInDarkTheme()) Color.Gray else Color.White,
                                 shape = RoundedCornerShape(10)
                             )
                             .padding(10.dp)
@@ -135,10 +139,18 @@ fun TuningSlider(
                                 color = MaterialTheme.colorScheme.primary,
                                 shape = RoundedCornerShape(100)
                             )
-                            .size(25.dp)
+                            .size(20.dp)
 
                     )
                 },
+                track = { sliderState ->
+                    SliderDefaults.Track(
+                        sliderState = sliderState,
+                        modifier = Modifier.height(5.dp),
+                        thumbTrackGapSize = 2.dp,
+                        trackInsideCornerSize = 10.dp
+                    )
+                }
             )
         }else{
             Slider(
@@ -154,10 +166,18 @@ fun TuningSlider(
                                 color = MaterialTheme.colorScheme.primary,
                                 shape = RoundedCornerShape(100)
                             )
-                            .size(25.dp)
+                            .size(20.dp)
 
                     )
                 },
+                track = { sliderState ->
+                    SliderDefaults.Track(
+                        sliderState = sliderState,
+                        modifier = Modifier.height(5.dp),
+                        thumbTrackGapSize = 2.dp,
+                        trackInsideCornerSize = 10.dp,
+                    )
+                }
             )
         }
     }

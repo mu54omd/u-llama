@@ -64,7 +64,7 @@ fun SettingScreen(
     var isChecked by rememberSaveable { mutableStateOf(false) }
     var isSelectedModelPulled by remember { mutableStateOf(isEmbeddingModelPulled(selectedEmbeddingModel)) }
     val sliderPositions = remember {
-        mutableStateListOf<Float>(
+        mutableStateListOf(
             savedParameters[2].toFloat(),
             savedParameters[3].toFloat(),
             savedParameters[4].toFloat(),

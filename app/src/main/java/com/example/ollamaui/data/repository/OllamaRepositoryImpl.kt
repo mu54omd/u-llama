@@ -2,7 +2,9 @@ package com.example.ollamaui.data.repository
 
 import arrow.core.Either
 import com.example.ollamaui.data.local.ChatDao
+import com.example.ollamaui.data.local.LogDao
 import com.example.ollamaui.data.remote.OllamaApi
+import com.example.ollamaui.domain.model.LogModel
 import com.example.ollamaui.domain.model.chat.ChatInputModel
 import com.example.ollamaui.domain.model.chat.ChatModel
 import com.example.ollamaui.domain.model.chat.ChatResponse
@@ -20,6 +22,7 @@ import javax.inject.Inject
 class OllamaRepositoryImpl @Inject constructor(
     private val ollamaApi: OllamaApi,
     private val chatDao: ChatDao,
+    private val logDao: LogDao
 ): OllamaRepository {
     override suspend fun getOllamaStatus(baseUrl: String, baseEndpoint: String): Either<NetworkError, String> {
         return Either.catch { ollamaApi.ollamaState(fullUrl = baseUrl + baseEndpoint) }.mapLeft { it.toNetworkError() }
@@ -78,5 +81,17 @@ class OllamaRepositoryImpl @Inject constructor(
 
     override suspend fun getLastId(): Int {
         return chatDao.getLastId()
+    }
+
+    override suspend fun insertLogToDb(logModel: LogModel) {
+        logDao.insert(logModel = logModel)
+    }
+
+    override suspend fun deleteLogFromDb(logModel: LogModel) {
+        logDao.delete(logModel = logModel)
+    }
+
+    override fun getLogsFromDb():Flow<List<LogModel>>{
+        return logDao.getLogs()
     }
 }

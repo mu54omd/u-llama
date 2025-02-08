@@ -1,6 +1,8 @@
 package com.example.ollamaui.ui.screen.common
 
-import android.icu.text.ListFormatter.Width
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,18 +10,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,9 +61,12 @@ fun CustomDropDownList(
                 onValueChange = {},
                 readOnly = true,
                 trailingIcon = { if(isEnable) ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded) },
-                modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).width(width.dp),
+                modifier = Modifier
+                    .menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
+                    .width(width.dp)
+                    .border(width = 1.dp, color = MaterialTheme.colorScheme.primary, shape = MaterialTheme.shapes.large),
                 textStyle = MaterialTheme.typography.bodySmall.copy(textAlign = TextAlign.Center),
-                shape = MaterialTheme.shapes.extraLarge,
+                shape = MaterialTheme.shapes.large,
                 colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
@@ -79,10 +83,13 @@ fun CustomDropDownList(
                 onDismissRequest = { isExpanded = false},
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier.height(100.dp),
-                containerColor = MaterialTheme.colorScheme.surfaceContainer
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                shadowElevation = 0.dp,
+                tonalElevation = 0.dp,
+                border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary)
             ) {
 
-                    listItems.forEach { item ->
+                    listItems.forEachIndexed { index, item->
                         DropdownMenuItem(
                             text = {
                                 Text(
@@ -98,6 +105,8 @@ fun CustomDropDownList(
                                 onItemClick(item)
                             },
                         )
+                        if(index != listItems.lastIndex)
+                        HorizontalDivider(modifier = Modifier.width((width-30).dp).align(Alignment.CenterHorizontally))
                     }
                 }
             }
@@ -105,16 +114,19 @@ fun CustomDropDownList(
     }
 }
 
-@Preview(showSystemUi = true)
+@Preview
 @Composable
 private fun DropDownListPreview() {
     OllamaUITheme {
-        Column(modifier = Modifier.fillMaxSize()) {
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxSize()) {
             CustomDropDownList(
                 defaultValue = "a",
                 listItems = listOf("a", "b", "c", "d", "b", "c", "d", "b", "c", "d"),
                 onItemClick = {},
-                isEnable = false
+                isEnable = true
             )
         }
     }
