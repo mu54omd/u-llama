@@ -1,6 +1,7 @@
 package com.example.ollamaui.domain.repository
 
 import arrow.core.Either
+import com.example.ollamaui.domain.model.LogModel
 import com.example.ollamaui.domain.model.chat.ChatInputModel
 import com.example.ollamaui.domain.model.chat.ChatModel
 import com.example.ollamaui.domain.model.chat.ChatResponse
@@ -26,4 +27,8 @@ interface OllamaRepository{
     fun getChats(): Flow<List<ChatModel>>
     suspend fun getChat(chatId: Int): ChatModel?
     suspend fun getLastId(): Int
+
+    suspend fun insertLogToDb(logModel: LogModel)
+    suspend fun deleteLogFromDb(logModel: LogModel)
+    fun getLogsFromDb(): Flow<List<LogModel>>
 }

@@ -22,7 +22,6 @@ import androidx.compose.ui.Modifier
 import com.example.ollamaui.R
 import com.example.ollamaui.domain.model.chat.ChatModel
 import com.example.ollamaui.domain.model.chat.EmptyChatModel
-import com.example.ollamaui.ui.screen.home.components.AboutDialog
 import com.example.ollamaui.ui.screen.home.components.CustomFabButton
 import com.example.ollamaui.ui.screen.home.components.DeleteDialog
 import com.example.ollamaui.ui.screen.home.components.HomeTopBar
@@ -33,6 +32,7 @@ import com.example.ollamaui.ui.screen.home.components.NewChatItem
 fun HomeScreen(
     onChatClick: (ChatModel) -> Unit,
     onSettingClick: () -> Unit,
+    onLogClick: () -> Unit,
     homeViewModel: HomeViewModel,
     onRefreshClick: () -> Unit,
     chatsList: ChatsList,
@@ -40,7 +40,6 @@ fun HomeScreen(
     modelList: List<String>,
 ) {
     var isNewChatDialogVisible by remember { mutableStateOf(false) }
-    var isAboutDialogVisible by remember { mutableStateOf(false) }
     var isDeleteDialogVisible by remember { mutableStateOf(false) }
 
     var userName by remember { mutableStateOf("") }
@@ -66,9 +65,7 @@ fun HomeScreen(
         topBar = {
                     HomeTopBar(
                         onSettingClick = { onSettingClick() },
-                        onAboutClick = {
-                            isAboutDialogVisible = true
-                        },
+                        onLogClick = { onLogClick() },
                         onDeleteClick = {
                             selectedChats.forEach{ selectedChat ->
                                 homeViewModel.deleteChatById(selectedChat)
@@ -145,15 +142,6 @@ fun HomeScreen(
                     avatarList = avatarList,
                     onAvatarClick = { selectedAvatar = it },
                     selectedAvatar = selectedAvatar
-                )
-            }
-            AnimatedVisibility(
-                visible = isAboutDialogVisible,
-                enter = scaleIn(),
-                exit = scaleOut(),
-            ) {
-                AboutDialog(
-                    onCloseClick = { isAboutDialogVisible = false}
                 )
             }
             AnimatedVisibility(

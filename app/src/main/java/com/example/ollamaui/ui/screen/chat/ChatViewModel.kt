@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.ollamaui.data.local.objectbox.ChunkDatabase
 import com.example.ollamaui.data.local.objectbox.FileDatabase
 import com.example.ollamaui.domain.model.ApiError
+import com.example.ollamaui.domain.model.LogModel
 import com.example.ollamaui.domain.model.MessageModel
 import com.example.ollamaui.domain.model.MessagesModel
 import com.example.ollamaui.domain.model.NetworkError
@@ -30,6 +31,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -338,6 +340,13 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch(job) {
             if(!isRespondingList.contains(chatState.value.chatModel.chatId)) isRespondingList.add(chatId)
             _chatState.update { it.copy(isRespondingList = isRespondingList) }
+            ollamaRepository.insertLogToDb(
+                LogModel(
+                    date = LocalDateTime.now().toString(),
+                    type = "ollama-post",
+                    content = "post: ${chatState.value.ollamaBaseAddress}${OLLAMA_CHAT_ENDPOINT}",
+                )
+            )
             ollamaRepository.postOllamaChat(
                 baseUrl = chatState.value.ollamaBaseAddress,
                 chatEndpoint = OLLAMA_CHAT_ENDPOINT,
@@ -381,6 +390,13 @@ class ChatViewModel @Inject constructor(
                         newMessageStatus = if(chatState.value.chatModel.chatId == oldChatModel.chatId) 0 else 1
                     ),
                 )
+                ollamaRepository.insertLogToDb(
+                    LogModel(
+                        date = LocalDateTime.now().toString(),
+                        type = "ollama-post",
+                        content = "Result: Success",
+                    )
+                )
             }.onLeft { error ->
                 isRespondingList.remove(chatId)
                 _chatState.update { it.copy(
@@ -398,11 +414,25 @@ class ChatViewModel @Inject constructor(
                     }
                 }
                 uploadChatToDatabase(oldChatModel.copy(newMessageStatus = 2))
+                ollamaRepository.insertLogToDb(
+                    LogModel(
+                        date = LocalDateTime.now().toString(),
+                        type = "ollama-post",
+                        content = "Result: Failed - ${error.error}",
+                    )
+                )
             }
         }
     }
     private fun ollamaPostEmbed(text: List<String>, embeddingModel: String, docId: Long, fileName: String){
         viewModelScope.launch {
+            ollamaRepository.insertLogToDb(
+                LogModel(
+                    date = LocalDateTime.now().toString(),
+                    type = "ollama-embed",
+                    content = "post: ${chatState.value.ollamaBaseAddress}${OLLAMA_EMBED_ENDPOINT}",
+                )
+            )
             ollamaRepository.postOllamaEmbed(
                 baseUrl = chatState.value.ollamaBaseAddress,
                 embedEndpoint = OLLAMA_EMBED_ENDPOINT,
@@ -423,9 +453,23 @@ class ChatViewModel @Inject constructor(
                             )
                         )
                     }
+                    ollamaRepository.insertLogToDb(
+                        LogModel(
+                            date = LocalDateTime.now().toString(),
+                            type = "ollama-embed",
+                            content = "Result: Success",
+                        )
+                    )
                 }
                 .onLeft { error ->
                     _chatState.update { it.copy(embedError = error) }
+                    ollamaRepository.insertLogToDb(
+                        LogModel(
+                            date = LocalDateTime.now().toString(),
+                            type = "ollama-embed",
+                            content = "Result: Failed - ${error.error}",
+                        )
+                    )
                 }
         }
     }
