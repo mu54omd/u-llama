@@ -9,6 +9,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -19,11 +22,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.dp
 import com.example.ollamaui.R
 import com.example.ollamaui.domain.model.chat.ChatModel
 import com.example.ollamaui.domain.model.chat.EmptyChatModel
 import com.example.ollamaui.ui.screen.home.components.CustomFabButton
 import com.example.ollamaui.ui.screen.home.components.DeleteDialog
+import com.example.ollamaui.ui.screen.home.components.DismissBackground
 import com.example.ollamaui.ui.screen.home.components.HomeTopBar
 import com.example.ollamaui.ui.screen.home.components.NewChatDialog
 import com.example.ollamaui.ui.screen.home.components.NewChatItem
@@ -154,8 +160,8 @@ fun HomeScreen(
                         chatTitle = chatItem.chatTitle,
                         userName = chatItem.userName,
                         onAcceptClick = {
-                            homeViewModel.deleteChat(chatItem)
                             isDeleteDialogVisible = false
+                            homeViewModel.deleteChat(chatItem)
                         },
                         onCloseClick = { isDeleteDialogVisible = false}
                     )
@@ -169,49 +175,67 @@ fun HomeScreen(
                         items = chatsList.items,
                         key = { chatItem -> chatItem.chatId }
                     ) { chatItem ->
-                        NewChatItem(
-                            modelName = chatItem.modelName,
-                            chatTitle = chatItem.chatTitle,
-                            userName = chatItem.userName,
-                            botName = chatItem.botName,
-                            onDeleteClick = {
-                                selectedChat = chatItem
-                                isDeleteDialogVisible = true
-                            },
-                            onItemClick = {
-                                when {
-                                    selectedChats.contains(chatItem.chatId) -> {
-                                        selectedChats.remove(chatItem.chatId)
+                        val dismissState = rememberSwipeToDismissBoxState(
+                            confirmValueChange = {
+                                when(it){
+                                    SwipeToDismissBoxValue.StartToEnd -> { }
+                                    SwipeToDismissBoxValue.EndToStart -> {
+                                        selectedChat = chatItem
+                                        isDeleteDialogVisible = true
                                     }
+                                    SwipeToDismissBoxValue.Settled -> { return@rememberSwipeToDismissBoxState false}
+                                }
+                                return@rememberSwipeToDismissBoxState false
+                            },
+                            positionalThreshold = with(LocalDensity.current) { { 150.dp.toPx() } }
+                        )
+                        SwipeToDismissBox(
+                            state = dismissState,
+                            enableDismissFromEndToStart = true,
+                            enableDismissFromStartToEnd = false,
+                            backgroundContent = { DismissBackground(dismissState) }
+                        ) {
+                            NewChatItem(
+                                modelName = chatItem.modelName,
+                                chatTitle = chatItem.chatTitle,
+                                userName = chatItem.userName,
+                                botName = chatItem.botName,
+                                onDeleteClick = {
+                                },
+                                onItemClick = {
+                                    when {
+                                        selectedChats.contains(chatItem.chatId) -> {
+                                            selectedChats.remove(chatItem.chatId)
+                                        }
+                                        else -> {
 
-                                    else -> {
-
-                                        if (selectedChats.isEmpty()) {
-                                            onChatClick(chatItem)
-                                        } else {
-                                            if (selectedChats.contains(chatItem.chatId)) {
-                                                selectedChats.remove(chatItem.chatId)
+                                            if (selectedChats.isEmpty()) {
+                                                onChatClick(chatItem)
                                             } else {
-                                                selectedChats.add(chatItem.chatId)
+                                                if (selectedChats.contains(chatItem.chatId)) {
+                                                    selectedChats.remove(chatItem.chatId)
+                                                } else {
+                                                    selectedChats.add(chatItem.chatId)
+                                                }
                                             }
                                         }
                                     }
-                                }
-                            },
-                            chatImage = chatItem.chatIcon,
-                            modifier = Modifier.animateItem(),
-                            onItemLongPress = {
-                                if(!selectedChats.contains(chatItem.chatId)) {
-                                    selectedChats.add(chatItem.chatId)
-                                }
-                            },
-                            onSelectedItemClick = {
-                                selectedChats.remove(chatItem.chatId)
-                            },
-                            isSelected = selectedChats.contains(chatItem.chatId),
-                            isNewMessageReceived = chatItem.newMessageStatus != 0,
-                            newMessageStatus = chatItem.newMessageStatus
-                        )
+                                },
+                                chatImage = chatItem.chatIcon,
+                                modifier = Modifier.animateItem(),
+                                onItemLongPress = {
+                                    if (!selectedChats.contains(chatItem.chatId)) {
+                                        selectedChats.add(chatItem.chatId)
+                                    }
+                                },
+                                onSelectedItemClick = {
+                                    selectedChats.remove(chatItem.chatId)
+                                },
+                                isSelected = selectedChats.contains(chatItem.chatId),
+                                isNewMessageReceived = chatItem.newMessageStatus != 0,
+                                newMessageStatus = chatItem.newMessageStatus
+                            )
+                        }
                     }
                 }
             }

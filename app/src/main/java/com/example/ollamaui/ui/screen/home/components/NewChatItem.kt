@@ -84,14 +84,6 @@ fun NewChatItem(
                         onItemLongPress()
                     } ,
                     onTap = {
-//                        when{
-//                            isSelected -> {
-//                                onSelectedItemClick()
-//                            }
-//                            !isSelected -> {
-//                                onItemClick()
-//                            }
-//                        }
                         onItemClick()
                     }
                 )
@@ -150,19 +142,15 @@ fun NewChatItem(
                 verticalArrangement = Arrangement.Center,
                 modifier = Modifier.padding(end = 10.dp)
             ) {
-                CustomButton(
-                    description = if(isSelected) "Clear Select" else "Delete Chat",
-                    onButtonClick = {
-                        if(isSelected) {
-                            onSelectedItemClick()
-                        } else {
-                            onDeleteClick()
-                        }
-                                    },
-                    icon = if(isSelected) R.drawable.baseline_clear_24 else R.drawable.baseline_delete_outline_24,
-                    containerColor = Color.Transparent,
-                    buttonSize = 30
-                )
+                if (isSelected) {
+                    CustomButton(
+                        description = "Clear Select",
+                        onButtonClick = { onSelectedItemClick() },
+                        icon = R.drawable.baseline_clear_24,
+                        containerColor = Color.Transparent,
+                        buttonSize = 30
+                    )
+                }
             }
 
         }

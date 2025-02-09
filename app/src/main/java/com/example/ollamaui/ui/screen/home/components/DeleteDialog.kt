@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.example.ollamaui.R
 import com.example.ollamaui.ui.screen.common.CustomButton
 import com.example.ollamaui.ui.theme.OllamaUITheme
@@ -37,7 +38,7 @@ fun DeleteDialog(
     onAcceptClick: () -> Unit
 ) {
     Dialog(
-        onDismissRequest = { onCloseClick() }
+        onDismissRequest = { onCloseClick() },
     ) {
         Box(
             modifier = modifier
