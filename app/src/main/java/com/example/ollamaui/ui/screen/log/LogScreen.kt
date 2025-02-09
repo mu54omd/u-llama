@@ -16,22 +16,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ollamaui.BuildConfig
@@ -48,6 +43,9 @@ fun LogScreen(
     onClearLogClick: () -> Unit,
     onBackClick: () -> Unit,
 ) {
+
+    val textValueLogs = logs.joinToString("\n") { ">>" + it.date + " " + it.type + " " + it.content }
+    val logVerticalState = rememberScrollState(initial = textValueLogs.lastIndex)
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -97,7 +95,7 @@ fun LogScreen(
             )
         }
         BasicTextField(
-            value = logs.joinToString("\n") { ">>" + it.date + " " + it.type + " " + it.content },
+            value = textValueLogs,
             onValueChange = {},
             readOnly = true,
             modifier = Modifier
@@ -114,7 +112,7 @@ fun LogScreen(
                 .fillMaxWidth()
                 .fillMaxHeight()
                 .padding(5.dp)
-                .verticalScroll(state = rememberScrollState()),
+                .verticalScroll(state = logVerticalState),
             textStyle = MaterialTheme.typography.bodySmall.copy(
                 color = MaterialTheme.colorScheme.onSurface,
             )

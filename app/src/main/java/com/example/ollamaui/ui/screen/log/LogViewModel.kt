@@ -2,7 +2,6 @@ package com.example.ollamaui.ui.screen.log
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.ollamaui.domain.model.LogModel
 import com.example.ollamaui.domain.repository.OllamaRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -21,9 +20,9 @@ class LogViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5000L),
             initialValue = emptyList()
         )
-    fun deleteLogs(logModel: LogModel){
+    fun deleteLogs(){
         viewModelScope.launch {
-            ollamaRepository.deleteLogFromDb(logModel)
+            ollamaRepository.deleteLogFromDb()
         }
     }
 }

@@ -154,9 +154,7 @@ fun AppNavigation(
                 LogScreen(
                     logs = logs,
                     onClearLogClick = {
-                        logs.forEach {
-                            logViewModel.deleteLogs(it)
-                        }
+                        logViewModel.deleteLogs()
                     },
                     onBackClick = {
                         navigateToTab(
