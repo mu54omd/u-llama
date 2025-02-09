@@ -11,7 +11,6 @@ data class LogModel(
     val type: String,
     val content: String,
 )
-
 object DumbLogModel{
     val dumb = LogModel(
         logId = 0,
