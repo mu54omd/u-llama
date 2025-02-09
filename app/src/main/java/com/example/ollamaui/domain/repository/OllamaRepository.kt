@@ -29,6 +29,6 @@ interface OllamaRepository{
     suspend fun getLastId(): Int
 
     suspend fun insertLogToDb(logModel: LogModel)
-    suspend fun deleteLogFromDb(logModel: LogModel)
+    suspend fun deleteLogFromDb()
     fun getLogsFromDb(): Flow<List<LogModel>>
 }
