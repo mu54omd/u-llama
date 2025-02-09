@@ -88,7 +88,7 @@ fun TuningSlider(
                         style = MaterialTheme.typography.labelSmall,
                         modifier = Modifier
                             .background(
-                                color = if(isSystemInDarkTheme()) Color.Gray else Color.White,
+                                color = if(isSystemInDarkTheme()) Color.DarkGray else Color.White,
                                 shape = RoundedCornerShape(10)
                             )
                             .padding(10.dp)
