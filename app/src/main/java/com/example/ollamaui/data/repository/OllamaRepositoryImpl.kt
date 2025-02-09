@@ -87,8 +87,8 @@ class OllamaRepositoryImpl @Inject constructor(
         logDao.insert(logModel = logModel)
     }
 
-    override suspend fun deleteLogFromDb(logModel: LogModel) {
-        logDao.delete(logModel = logModel)
+    override suspend fun deleteLogFromDb() {
+        logDao.delete()
     }
 
     override fun getLogsFromDb():Flow<List<LogModel>>{
