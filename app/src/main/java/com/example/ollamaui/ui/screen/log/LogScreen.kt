@@ -101,7 +101,7 @@ fun LogScreen(
             modifier = Modifier
                 .padding(10.dp)
                 .background(
-                    color = if(isSystemInDarkTheme()) Color.Gray else Color.White,
+                    color = if(isSystemInDarkTheme()) Color.DarkGray else Color.White,
                     shape = MaterialTheme.shapes.small
                 )
                 .border(
