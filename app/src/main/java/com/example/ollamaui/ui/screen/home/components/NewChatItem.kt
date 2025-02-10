@@ -38,10 +38,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -54,6 +52,8 @@ import com.example.ollamaui.ui.theme.OllamaUITheme
 import kotlin.math.roundToInt
 
 const val ANIMATION_DURATION = 350
+const val MIN_DRAG_AMOUNT = 30
+
 
 @SuppressLint("UnusedTransitionTargetStateParameter")
 @Composable
@@ -93,7 +93,6 @@ fun NewChatItem(
     )
 
     ///////////////////////////////////////
-    var offsetX by remember { mutableFloatStateOf(0f) }
     val transitionState = remember {
         MutableTransitionState(isRevealed).apply {
             targetState = !isRevealed
@@ -104,7 +103,7 @@ fun NewChatItem(
     val offsetTransition by transition.animateFloat(
         label = "cardOffsetTransition",
         transitionSpec = { tween(durationMillis = ANIMATION_DURATION) },
-        targetValueByState = { if (isRevealed) cardOffset - offsetX else -offsetX },
+        targetValueByState = { if (isRevealed) cardOffset else 0f },
         )
     /////////////////////////////////////////
 
@@ -113,22 +112,14 @@ fun NewChatItem(
             .padding(start = animatedSize.dp, end = animatedSize.dp, top = animatedSize.dp)
             .fillMaxWidth()
             .clip(shape = MaterialTheme.shapes.large)
-            .offset { IntOffset(-(offsetX + offsetTransition).roundToInt(), 0) }
+            .offset { IntOffset(-offsetTransition.roundToInt(), 0) }
             .background(color = animatedColor)
             .pointerInput(Unit){
-                detectHorizontalDragGestures { change, dragAmount ->
-                    val original = Offset(offsetX, 0f)
-                    val summed = original + Offset(x = dragAmount, y = 0f)
-                    val newValue = Offset(x = summed.x.coerceIn(0f, cardOffset), y = 0f)
-                    if (newValue.x <= 10) {
-                        onExpand()
-                        return@detectHorizontalDragGestures
-                    } else if (newValue.x >= 0) {
-                        onCollapse()
-                        return@detectHorizontalDragGestures
+                detectHorizontalDragGestures { _, dragAmount ->
+                    when {
+                        dragAmount >= MIN_DRAG_AMOUNT -> onCollapse()
+                        dragAmount < -MIN_DRAG_AMOUNT -> onExpand()
                     }
-                    if (change.positionChange() != Offset.Zero) change.consume()
-                    offsetX = newValue.x
                 }
             }
             .pointerInput(Unit){
