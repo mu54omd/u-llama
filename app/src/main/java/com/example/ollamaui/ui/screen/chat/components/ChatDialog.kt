@@ -4,6 +4,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -21,15 +22,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.ollamaui.domain.model.MessageModel
 import com.example.ollamaui.ui.common.isFromMe
 import com.example.ollamaui.ui.theme.OllamaUITheme
 import com.example.ollamaui.utils.Constants.USER_ROLE
 import com.halilibo.richtext.commonmark.CommonmarkAstNodeParser
 import com.halilibo.richtext.markdown.BasicMarkdown
+import com.halilibo.richtext.ui.BlockQuoteGutter
+import com.halilibo.richtext.ui.CodeBlockStyle
+import com.halilibo.richtext.ui.RichTextStyle
 import com.halilibo.richtext.ui.material3.RichText
+import com.halilibo.richtext.ui.string.RichTextStringStyle
 
 @Composable
 fun ChatDialog(
@@ -51,6 +61,22 @@ fun ChatDialog(
     val animatedColorBotMessage by animateColorAsState(
         if(isSelected) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.secondaryContainer,
         label = "Animated Color Bot Message",
+    )
+    val textBgColor = if(!isSystemInDarkTheme()) Color.LightGray else Color.DarkGray
+    val richTextStyle = RichTextStyle(
+        codeBlockStyle = CodeBlockStyle(
+            textStyle = MaterialTheme.typography.bodySmall,
+            padding = 6.sp,
+            modifier = Modifier.background(
+                color = textBgColor)
+        ),
+        stringStyle = RichTextStringStyle(
+            codeStyle = SpanStyle(
+                background = textBgColor,
+                fontStyle = FontStyle.Italic,
+                fontSize = 14.sp
+            )
+        )
     )
     Column(
         modifier = modifier
@@ -105,7 +131,9 @@ fun ChatDialog(
                     }else{
                         val thinking = messageModel.content.split("</think>")
                         if(thinking.size == 1){
-                            RichText {
+                            RichText(
+                                style = richTextStyle
+                            ) {
                                 val parser = remember { CommonmarkAstNodeParser() }
                                 val astNode = remember(parser) {
                                     parser.parse(messageModel.content)
@@ -125,7 +153,9 @@ fun ChatDialog(
                                     .border(width = 1.dp, color = Color.Gray, shape = MaterialTheme.shapes.small)
                                     .padding(10.dp)
                                 )
-                            RichText {
+                            RichText(
+                                style = richTextStyle
+                            ) {
                                 val parser = remember { CommonmarkAstNodeParser() }
                                 val astNode = remember(parser) {
                                     parser.parse(thinking[1].trim())
