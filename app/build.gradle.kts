@@ -97,10 +97,10 @@ dependencies {
     //constraint layout
     implementation(libs.androidx.constraintlayout.compose)
 
-//    //RichText
-//    implementation(libs.richtext.ui.material3)
-//    implementation(libs.richtext.markdown)
-//    implementation(libs.richtext.commonmark)
+    //RichText
+    implementation(libs.richtext.ui.material3)
+    implementation(libs.richtext.markdown)
+    implementation(libs.richtext.commonmark)
 
     //ObjectBox
     debugImplementation(libs.objectbox.android.objectbrowser)

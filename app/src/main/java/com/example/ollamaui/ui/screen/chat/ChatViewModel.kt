@@ -73,7 +73,7 @@ class ChatViewModel @Inject constructor(
         val imageList = selectedImages.map { it.attachResult }
         when{
             selectedImages.isEmpty() && selectedDocs.isEmpty() -> {
-                messages.add(MessageModel(content = text, role = USER_ROLE))
+                messages.add(MessageModel(content = text.trim(), role = USER_ROLE))
                 _chatState.update {
                     it.copy(
                         chatModel = ChatModel(
@@ -94,7 +94,7 @@ class ChatViewModel @Inject constructor(
                 )
             }
             selectedImages.isNotEmpty() && selectedDocs.isEmpty() -> {
-                messages.add(MessageModel(content = text, role = USER_ROLE, images = imageList))
+                messages.add(MessageModel(content = text.trim(), role = USER_ROLE, images = imageList))
                 _chatState.update {
                     it.copy(
                         chatModel = ChatModel(
@@ -118,14 +118,14 @@ class ChatViewModel @Inject constructor(
                 val job =
                     getSimilarChunk(
                         fileIds = selectedDocs.map{ it.fileId },
-                        query = text,
+                        query = text.trim(),
                         n = 5,
                         embeddingModel = if (embeddingModel != "") embeddingModel else chatState.value.chatModel.modelName,
                     )
                 job.invokeOnCompletion {
                     messages.add(
                         MessageModel(
-                            content = "Using this data: {${chatState.value.retrievedContext}}. Respond to this prompt: {${text}}.",
+                            content = "Using this data: {${chatState.value.retrievedContext}}. Respond to this prompt: {${text.trim()}}.",
                             role = USER_ROLE
                         )
                     )
