@@ -42,6 +42,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
@@ -60,12 +61,9 @@ const val MIN_DRAG_AMOUNT = 30
 fun NewChatItem(
     modifier: Modifier = Modifier,
     modelName: String,
-    botName: String,
-    userName: String,
     chatTitle: String,
     isNewMessageReceived: Boolean,
     newMessageStatus: Int,
-    @DrawableRes chatImage: Int,
     onItemClick: () -> Unit,
     onSelectedItemClick: () -> Unit,
     onItemLongPress: () -> Unit,
@@ -111,8 +109,8 @@ fun NewChatItem(
         modifier = modifier
             .padding(start = animatedSize.dp, end = animatedSize.dp, top = animatedSize.dp)
             .fillMaxWidth()
-            .clip(shape = MaterialTheme.shapes.large)
             .offset { IntOffset(-offsetTransition.roundToInt(), 0) }
+            .clip(shape = MaterialTheme.shapes.large)
             .background(color = animatedColor)
             .pointerInput(Unit){
                 detectHorizontalDragGestures { _, dragAmount ->
@@ -145,35 +143,24 @@ fun NewChatItem(
                     .background(color = indicatorAnimation)
                     .size(75.dp),
                 contentAlignment = Alignment.Center
-            ) {
-                Image(
-                    painter = painterResource(chatImage),
-                    contentDescription = "Chat Image",
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(100))
-                        .background(color = MaterialTheme.colorScheme.outline)
-                        .size(65.dp),
+            ){
+                Text(
+                    text = "${modelName[0]}${modelName[1]}${modelName[2]}",
+                    modifier = Modifier,
+                    style = MaterialTheme.typography.displayMedium.copy(textAlign = TextAlign.Center)
                 )
-
             }
             Spacer(modifier = Modifier.width(10.dp))
             Column(
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = "$botName: ($modelName)",
+                    text = modelName,
                     style = MaterialTheme.typography.labelSmall,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1,
                     modifier = Modifier.basicMarquee(spacing = MarqueeSpacing(10.dp))
                     )
-                Text(
-                    text = userName,
-                    style = MaterialTheme.typography.labelMedium,
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1,
-                    modifier = Modifier.basicMarquee()
-                )
                 Text(
                     text = chatTitle,
                     style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
@@ -213,15 +200,12 @@ private fun NewChatItemPreview() {
             onItemLongPress = {},
             onSelectedItemClick = {},
             isSelected = false,
-            userName = "User",
-            botName = "Bot",
             modelName = "llama3.1",
             chatTitle = "Title",
-            chatImage = R.drawable.avatar_man_01,
-            isNewMessageReceived = false,
-            newMessageStatus = 2,
+            isNewMessageReceived = true,
+            newMessageStatus = 1,
             isRevealed = true,
-            cardOffset = 156f,
+            cardOffset = 80f,
             onExpand = {},
             onCollapse = {},
         )

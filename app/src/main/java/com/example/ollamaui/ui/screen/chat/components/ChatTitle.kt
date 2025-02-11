@@ -2,12 +2,9 @@ package com.example.ollamaui.ui.screen.chat.components
 
 import androidx.compose.foundation.MarqueeSpacing
 import androidx.compose.foundation.basicMarquee
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,7 +25,7 @@ import com.example.ollamaui.ui.theme.OllamaUITheme
 fun ChatTitle(
     modifier: Modifier = Modifier,
     title: String,
-    botName: String,
+    modelName: String,
     ) {
     var isEnable1 by remember { mutableStateOf(false)}
     var isEnable2 by remember { mutableStateOf(false)}
@@ -38,7 +35,7 @@ fun ChatTitle(
         modifier = modifier
     ) {
         Text(
-            text = botName,
+            text = modelName,
             style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
             color = MaterialTheme.colorScheme.onBackground,
             overflow = TextOverflow.Ellipsis,
@@ -67,7 +64,7 @@ fun ChatTitle(
 private fun ChatTitlePreview() {
     OllamaUITheme {
         ChatTitle(
-            botName = "Boooooooooooooooooooooooooooooooooot",
+            modelName = "Boooooooooooooooooooooooooooooooooot",
             title = "Chaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaat"
         )
     }
