@@ -78,12 +78,9 @@ class ChatViewModel @Inject constructor(
                     it.copy(
                         chatModel = ChatModel(
                             chatId = oldChatModel.chatId,
-                            chatIcon = oldChatModel.chatIcon,
                             chatTitle = oldChatModel.chatTitle,
                             chatMessages = MessagesModel(messageModels = messages),
                             modelName = oldChatModel.modelName,
-                            userName = oldChatModel.userName,
-                            botName = oldChatModel.botName,
                         ),
                         isDatabaseChanged = true
                     )
@@ -99,12 +96,9 @@ class ChatViewModel @Inject constructor(
                     it.copy(
                         chatModel = ChatModel(
                             chatId = oldChatModel.chatId,
-                            chatIcon = oldChatModel.chatIcon,
                             chatTitle = oldChatModel.chatTitle,
                             chatMessages = MessagesModel(messageModels = messages),
                             modelName = oldChatModel.modelName,
-                            userName = oldChatModel.userName,
-                            botName = oldChatModel.botName,
                         ),
                         isDatabaseChanged = true
                     )
@@ -126,19 +120,16 @@ class ChatViewModel @Inject constructor(
                     messages.add(
                         MessageModel(
                             content = "Using this data: {${chatState.value.retrievedContext}}. Respond to this prompt: {${text.trim()}}.",
-                            role = USER_ROLE
+                            role = USER_ROLE,
                         )
                     )
                     _chatState.update {
                         it.copy(
                             chatModel = ChatModel(
                                 chatId = oldChatModel.chatId,
-                                chatIcon = oldChatModel.chatIcon,
                                 chatTitle = oldChatModel.chatTitle,
                                 chatMessages = MessagesModel(messageModels = messages),
                                 modelName = oldChatModel.modelName,
-                                userName = oldChatModel.userName,
-                                botName = oldChatModel.botName,
                             ),
                             isDatabaseChanged = true
                         )
@@ -366,12 +357,9 @@ class ChatViewModel @Inject constructor(
                         it.copy(
                             chatModel = ChatModel(
                                 chatId = oldChatModel.chatId,
-                                chatIcon = oldChatModel.chatIcon,
                                 chatTitle = oldChatModel.chatTitle,
                                 chatMessages = MessagesModel(messageModels = oldMessages),
                                 modelName = oldChatModel.modelName,
-                                userName = oldChatModel.userName,
-                                botName = oldChatModel.botName
                             ),
                             chatResponse = response,
                             chatError = null
@@ -381,12 +369,9 @@ class ChatViewModel @Inject constructor(
                 uploadChatToDatabase(
                     chatModel = ChatModel(
                         chatId = oldChatModel.chatId,
-                        chatIcon = oldChatModel.chatIcon,
                         chatTitle = oldChatModel.chatTitle,
                         chatMessages = MessagesModel( messageModels = oldMessages),
                         modelName = oldChatModel.modelName,
-                        userName = oldChatModel.userName,
-                        botName = oldChatModel.botName,
                         newMessageStatus = if(chatState.value.chatModel.chatId == oldChatModel.chatId) 0 else 1
                     ),
                 )

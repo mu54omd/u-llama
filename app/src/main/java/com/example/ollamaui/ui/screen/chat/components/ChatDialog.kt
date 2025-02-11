@@ -24,8 +24,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -35,7 +33,6 @@ import com.example.ollamaui.ui.theme.OllamaUITheme
 import com.example.ollamaui.utils.Constants.USER_ROLE
 import com.halilibo.richtext.commonmark.CommonmarkAstNodeParser
 import com.halilibo.richtext.markdown.BasicMarkdown
-import com.halilibo.richtext.ui.BlockQuoteGutter
 import com.halilibo.richtext.ui.CodeBlockStyle
 import com.halilibo.richtext.ui.RichTextStyle
 import com.halilibo.richtext.ui.material3.RichText
@@ -44,8 +41,6 @@ import com.halilibo.richtext.ui.string.RichTextStringStyle
 @Composable
 fun ChatDialog(
     messageModel: MessageModel,
-    userName: String,
-    botName: String,
     modifier: Modifier = Modifier,
     onItemClick: () -> Unit,
     onSelectedItemClick: () -> Unit,
@@ -167,7 +162,7 @@ fun ChatDialog(
                 }
                 Spacer(modifier = Modifier.height(2.dp))
             }
-        ChatDialogDetails(isVisible = isVisible, isFromMe = isFromMe, userName = userName, botName = botName)
+        ChatDialogDetails(isVisible = isVisible, isFromMe = isFromMe, date = messageModel.date, time = messageModel.time)
     }
 
 }
@@ -181,9 +176,9 @@ private fun ChatDialogPreview() {
                 messageModel = MessageModel(
                     content = "<think> User ask some question </think> Hi. How are you???",
                     role = "system",
+                    time = "17:43",
+                    date = "2025-05-17",
                 ),
-                userName = "Musa",
-                botName = "Musashi",
                 isSelected = false,
                 isVisible = false,
                 onItemClick = {},
@@ -193,10 +188,10 @@ private fun ChatDialogPreview() {
             ChatDialog(
                 messageModel = MessageModel(
                     content = "Hello! I'm fine.",
-                    role = "assistant"
+                    role = "assistant",
+                    time = "17:43",
+                    date = "2025-05-17",
                 ),
-                userName = "Musa",
-                botName = "Musashi",
                 isSelected = false,
                 isVisible = false,
                 onItemClick = {},
@@ -206,10 +201,10 @@ private fun ChatDialogPreview() {
             ChatDialog(
                 messageModel = MessageModel(
                     content = "Let's start with the basic syntax of Kotlin:\n\n**Variables**\n\nIn Kotlin, variables are declared using the `var` keyword. We can declare a variable and assign it a value in one line like this:\n```\nval name = \"Musa\"\nprintln(name)\n```\nHere, `name` is a local variable (declared inside the function), which is stored on the stack.\n\n",
-                    role = "assistant"
+                    role = "assistant",
+                    time = "17:43",
+                    date = "2025-05-17",
                 ),
-                userName = "Musa",
-                botName = "Musashi",
                 isSelected = false,
                 isVisible = false,
                 onItemClick = {},
@@ -219,10 +214,10 @@ private fun ChatDialogPreview() {
             ChatDialog(
                 messageModel = MessageModel(
                     content = "Using this data: {some data}. Respond to this prompt: {some prompt}.",
-                    role = "user"
+                    role = "user",
+                    time = "17:43",
+                    date = "2025-05-17",
                 ),
-                userName = "Musa",
-                botName = "Musashi",
                 isSelected = false,
                 isVisible = false,
                 onItemClick = {},

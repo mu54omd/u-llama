@@ -89,9 +89,8 @@ fun ChatScreen(
     Scaffold(
         topBar = {
             ChatTopBar(
-                botName = chatState.chatModel.botName,
+                modelName = chatState.chatModel.modelName,
                 chatTitle = chatState.chatModel.chatTitle,
-                chatIcon = chatState.chatModel.chatIcon,
                 onBackClick = onBackClick,
                 onCopyClick = {
                     clipboard.setText(AnnotatedString(text = messageModelToText(selectedDialogs)))
@@ -230,8 +229,6 @@ fun ChatScreen(
             Conversation(
                 messagesModel = chatState.chatModel.chatMessages ,
                 modifier = Modifier.weight(1f),
-                botName = chatState.chatModel.botName,
-                userName = chatState.chatModel.userName,
                 onItemClick = {index, message ->
                     if(selectedDialogs.isEmpty()) {
                         if(visibleDetails.contains(index)){

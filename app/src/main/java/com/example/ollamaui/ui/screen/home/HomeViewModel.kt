@@ -37,18 +37,18 @@ class HomeViewModel @Inject constructor(
         userName: String,
         botName: String,
         systemPrompt: String,
-        chatIcon: Int,
         selectedModel: String
     ){
-        val startMessage = MessageModel(content = "Your name is $botName and mine is ${userName}. $systemPrompt", role = SYSTEM_ROLE)
+        val startMessage = MessageModel(
+            content = "Your name is $botName and mine is ${userName}. $systemPrompt",
+            role = SYSTEM_ROLE,
+
+        )
         viewModelScope.launch {
             val chatModel = ChatModel(
                 chatTitle = chatTitle,
                 modelName = selectedModel,
-                chatIcon = chatIcon,
                 chatMessages = MessagesModel(messageModels = listOf(startMessage)),
-                userName = userName,
-                botName = botName,
             )
             ollamaRepository.insertToDb(chatModel)
 

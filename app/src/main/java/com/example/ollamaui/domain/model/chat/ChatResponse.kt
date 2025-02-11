@@ -25,7 +25,7 @@ object EmptyChatResponse{
         done = false,
         doneReason = "",
         model = "",
-        message = MessageModel(role = "", content = ""),
+        message = MessageModel(role = "", content = "", date = "", time = ""),
         totalDuration = 0L
     )
 }
