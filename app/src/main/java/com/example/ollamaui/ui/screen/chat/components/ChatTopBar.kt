@@ -34,8 +34,7 @@ import com.example.ollamaui.utils.Constants.TOP_BAR_HEIGHT
 @Composable
 fun ChatTopBar(
     modifier: Modifier = Modifier,
-    @DrawableRes chatIcon: Int,
-    botName: String,
+    modelName: String,
     chatTitle: String,
     onBackClick: () -> Unit,
     onCopyClick: () -> Unit,
@@ -66,25 +65,8 @@ fun ChatTopBar(
                 horizontalArrangement = Arrangement.Start,
                 modifier = Modifier.weight(1f)
             ) {
-                Box(
-                    modifier = Modifier
-                        .padding(5.dp)
-                        .clip(RoundedCornerShape(100))
-                        .background(color = MaterialTheme.colorScheme.surfaceVariant)
-                        .size(75.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Image(
-                        painter = painterResource(chatIcon),
-                        contentDescription = chatTitle,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(100))
-                            .background(color = MaterialTheme.colorScheme.outline)
-                            .size(65.dp),
-                    )
-                }
                 Spacer(modifier = Modifier.width(10.dp))
-                ChatTitle(title = chatTitle, botName = botName)
+                ChatTitle(title = chatTitle, modelName = modelName)
             }
             AnimatedVisibility(
                 visible = isCopyButtonEnabled,
@@ -110,9 +92,8 @@ fun ChatTopBar(
 private fun ChatTopBarPreview() {
     OllamaUITheme {
         ChatTopBar(
-            botName = "Very very very very very long name",
+            modelName = "Very very very very very long name",
             chatTitle = "Very very very very very long title",
-            chatIcon = R.drawable.avatar_man_03,
             onBackClick = {},
             onCopyClick = {},
             isCopyButtonEnabled = false

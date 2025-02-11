@@ -24,8 +24,8 @@ import com.example.ollamaui.R
 import com.example.ollamaui.domain.model.chat.ChatModel
 import com.example.ollamaui.ui.screen.home.components.CustomFabButton
 import com.example.ollamaui.ui.screen.home.components.HomeTopBar
-import com.example.ollamaui.ui.screen.home.components.NewChatDialog
 import com.example.ollamaui.ui.screen.home.components.NewChatItem
+import com.example.ollamaui.ui.screen.home.components.NewChatModal
 import com.example.ollamaui.ui.screen.home.components.SwipeActions
 
 @Composable
@@ -49,11 +49,6 @@ fun HomeScreen(
     val isSelectedChatsEmpty by remember(selectedChats) { derivedStateOf { selectedChats.isEmpty() } }
 //    val activity = (LocalContext.current as? Activity)
     val maxChar = 25
-    val avatarList = listOf(
-        R.drawable.avatar_man_01, R.drawable.avatar_man_02, R.drawable.avatar_man_03, R.drawable.avatar_man_04,
-        R.drawable.avatar_woman_01, R.drawable.avatar_woman_02, R.drawable.avatar_woman_03, R.drawable.avatar_woman_04
-    )
-    var selectedAvatar by remember { mutableIntStateOf(avatarList.random()) }
     var isRevealed by remember { mutableIntStateOf(-1) }
 
     Scaffold(
@@ -94,7 +89,6 @@ fun HomeScreen(
                         onRefreshClick()
                     }
                     else {
-                        selectedAvatar = avatarList.random()
                         isNewChatDialogVisible = true
                     }
                 }
@@ -112,12 +106,9 @@ fun HomeScreen(
                 enter = scaleIn(),
                 exit = scaleOut(),
             ) {
-                NewChatDialog(
-                    userName = userName,
-                    botName = botName,
+                NewChatModal(
                     systemPrompt = systemPrompt,
                     maxChar = maxChar,
-                    onUserNameChange = { if(it.length<=maxChar) userName = it },
                     chatTitle = chatTitle,
                     onChatTitleChange = { if(it.length<=maxChar) chatTitle = it },
                     onCloseClick = { isNewChatDialogVisible = false},
@@ -126,19 +117,14 @@ fun HomeScreen(
                             chatTitle = chatTitle,
                             userName = userName,
                             botName = botName,
-                            chatIcon = selectedAvatar,
                             selectedModel = selectedModel,
                             systemPrompt = systemPrompt
                             )
                         isNewChatDialogVisible = false
                     },
-                    onBotNameChange = { if(it.length<=maxChar) botName = it },
                     onSystemPromptChange = { if(it.length<=maxChar*6) systemPrompt = it},
                     modelList = modelList,
                     onModelClick = { model -> selectedModel = model},
-                    avatarList = avatarList,
-                    onAvatarClick = { selectedAvatar = it },
-                    selectedAvatar = selectedAvatar
                 )
             }
             LazyColumn(
@@ -159,8 +145,6 @@ fun HomeScreen(
                             NewChatItem(
                                 modelName = chatItem.modelName,
                                 chatTitle = chatItem.chatTitle,
-                                userName = chatItem.userName,
-                                botName = chatItem.botName,
                                 onItemClick = {
                                     when {
                                         selectedChats.contains(chatItem.chatId) -> {
@@ -181,7 +165,6 @@ fun HomeScreen(
                                         }
                                     }
                                 },
-                                chatImage = chatItem.chatIcon,
                                 onItemLongPress = {
                                     when{
                                         isRevealed != -1 -> { isRevealed = -1}

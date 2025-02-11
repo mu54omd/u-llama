@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "e9178b584db5f9b1271031bc354d5359",
+    "identityHash": "c136300c1d88dc13c0fa87f9ea89892c",
     "entities": [
       {
         "tableName": "ChatModel",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`chatId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `modelName` TEXT NOT NULL, `chatIcon` INTEGER NOT NULL, `userName` TEXT NOT NULL, `botName` TEXT NOT NULL, `chatTitle` TEXT NOT NULL, `chatMessages` TEXT NOT NULL, `newMessageStatus` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`chatId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `modelName` TEXT NOT NULL, `chatTitle` TEXT NOT NULL, `chatMessages` TEXT NOT NULL, `newMessageStatus` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "chatId",
@@ -17,24 +17,6 @@
           {
             "fieldPath": "modelName",
             "columnName": "modelName",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "chatIcon",
-            "columnName": "chatIcon",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "userName",
-            "columnName": "userName",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "botName",
-            "columnName": "botName",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -70,7 +52,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e9178b584db5f9b1271031bc354d5359')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c136300c1d88dc13c0fa87f9ea89892c')"
     ]
   }
 }
