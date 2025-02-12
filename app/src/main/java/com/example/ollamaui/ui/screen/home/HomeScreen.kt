@@ -115,8 +115,6 @@ fun HomeScreen(
                     onAcceptClick = {
                         homeViewModel.addNewChat(
                             chatTitle = chatTitle,
-                            userName = userName,
-                            botName = botName,
                             selectedModel = selectedModel,
                             systemPrompt = systemPrompt
                             )
