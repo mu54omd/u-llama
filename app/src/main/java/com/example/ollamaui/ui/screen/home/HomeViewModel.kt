@@ -34,13 +34,11 @@ class HomeViewModel @Inject constructor(
 
     fun addNewChat(
         chatTitle: String,
-        userName: String,
-        botName: String,
         systemPrompt: String,
         selectedModel: String
     ){
         val startMessage = MessageModel(
-            content = "Your name is $botName and mine is ${userName}. $systemPrompt",
+            content = systemPrompt,
             role = SYSTEM_ROLE,
 
         )
