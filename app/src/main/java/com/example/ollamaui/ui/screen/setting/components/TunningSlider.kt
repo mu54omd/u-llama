@@ -19,23 +19,30 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.example.ollamaui.R
 import com.example.ollamaui.ui.screen.common.CustomButton
 import com.example.ollamaui.ui.theme.OllamaUITheme
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,48 +57,60 @@ fun TuningSlider(
     startPosition: Float = 0f,
     endPosition: Float = 1f,
 ) {
-    var isExplanationShowed by remember { mutableStateOf(false) }
     val interactionSource = remember { MutableInteractionSource() }
+    val tooltipState = rememberTooltipState(isPersistent = true)
+    val scope = rememberCoroutineScope()
+
     Column(
         verticalArrangement = Arrangement.spacedBy(1.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxWidth()
-            .padding(start = 20.dp, end = 20.dp, top = 5.dp, bottom = 5.dp)
-            .height(110.dp)
+            .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 10.dp)
+            .height(60.dp)
     ){
         Row(
             verticalAlignment = Alignment.Top,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Column(
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.Start
-            ) {
-                Row {
-                    Text(text = title)
-                    Spacer(modifier = Modifier.width(5.dp))
-                    CustomButton(
-                        onButtonClick = {
-                            isExplanationShowed = !isExplanationShowed
-                        },
-                        icon = R.drawable.baseline_question_mark_24,
-                        description = "Parameter explanation",
-                        iconSize = 15,
-                        buttonSize = 20
-                    )
-                }
-                AnimatedVisibility (
-                    visible = isExplanationShowed) {
+
+            TooltipBox(
+                positionProvider = TooltipDefaults.rememberRichTooltipPositionProvider(),
+                tooltip = {
                     Text(
                         text = explanation,
                         style = MaterialTheme.typography.labelSmall,
                         modifier = Modifier
                             .background(
-                                color = if(isSystemInDarkTheme()) Color.DarkGray else Color.White,
-                                shape = RoundedCornerShape(10)
+                                color = if (isSystemInDarkTheme()) Color.DarkGray else Color.White,
+                                shape = RoundedCornerShape(30)
+                            )
+                            .border(
+                                width = 1.dp,
+                                color = MaterialTheme.colorScheme.primary,
+                                shape = RoundedCornerShape(30)
                             )
                             .padding(10.dp)
+                    )
+                          },
+                state = tooltipState,
+                focusable = false
+            ) {
+                Row(
+                    modifier = Modifier.padding(start = 10.dp, end = 10.dp)
+                ) {
+                    Text(text = title)
+                    Spacer(modifier = Modifier.width(5.dp))
+                    CustomButton(
+                        onButtonClick = {
+                            scope.launch {
+                                tooltipState.show()
+                            }
+                        },
+                        icon = R.drawable.baseline_question_mark_24,
+                        description = "Parameter explanation",
+                        iconSize = 15,
+                        buttonSize = 20
                     )
                 }
             }
@@ -100,7 +119,10 @@ fun TuningSlider(
                 value = if(isInteger) sliderPosition.toInt().toString() else decimalFilter.format(sliderPosition),
                 onValueChange = {},
                 modifier = Modifier.width(60.dp),
-                textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
+                textStyle = LocalTextStyle.current.copy(
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                    ),
                 enabled = true,
                 readOnly = true,
                 maxLines = 1,
@@ -111,13 +133,13 @@ fun TuningSlider(
                         horizontalArrangement = Arrangement.Center,
                         modifier = Modifier
                             .background(
-                                color = Color.White,
-                                shape = RoundedCornerShape(percent = 10)
+                                color = Color.Transparent,
+                                shape = RoundedCornerShape(percent = 30)
                             )
                             .border(
                                 width = 1.dp,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                shape = RoundedCornerShape(10)
+                                color = MaterialTheme.colorScheme.primary,
+                                shape = RoundedCornerShape(percent = 30)
                             )
                     ) {
                         innerTextField()
@@ -146,9 +168,9 @@ fun TuningSlider(
                 track = { sliderState ->
                     SliderDefaults.Track(
                         sliderState = sliderState,
-                        modifier = Modifier.height(5.dp),
-                        thumbTrackGapSize = 2.dp,
-                        trackInsideCornerSize = 10.dp
+                        modifier = Modifier.height(4.dp),
+                        thumbTrackGapSize = 5.dp,
+                        trackInsideCornerSize = 20.dp
                     )
                 }
             )
@@ -173,9 +195,9 @@ fun TuningSlider(
                 track = { sliderState ->
                     SliderDefaults.Track(
                         sliderState = sliderState,
-                        modifier = Modifier.height(5.dp),
-                        thumbTrackGapSize = 2.dp,
-                        trackInsideCornerSize = 10.dp,
+                        modifier = Modifier.height(4.dp),
+                        thumbTrackGapSize = 5.dp,
+                        trackInsideCornerSize = 20.dp,
                     )
                 }
             )

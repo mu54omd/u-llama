@@ -10,7 +10,7 @@ object Constants {
     const val OLLAMA_EMBED_ENDPOINT = "/api/embed"
     const val OLLAMA_PULL_ENDPOINT = "/api/pull"
 
-//    const val OLLAMA_IS_RUNNING = "Ollama is running"
+    const val OLLAMA_IS_RUNNING = "Ollama is running"
 
     const val CHAT_DATABASE = "chat_db"
     const val LOG_DATABASE = "log_db"
