@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,6 +28,7 @@ import com.example.ollamaui.R
 import com.example.ollamaui.ui.screen.common.CustomButton
 import com.example.ollamaui.ui.screen.common.CustomDropDownList
 import com.example.ollamaui.ui.theme.OllamaUITheme
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,6 +43,7 @@ fun NewChatModal(
     modelList: List<String>,
     onModelClick: (String) -> Unit,
     ) {
+    val scope = rememberCoroutineScope()
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     ModalBottomSheet (
         onDismissRequest = { onCloseClick() },
@@ -99,7 +102,12 @@ fun NewChatModal(
                 Spacer(modifier = Modifier.width(50.dp))
                 CustomButton(
                     description = "Close",
-                    onButtonClick = onCloseClick,
+                    onButtonClick = {
+                        scope.launch {
+                            bottomSheetState.hide()
+                        }
+                        onCloseClick()
+                    },
                     icon = R.drawable.baseline_clear_24,
                     buttonSize = 50,
                     containerColor = MaterialTheme.colorScheme.errorContainer
