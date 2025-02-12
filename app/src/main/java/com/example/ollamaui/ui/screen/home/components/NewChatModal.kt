@@ -8,9 +8,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -47,7 +49,7 @@ fun NewChatModal(
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     ModalBottomSheet (
         onDismissRequest = { onCloseClick() },
-        containerColor = MaterialTheme.colorScheme.inversePrimary,
+        containerColor = MaterialTheme.colorScheme.primaryContainer,
         sheetState = bottomSheetState
     ) {
         var isModelSelected by remember { mutableStateOf(false) }
@@ -91,28 +93,22 @@ fun NewChatModal(
                     .fillMaxWidth()
                     .padding(bottom = 5.dp)
             ) {
-                CustomButton(
-                    description = "Accept",
-                    onButtonClick = onAcceptClick,
-                    icon = R.drawable.baseline_check_24,
-                    buttonSize = 50,
-                    isButtonEnabled = chatTitle.isNotEmpty() && isModelSelected,
-                    containerColor = MaterialTheme.colorScheme.tertiaryContainer
-                )
+                Button(
+                    onClick = onAcceptClick
+                ){
+                    Text(text = "Accept")
+                }
                 Spacer(modifier = Modifier.width(50.dp))
-                CustomButton(
-                    description = "Close",
-                    onButtonClick = {
+                Button(
+                    onClick = {
                         scope.launch {
                             bottomSheetState.hide()
                         }
                         onCloseClick()
-                    },
-                    icon = R.drawable.baseline_clear_24,
-                    buttonSize = 50,
-                    containerColor = MaterialTheme.colorScheme.errorContainer
-                )
-
+                    }
+                ) {
+                    Text(text = "Close")
+                }
             }
         }
     }

@@ -20,7 +20,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.ollamaui.R
 import com.example.ollamaui.domain.model.chat.ChatModel
 import com.example.ollamaui.ui.screen.home.components.CustomFabButton
 import com.example.ollamaui.ui.screen.home.components.HomeTopBar

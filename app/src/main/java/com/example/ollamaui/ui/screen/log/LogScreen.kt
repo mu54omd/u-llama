@@ -106,7 +106,7 @@ fun LogScreen(
                 )
                 .border(
                     width = 1.dp,
-                    color = MaterialTheme.colorScheme.primaryContainer,
+                    color = MaterialTheme.colorScheme.primary,
                     shape = MaterialTheme.shapes.small
                 )
                 .fillMaxWidth()
