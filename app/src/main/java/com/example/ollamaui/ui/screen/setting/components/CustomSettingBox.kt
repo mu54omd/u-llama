@@ -38,7 +38,7 @@ fun CustomSettingBox(
                 .padding(start = 10.dp, end = 10.dp, top = 20.dp, bottom = 35.dp)
                 .border(
                     width = 1.dp,
-                    color = MaterialTheme.colorScheme.primaryContainer,
+                    color = MaterialTheme.colorScheme.primary,
                     shape = MaterialTheme.shapes.extraSmall
                 )
         ) {

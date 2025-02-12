@@ -24,6 +24,7 @@ import com.example.ollamaui.ui.screen.home.components.LogScreen
 import com.example.ollamaui.ui.screen.loading.LoadingScreen
 import com.example.ollamaui.ui.screen.log.LogViewModel
 import com.example.ollamaui.ui.screen.setting.SettingScreen
+import com.example.ollamaui.utils.Constants.OLLAMA_IS_RUNNING
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -84,7 +85,7 @@ fun AppNavigation(
                             route = Screens.LogScreen.route
                         )
                     },
-                    isChatReady = mainState.isModelListLoaded and (mainState.ollamaStatus == "Ollama is running"),
+                    isChatReady = mainState.isModelListLoaded and (mainState.ollamaStatus == OLLAMA_IS_RUNNING),
                     modelList = mainState.filteredModelList,
                 )
             }
