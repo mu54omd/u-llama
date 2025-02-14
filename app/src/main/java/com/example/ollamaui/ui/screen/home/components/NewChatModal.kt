@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -26,8 +27,6 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.ollamaui.R
-import com.example.ollamaui.ui.screen.common.CustomButton
 import com.example.ollamaui.ui.screen.common.CustomDropDownList
 import com.example.ollamaui.ui.theme.OllamaUITheme
 import kotlinx.coroutines.launch
@@ -48,9 +47,11 @@ fun NewChatModal(
     val scope = rememberCoroutineScope()
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     ModalBottomSheet (
+        tonalElevation = 10.dp,
         onDismissRequest = { onCloseClick() },
-        containerColor = MaterialTheme.colorScheme.primaryContainer,
-        sheetState = bottomSheetState
+        containerColor = MaterialTheme.colorScheme.surface,
+        sheetState = bottomSheetState,
+        shape = MaterialTheme.shapes.small.copy(bottomEnd = CornerSize(0.dp), bottomStart = CornerSize(0.dp)),
     ) {
         var isModelSelected by remember { mutableStateOf(false) }
         Column(

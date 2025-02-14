@@ -64,15 +64,15 @@ fun CustomDropDownList(
                 modifier = Modifier
                     .menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
                     .width(width.dp)
-                    .border(width = 1.dp, color = MaterialTheme.colorScheme.primary, shape = MaterialTheme.shapes.large),
+                    .border(width = 1.dp, color = MaterialTheme.colorScheme.onBackground, shape = MaterialTheme.shapes.medium),
                 textStyle = MaterialTheme.typography.bodySmall.copy(textAlign = TextAlign.Center),
                 shape = MaterialTheme.shapes.large,
                 colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
                     disabledIndicatorColor = Color.Transparent,
-                    focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer
+                    focusedContainerColor = MaterialTheme.colorScheme.background,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.background
                 ),
                 label = { Text(label) },
                 enabled = isEnable
@@ -83,10 +83,10 @@ fun CustomDropDownList(
                 onDismissRequest = { isExpanded = false},
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier.height(100.dp),
-                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                containerColor = MaterialTheme.colorScheme.background,
                 shadowElevation = 0.dp,
                 tonalElevation = 0.dp,
-                border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary)
+                border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.onBackground)
             ) {
 
                     listItems.forEachIndexed { index, item->
