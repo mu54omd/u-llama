@@ -54,7 +54,6 @@ fun SettingScreen(
     onFetchEmbeddingModelClick: () -> Unit,
     onBackClick: () -> Unit,
 ) {
-
     val ipRegex = remember { Regex("\\d{0,3}\\.?\\d{0,3}\\.?\\d{0,3}\\.?\\d{0,3}") }
     val portRegex = remember { Regex("\\d{0,5}") }
     var ipAddress by rememberSaveable { mutableStateOf(savedParameters[0].split("//")[1].split(":")[0]) }
@@ -269,6 +268,8 @@ fun SettingScreen(
                     sliderPositions[4] = DefaultModelParameters.default.topK.toFloat()
                     sliderPositions[5] = DefaultModelParameters.default.topP
                     sliderPositions[6] = DefaultModelParameters.default.minP
+
+
                 }
             ) {
                 Text(text = "Reset")
@@ -299,6 +300,8 @@ fun SettingScreen(
         onBackClick()
     }
 }
+
+
 
 @Preview
 @Composable

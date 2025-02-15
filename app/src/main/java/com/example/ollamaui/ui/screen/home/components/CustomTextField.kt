@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -28,24 +29,22 @@ fun CustomTextField(
     modifier: Modifier = Modifier,
     value: String,
     label: String,
-    roundCornerPercent: Int = 30,
+    roundCornerPercent: Int = 20,
     onValueChange: (String) -> Unit,
     onDone: () -> Unit = {},
-    trailingIcon: @Composable() (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
     maxChar: Int,
     maxLines: Int = 1,
     minLines: Int = 1
 ) {
-    TextField(
+    OutlinedTextField(
         value = value,
         label = { Text(text = label, style = MaterialTheme.typography.bodySmall) },
         onValueChange = onValueChange,
         shape = RoundedCornerShape(roundCornerPercent),
         colors = TextFieldDefaults.colors(
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer
+            focusedContainerColor = Color.Transparent,
+            unfocusedContainerColor = Color.Transparent,
         ),
         maxLines = maxLines,
         minLines = minLines,

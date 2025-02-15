@@ -9,12 +9,12 @@ plugins {
 
 android {
     namespace = "com.example.ollamaui"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.ollamaui"
         minSdk = 21
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 5
         versionName = "1.0.11"
 
@@ -60,7 +60,14 @@ android {
 
 dependencies {
 
+    //Desugaring
     coreLibraryDesugaring(libs.desugar.jdk.libs)
+
+    //Animation
+    implementation(libs.androidx.compose.animation)
+
+    //Navigation-Compose
+    implementation(libs.androidx.navigation.compose)
 
     //Hilt
     implementation(libs.hilt.android)

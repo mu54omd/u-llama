@@ -74,7 +74,7 @@ fun HomeScreen(
                         chatsListSize = chatsList.items.size
                     )
                  },
-        bottomBar = { },
+        bottomBar = {},
         floatingActionButton = {
             CustomFabButton(
                 isModelListLoaded = isChatReady,
