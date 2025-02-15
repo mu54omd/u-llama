@@ -58,9 +58,12 @@ fun AppNavigation(
             startDestination = Screens.LoadingScreen.route,
             modifier = Modifier
                 .background( color = MaterialTheme.colorScheme.background )
-                .safeDrawingPadding()
+                .safeDrawingPadding(),
+
         ) {
-            composable(route = Screens.HomeScreen.route) {
+            composable(
+                route = Screens.HomeScreen.route,
+            ) {
                 HomeScreen(
                     homeViewModel = homeViewModel,
                     chatsList = chatsList,
@@ -90,7 +93,9 @@ fun AppNavigation(
                 )
             }
 
-            composable(route = Screens.ChatScreen.route) {
+            composable(
+                route = Screens.ChatScreen.route,
+            ) {
                 ChatScreen(
                     chatViewModel = chatViewModel,
                     chatState = chatState,

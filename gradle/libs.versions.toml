@@ -5,13 +5,13 @@ hiltAndroid = "2.52"
 hiltNavigationCompose = "1.2.0"
 jsoup = "1.14.3"
 kotlin = "2.0.20"
-coreKtx = "1.13.1"
+coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
-lifecycleRuntimeKtx = "2.8.6"
-activityCompose = "1.9.3"
-composeBom = "2024.10.00"
+lifecycleRuntimeKtx = "2.8.7"
+activityCompose = "1.10.0"
+composeBom = "2025.02.00"
 okhttpBom = "4.12.0"
 retrofit = "2.11.0"
 converterGson = "2.11.0"
@@ -20,14 +20,18 @@ arrowCore = "1.2.4"
 kotlinxSerializationJson = "1.7.1"
 richtext= "1.0.0-alpha02"
 roomRuntime = "2.6.1"
-datastorePreferences = "1.1.1"
-constraintlayoutCompose = "1.0.1"
-objectbox = "4.0.2"
+datastorePreferences = "1.1.2"
+constraintlayoutCompose = "1.1.0"
+objectbox = "4.1.0"
 itextpdf = "5.5.13.4"
-
+nav_version = "2.8.7"
+animation_version = "1.7.8"
 
 
 [libraries]
+
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "nav_version" }
+androidx-compose-animation = { group = "androidx.compose.animation", name = "animation", version.ref = "animation_version"}
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 desugar_jdk_libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar_jdk_libs" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
