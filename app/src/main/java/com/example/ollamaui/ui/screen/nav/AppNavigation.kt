@@ -1,6 +1,8 @@
 package com.example.ollamaui.ui.screen.nav
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.MaterialTheme
@@ -121,7 +123,11 @@ fun AppNavigation(
                     }
                 )
             }
-            composable(route = Screens.SettingScreen.route){
+            composable(
+                route = Screens.SettingScreen.route,
+                enterTransition = { scaleIn() },
+                exitTransition = { scaleOut() }
+                ){
                 SettingScreen(
                     savedParameters = listOf(
                         ollamaAddress,
