@@ -1,5 +1,6 @@
 package com.example.ollamaui.ui.screen.setting
 
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
@@ -19,12 +20,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -41,6 +46,7 @@ import com.example.ollamaui.ui.screen.common.CustomDropDownList
 import com.example.ollamaui.ui.screen.setting.components.CustomSettingBox
 import com.example.ollamaui.ui.screen.setting.components.TuningSlider
 import com.example.ollamaui.ui.theme.OllamaUITheme
+import kotlinx.coroutines.launch
 
 @Composable
 fun SettingScreen(
@@ -61,7 +67,13 @@ fun SettingScreen(
     var selectedEmbeddingModel by rememberSaveable { mutableStateOf(savedParameters[1]) }
     var networkStatus by remember { mutableStateOf("") }
     var isChecked by rememberSaveable { mutableStateOf(false) }
-    var isSelectedModelPulled by remember { mutableStateOf(isEmbeddingModelPulled(selectedEmbeddingModel)) }
+    var isSelectedModelPulled by remember {
+        mutableStateOf(
+            isEmbeddingModelPulled(
+                selectedEmbeddingModel
+            )
+        )
+    }
     val sliderPositions = remember {
         mutableStateListOf(
             savedParameters[2].toFloat(),
@@ -73,236 +85,247 @@ fun SettingScreen(
             savedParameters[8].toFloat()
         )
     }
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    Column(
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .verticalScroll(state = rememberScrollState())
-            .background(color = MaterialTheme.colorScheme.background)
-            .padding(top = 30.dp)
-            .fillMaxSize()
-    ) {
-        CustomSettingBox(
-            title = "Ollama Address",
-        ) {
-            OutlinedTextField(
-                value = ipAddress,
-                onValueChange = { input ->
-                    if(ipRegex.matches(input)) {
-                        ipAddress = input
-                    }
-                },
-                label = { Text(text = "Ip address") },
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent,
-                ),
-                singleLine = true,
-                supportingText = {
-                    if(isChecked) {
-                        Text(text = ollamaStatus)
-                    }
-                },
-                modifier = Modifier
-                    .weight(0.3f)
-                    .padding(start = 10.dp, top = 20.dp, bottom = 20.dp)
-            )
-            Spacer(modifier = Modifier.width(20.dp))
-            OutlinedTextField(
-                value = port,
-                onValueChange = { input -> if(portRegex.matches(input)) port = input },
-                label = { Text(text = "Port") },
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent,
-                    ),
-                singleLine = true,
-                modifier = Modifier
-                    .weight(0.2f)
-                    .padding(top = 20.dp , end = 10.dp, bottom = 20.dp)
-            )
-            Button(
-                onClick = {
-                    onCheckClick("http://$ipAddress:$port")
-                    networkStatus = ollamaStatus
-                    isChecked = true
-                },
-                modifier = Modifier.padding(top = 30.dp, end = 10.dp)
-            ) {
-                Text("Check")
-            }
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
         }
-        CustomSettingBox(
-            title = "Embedding Model",
-            rowHorizontalArrangement = Arrangement.Start
+    ) { padding ->
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .verticalScroll(state = rememberScrollState())
+                .background(color = MaterialTheme.colorScheme.background)
+                .padding(paddingValues = padding)
+                .fillMaxSize()
         ) {
-            CustomDropDownList(
-                listItems = embeddingModelList,
-                onItemClick = {
-                    selectedEmbeddingModel = it
-                    isSelectedModelPulled = isEmbeddingModelPulled(selectedEmbeddingModel)
-                              },
-                defaultValue = selectedEmbeddingModel,
-                modifier = Modifier.padding(start = 10.dp, top = 20.dp, bottom = 10.dp)
-            )
-            Spacer(modifier = Modifier.weight(1f))
+            CustomSettingBox(
+                title = "Ollama Address",
+            ) {
+                OutlinedTextField(
+                    value = ipAddress,
+                    onValueChange = { input ->
+                        if (ipRegex.matches(input)) {
+                            ipAddress = input
+                        }
+                    },
+                    label = { Text(text = "Ip address") },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                    ),
+                    singleLine = true,
+                    supportingText = {
+                        if (isChecked) {
+                            Text(text = ollamaStatus)
+                        }
+                    },
+                    modifier = Modifier
+                        .weight(0.3f)
+                        .padding(start = 10.dp, top = 20.dp, bottom = 20.dp)
+                )
+                Spacer(modifier = Modifier.width(20.dp))
+                OutlinedTextField(
+                    value = port,
+                    onValueChange = { input -> if (portRegex.matches(input)) port = input },
+                    label = { Text(text = "Port") },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                    ),
+                    singleLine = true,
+                    modifier = Modifier
+                        .weight(0.2f)
+                        .padding(top = 20.dp, end = 10.dp, bottom = 20.dp)
+                )
+                Button(
+                    onClick = {
+                        onCheckClick("http://$ipAddress:$port")
+                        networkStatus = ollamaStatus
+                        isChecked = true
+                    },
+                    modifier = Modifier.padding(top = 30.dp, end = 10.dp)
+                ) {
+                    Text("Check")
+                }
+            }
+            CustomSettingBox(
+                title = "Embedding Model",
+                rowHorizontalArrangement = Arrangement.Start
+            ) {
+                CustomDropDownList(
+                    listItems = embeddingModelList,
+                    onItemClick = {
+                        selectedEmbeddingModel = it
+                        isSelectedModelPulled = isEmbeddingModelPulled(selectedEmbeddingModel)
+                    },
+                    defaultValue = selectedEmbeddingModel,
+                    modifier = Modifier.padding(start = 10.dp, top = 20.dp, bottom = 10.dp)
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier.padding(top = 40.dp, end = 10.dp)
+                ) {
+                    CustomButton(
+                        onButtonClick = {
+                            onFetchEmbeddingModelClick()
+                        },
+                        description = "re-fetch",
+                        icon = R.drawable.baseline_refresh_24,
+                        containerColor = Color.Transparent
+                    )
+                    CustomButton(
+                        onButtonClick = {
+                            onPullEmbeddingModelClick(selectedEmbeddingModel)
+                        },
+                        description = "pull",
+                        icon = R.drawable.baseline_cloud_download_24,
+                        containerColor = Color.Transparent
+                    )
+                    AnimatedVisibility(
+                        visible = isSelectedModelPulled,
+                        enter = scaleIn(),
+                        exit = scaleOut()
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.baseline_check_24),
+                            contentDescription = "isModelPulled",
+                        )
+                    }
+                }
+            }
+            CustomSettingBox(
+                title = "Tuning Parameters",
+            ) {
+                Column(
+                    modifier = Modifier.padding(top = 20.dp),
+                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    TuningSlider(
+                        title = "Temperature",
+                        sliderPosition = sliderPositions[0],
+                        onSliderChange = { sliderPositions[0] = it },
+                        explanation = "Regulates the unpredictability of output.",
+                        isInteger = false,
+                        startPosition = 0f,
+                        endPosition = 2f,
+                    )
+                    TuningSlider(
+                        title = "Context size",
+                        sliderPosition = sliderPositions[1],
+                        onSliderChange = { sliderPositions[1] = it },
+                        explanation = "Sets the size of the context window\nused to generate the next token.",
+                        isInteger = true,
+                        startPosition = 1f,
+                        endPosition = 8192f,
+                    )
+                    TuningSlider(
+                        title = "Frequency penalty",
+                        sliderPosition = sliderPositions[2],
+                        onSliderChange = { sliderPositions[2] = it },
+                        explanation = "Discourages repetition proportionally\nto how frequently they appear.",
+                        isInteger = false,
+                        startPosition = 0f,
+                        endPosition = 2f
+                    )
+                    TuningSlider(
+                        title = "Presence penalty",
+                        sliderPosition = sliderPositions[3],
+                        onSliderChange = { sliderPositions[3] = it },
+                        explanation = "Discourages repetition based on\nif they have occurred or not.",
+                        isInteger = false,
+                        startPosition = 0f,
+                        endPosition = 2f
+                    )
+                    TuningSlider(
+                        title = "Top K",
+                        sliderPosition = sliderPositions[4],
+                        onSliderChange = { sliderPositions[4] = it },
+                        explanation = "Reduces the probability of generating nonsense.\nHigher value will give more diverse answers",
+                        isInteger = true,
+                        startPosition = 0f,
+                        endPosition = 100f,
+                    )
+                    TuningSlider(
+                        title = "Top P ",
+                        sliderPosition = sliderPositions[5],
+                        onSliderChange = { sliderPositions[5] = it },
+                        explanation = "Manage the randomness of their output.\nHigher value will lead to more diverse text.",
+                        isInteger = false,
+                        startPosition = 0f,
+                        endPosition = 2f,
+                    )
+                    TuningSlider(
+                        title = "Min P",
+                        sliderPosition = sliderPositions[6],
+                        onSliderChange = { sliderPositions[6] = it },
+                        explanation = "Aims to ensure a balance of quality and variety.",
+                        isInteger = false,
+                        startPosition = 0f,
+                        endPosition = 2f,
+                    )
+                }
+            }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                modifier = Modifier.padding(top = 40.dp, end = 10.dp)
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                CustomButton(
-                    onButtonClick = {
-                        onFetchEmbeddingModelClick()
-                    },
-                    description = "re-fetch",
-                    icon = R.drawable.baseline_refresh_24,
-                    containerColor = Color.Transparent
-                )
-                CustomButton(
-                    onButtonClick = {
-                        onPullEmbeddingModelClick(selectedEmbeddingModel)
-                    },
-                    description = "pull",
-                    icon = R.drawable.baseline_cloud_download_24,
-                    containerColor = Color.Transparent
-                )
-                AnimatedVisibility(
-                    visible = isSelectedModelPulled,
-                    enter = scaleIn(),
-                    exit = scaleOut()
+                Button(
+                    onClick = {
+//                    ipAddress = "127.0.0.1"
+//                    port = "11434"
+//                    selectedEmbeddingModel = ""
+                        sliderPositions[0] = DefaultModelParameters.default.temperature
+                        sliderPositions[1] = DefaultModelParameters.default.numCtx.toFloat()
+                        sliderPositions[2] = DefaultModelParameters.default.presencePenalty
+                        sliderPositions[3] = DefaultModelParameters.default.frequencyPenalty
+                        sliderPositions[4] = DefaultModelParameters.default.topK.toFloat()
+                        sliderPositions[5] = DefaultModelParameters.default.topP
+                        sliderPositions[6] = DefaultModelParameters.default.minP
+                        scope.launch {
+                            snackbarHostState.showSnackbar(message = "The default parameters applied!")
+                        }
+                    }
                 ) {
-                    Icon(
-                        painter = painterResource(R.drawable.baseline_check_24),
-                        contentDescription = "isModelPulled",
-                    )
+                    Text(text = "Reset Parameters")
                 }
-            }
-        }
-        CustomSettingBox(
-            title = "Tuning Parameters",
-        ) {
-            Column(
-                modifier = Modifier.padding(top = 20.dp),
-                verticalArrangement = Arrangement.spacedBy(2.dp)
-            ) {
-                TuningSlider(
-                    title = "Temperature",
-                    sliderPosition = sliderPositions[0],
-                    onSliderChange = { sliderPositions[0] = it },
-                    explanation = "Regulates the unpredictability of output.",
-                    isInteger = false,
-                    startPosition = 0f,
-                    endPosition = 2f,
-                )
-                TuningSlider(
-                    title = "Context size",
-                    sliderPosition = sliderPositions[1],
-                    onSliderChange = { sliderPositions[1] = it },
-                    explanation = "Sets the size of the context window\nused to generate the next token.",
-                    isInteger = true,
-                    startPosition = 1f,
-                    endPosition = 8192f,
-                )
-                TuningSlider(
-                    title = "Frequency penalty",
-                    sliderPosition = sliderPositions[2],
-                    onSliderChange = { sliderPositions[2] = it },
-                    explanation = "Discourages repetition proportionally\nto how frequently they appear.",
-                    isInteger = false,
-                    startPosition = 0f,
-                    endPosition = 2f
-                )
-                TuningSlider(
-                    title = "Presence penalty",
-                    sliderPosition = sliderPositions[3],
-                    onSliderChange = { sliderPositions[3] = it },
-                    explanation = "Discourages repetition based on\nif they have occurred or not.",
-                    isInteger = false,
-                    startPosition = 0f,
-                    endPosition = 2f
-                )
-                TuningSlider(
-                    title = "Top K",
-                    sliderPosition = sliderPositions[4],
-                    onSliderChange = { sliderPositions[4] = it },
-                    explanation = "Reduces the probability of generating nonsense.\nHigher value will give more diverse answers",
-                    isInteger = true,
-                    startPosition = 0f,
-                    endPosition = 100f,
-                )
-                TuningSlider(
-                    title = "Top P ",
-                    sliderPosition = sliderPositions[5],
-                    onSliderChange = { sliderPositions[5] = it },
-                    explanation = "Manage the randomness of their output.\nHigher value will lead to more diverse text.",
-                    isInteger = false,
-                    startPosition = 0f,
-                    endPosition = 2f,
-                )
-                TuningSlider(
-                    title = "Min P",
-                    sliderPosition = sliderPositions[6],
-                    onSliderChange = { sliderPositions[6] = it },
-                    explanation = "Aims to ensure a balance of quality and variety.",
-                    isInteger = false,
-                    startPosition = 0f,
-                    endPosition = 2f,
-                )
-            }
-        }
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            Button(
-                onClick = {
-                    ipAddress = "127.0.0.1"
-                    port = "11434"
-                    selectedEmbeddingModel = ""
-                    sliderPositions[0] = DefaultModelParameters.default.temperature
-                    sliderPositions[1] = DefaultModelParameters.default.numCtx.toFloat()
-                    sliderPositions[2] = DefaultModelParameters.default.presencePenalty
-                    sliderPositions[3] = DefaultModelParameters.default.frequencyPenalty
-                    sliderPositions[4] = DefaultModelParameters.default.topK.toFloat()
-                    sliderPositions[5] = DefaultModelParameters.default.topP
-                    sliderPositions[6] = DefaultModelParameters.default.minP
 
-
-                }
-            ) {
-                Text(text = "Reset")
-            }
-
-            Button(
-                onClick = {
-                    onSaveClick(
-                        "http://$ipAddress:$port",
-                        selectedEmbeddingModel,
-                        ModelParameters(
-                            temperature = sliderPositions[0],
-                            numCtx = sliderPositions[1].toInt(),
-                            presencePenalty = sliderPositions[2],
-                            frequencyPenalty = sliderPositions[3],
-                            topK = sliderPositions[4].toInt(),
-                            topP = sliderPositions[5],
-                            minP = sliderPositions[6]
+                Button(
+                    onClick = {
+                        onSaveClick(
+                            "http://$ipAddress:$port",
+                            selectedEmbeddingModel,
+                            ModelParameters(
+                                temperature = sliderPositions[0],
+                                numCtx = sliderPositions[1].toInt(),
+                                presencePenalty = sliderPositions[2],
+                                frequencyPenalty = sliderPositions[3],
+                                topK = sliderPositions[4].toInt(),
+                                topP = sliderPositions[5],
+                                minP = sliderPositions[6]
+                            )
                         )
-                    )
+                        scope.launch {
+                            snackbarHostState.showSnackbar(message = "The settings saved!")
+                        }
+                    }
+                ) {
+                    Text(text = "Save")
                 }
-            ) {
-                Text(text = "Save")
             }
         }
-    }
-    BackHandler {
-        onBackClick()
+        BackHandler {
+            onBackClick()
+        }
     }
 }
 
-
-
+@Preview(uiMode = UI_MODE_NIGHT_YES)
 @Preview
 @Composable
 private fun SettingScreenPreview() {
