@@ -1,5 +1,6 @@
 package com.example.ollamaui.ui.screen.chat.components
 
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -50,11 +51,11 @@ fun ChatDialog(
 ) {
     val isFromMe = isFromMe(messageModel)
     val animatedColorMyMessage by animateColorAsState(
-        if(isSelected) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.primaryContainer,
+        if(isSelected) MaterialTheme.colorScheme.tertiaryContainer.copy(red = MaterialTheme.colorScheme.tertiaryContainer.red + 30f) else MaterialTheme.colorScheme.primaryContainer,
         label = "Animated Color My Message",
     )
     val animatedColorBotMessage by animateColorAsState(
-        if(isSelected) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.secondaryContainer,
+        if(isSelected) MaterialTheme.colorScheme.tertiaryContainer.copy(red = MaterialTheme.colorScheme.tertiaryContainer.red + 30f) else MaterialTheme.colorScheme.tertiaryContainer,
         label = "Animated Color Bot Message",
     )
     val textBgColor = if(!isSystemInDarkTheme()) Color.LightGray else Color.DarkGray
@@ -167,6 +168,7 @@ fun ChatDialog(
 
 }
 
+@Preview(uiMode = UI_MODE_NIGHT_YES)
 @Preview
 @Composable
 private fun ChatDialogPreview() {

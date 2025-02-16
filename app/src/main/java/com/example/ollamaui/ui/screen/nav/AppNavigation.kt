@@ -1,8 +1,7 @@
 package com.example.ollamaui.ui.screen.nav
 
 import android.annotation.SuppressLint
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.MaterialTheme
@@ -97,6 +96,12 @@ fun AppNavigation(
 
             composable(
                 route = Screens.ChatScreen.route,
+                enterTransition = {
+                    slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Start)
+                },
+                exitTransition = {
+                    slideOutOfContainer(towards = AnimatedContentTransitionScope.SlideDirection.End)
+                }
             ) {
                 ChatScreen(
                     chatViewModel = chatViewModel,
@@ -125,8 +130,12 @@ fun AppNavigation(
             }
             composable(
                 route = Screens.SettingScreen.route,
-                enterTransition = { scaleIn() },
-                exitTransition = { scaleOut() }
+                enterTransition = {
+                    slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.End)
+                },
+                exitTransition = {
+                    slideOutOfContainer(towards = AnimatedContentTransitionScope.SlideDirection.Start)
+                }
                 ){
                 SettingScreen(
                     savedParameters = listOf(
@@ -162,7 +171,15 @@ fun AppNavigation(
                     }
                 )
             }
-            composable(route = Screens.LogScreen.route){
+            composable(
+                route = Screens.LogScreen.route,
+                enterTransition = {
+                    slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Start)
+                },
+                exitTransition = {
+                    slideOutOfContainer(towards = AnimatedContentTransitionScope.SlideDirection.End)
+                }
+            ){
                 LogScreen(
                     logs = logs,
                     onClearLogClick = {
