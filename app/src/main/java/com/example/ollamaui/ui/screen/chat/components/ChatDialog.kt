@@ -84,10 +84,10 @@ fun ChatDialog(
                     .align(if (isFromMe(messageModel)) Alignment.End else Alignment.Start)
                     .clip(
                         RoundedCornerShape(
-                            topStart = 48f,
-                            topEnd = 48f,
-                            bottomStart = if (isFromMe) 48f else 0f,
-                            bottomEnd = if (isFromMe) 0f else 48f
+                            topStart = if (isFromMe) 50f else 0f,
+                            topEnd = if (isFromMe) 0f else 50f,
+                            bottomStart = if (isFromMe) 50f else 0f,
+                            bottomEnd = if (isFromMe) 0f else 50f
                         )
                     )
                     .pointerInput(Unit){
@@ -176,9 +176,8 @@ fun ChatDialog(
     }
 
 }
-
-@Preview(uiMode = UI_MODE_NIGHT_YES)
 @Preview
+@Preview(uiMode = UI_MODE_NIGHT_YES)
 @Composable
 private fun ChatDialogPreview() {
     OllamaUITheme {

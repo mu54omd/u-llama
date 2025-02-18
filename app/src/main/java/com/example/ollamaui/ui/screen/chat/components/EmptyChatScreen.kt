@@ -1,11 +1,11 @@
 package com.example.ollamaui.ui.screen.chat.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -24,12 +24,13 @@ fun EmptyChatScreen() {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            Image(
+            Icon(
                 painter = painterResource(R.drawable.baseline_error_outline_24),
                 contentDescription = "EmptyChat Warning!",
                 modifier = Modifier.size(30.dp)
             )
-            Text(text = "Please select a chat!")
+            Text(text = "Please start or select a chat!")
         }
     }
 }
+
