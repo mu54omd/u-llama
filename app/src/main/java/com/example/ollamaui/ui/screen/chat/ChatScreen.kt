@@ -42,6 +42,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import com.example.ollamaui.R
 import com.example.ollamaui.domain.model.MessageModel
+import com.example.ollamaui.domain.model.chat.ChatModel
 import com.example.ollamaui.domain.model.objectbox.File
 import com.example.ollamaui.ui.common.messageModelToText
 import com.example.ollamaui.ui.screen.chat.components.AttachDocs
@@ -84,7 +85,6 @@ fun ChatScreen(
     val file = remember { mutableStateOf(File()) }
     val selectedImages = remember { mutableStateListOf<File>() }
     val selectedDocs = remember { mutableStateListOf<File>() }
-
 
     Scaffold(
         topBar = {

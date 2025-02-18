@@ -115,15 +115,17 @@ fun ChatDialog(
                     horizontalAlignment = if (isFromMe) Alignment.End else Alignment.Start,
                 ) {
                     if(messageModel.role == USER_ROLE) {
-                        Text(
-                            text = if (messageModel.content.split(" Respond to this prompt: ").size == 1) {
-                                messageModel.content.trim()
-                            } else {
-                                messageModel.content.split(" Respond to this prompt: ")[1].substring(
-                                    1,
-                                ).dropLast(2).trim()
+                        val regex = Regex("Using this data: \\{(\n*.*)\\}. Respond to this prompt: \\{(\n*.*)\\}.")
+                        val match = regex.find(messageModel.content)
+                        if(match != null){
+                            match.groups[2]?.let {
+                                Text(
+                                    text = it.value
+                                )
                             }
-                        )
+                        }else{
+                            Text(text = messageModel.content)
+                        }
                     }else{
                         val thinking = messageModel.content.split("</think>")
                         if(thinking.size == 1){
@@ -137,18 +139,25 @@ fun ChatDialog(
                                 BasicMarkdown(astNode)
                             }
                         }else{
-                            Text(
-                                text = thinking[0].substring(8).trim(),
-                                style = MaterialTheme.typography.bodySmall,
-                                modifier = Modifier
-                                    .padding(bottom = 4.dp)
-                                    .background(
-                                        color = MaterialTheme.colorScheme.surfaceVariant,
-                                        shape = MaterialTheme.shapes.small
-                                    )
-                                    .border(width = 1.dp, color = Color.Gray, shape = MaterialTheme.shapes.small)
-                                    .padding(10.dp)
+                            val thinkingText = thinking[0].substring(8).trim()
+                            if(thinkingText.isNotEmpty()) {
+                                Text(
+                                    text = thinkingText,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    modifier = Modifier
+                                        .padding(bottom = 4.dp)
+                                        .background(
+                                            color = MaterialTheme.colorScheme.surfaceVariant,
+                                            shape = MaterialTheme.shapes.small
+                                        )
+                                        .border(
+                                            width = 1.dp,
+                                            color = Color.Gray,
+                                            shape = MaterialTheme.shapes.small
+                                        )
+                                        .padding(10.dp)
                                 )
+                            }
                             RichText(
                                 style = richTextStyle
                             ) {
@@ -189,7 +198,7 @@ private fun ChatDialogPreview() {
             )
             ChatDialog(
                 messageModel = MessageModel(
-                    content = "Hello! I'm fine.",
+                    content = "<think>\n\n</think> Hi. How are you???",
                     role = "assistant",
                     time = "17:43",
                     date = "2025-05-17",

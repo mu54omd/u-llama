@@ -48,12 +48,7 @@ fun AppNavigation(
     val logViewModel: LogViewModel = hiltViewModel()
     val logs = logViewModel.logs.collectAsStateWithLifecycle().value
 
-    Scaffold(
-        topBar = {},
-        bottomBar = {},
-        snackbarHost = {},
-        modifier = Modifier
-    ) {
+    Scaffold {
         NavHost(
             navController = navController,
             startDestination = Screens.LoadingScreen.route,
@@ -66,7 +61,6 @@ fun AppNavigation(
                 route = Screens.HomeScreen.route,
             ) {
                 HomeScreen(
-                    homeViewModel = homeViewModel,
                     chatsList = chatsList,
                     onChatClick = {
                         val chatModel = homeViewModel.findChat(chatId = it.chatId)?:it
@@ -75,6 +69,15 @@ fun AppNavigation(
                             navController = navController,
                             route = Screens.ChatScreen.route
                         )
+                    },
+                    onDeleteChatClick = { chatModel ->
+                        homeViewModel.deleteChat(chatModel)
+                    },
+                    onDeleteChatByIdClick = { chatId ->
+                        homeViewModel.deleteChatById(chatId)
+                    },
+                    onAddNewChatClick = { chatTitle, systemPrompt, selectedModel ->
+                        homeViewModel.addNewChat(chatTitle, systemPrompt, selectedModel)
                     },
                     onRefreshClick = { mainViewModel.refresh() },
                     onSettingClick = {

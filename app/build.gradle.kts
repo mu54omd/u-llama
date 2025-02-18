@@ -16,7 +16,7 @@ android {
         minSdk = 21
         targetSdk = 35
         versionCode = 5
-        versionName = "1.0.11"
+        versionName = "1.0.12"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -68,6 +68,14 @@ dependencies {
 
     //Navigation-Compose
     implementation(libs.androidx.navigation.compose)
+
+    //Navigation Suit
+    implementation(libs.androidx.material3.adaptive.navigation.suite)
+
+    //Adaptive
+    implementation(libs.androidx.material3.adaptive)
+    implementation(libs.androidx.adaptive.layout)
+    implementation(libs.androidx.adaptive.navigation)
 
     //Hilt
     implementation(libs.hilt.android)
