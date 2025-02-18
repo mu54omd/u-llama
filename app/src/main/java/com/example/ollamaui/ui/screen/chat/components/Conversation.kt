@@ -36,7 +36,7 @@ fun Conversation(
     ) {
         itemsIndexed(
             items = messagesModel.messageModels,
-            key = { index, _ ->  index}
+            key = { _, item ->  item.messageId }
         ){ index, message ->
             if (message.role != SYSTEM_ROLE) {
                 ChatDialog(

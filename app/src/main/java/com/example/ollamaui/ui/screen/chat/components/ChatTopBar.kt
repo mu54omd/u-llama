@@ -76,7 +76,7 @@ fun ChatTopBar(
                 )
             }
         }
-        HorizontalDivider()
+        HorizontalDivider(thickness = 2.dp)
     }
 }
 

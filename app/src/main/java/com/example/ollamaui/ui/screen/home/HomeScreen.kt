@@ -32,7 +32,9 @@ fun HomeScreen(
     onChatClick: (ChatModel) -> Unit,
     onSettingClick: () -> Unit,
     onLogClick: () -> Unit,
-    homeViewModel: HomeViewModel,
+    onAddNewChatClick: (String, String, String) -> Unit,
+    onDeleteChatByIdClick: (Int) -> Unit,
+    onDeleteChatClick: (ChatModel) -> Unit,
     onRefreshClick: () -> Unit,
     chatsList: ChatsList,
     isChatReady: Boolean,
@@ -57,7 +59,7 @@ fun HomeScreen(
                         onLogClick = { onLogClick() },
                         onDeleteClick = {
                             selectedChats.forEach{ selectedChat ->
-                                homeViewModel.deleteChatById(selectedChat)
+                                onDeleteChatByIdClick(selectedChat)
                             }
                             selectedChats.clear()
                         },
@@ -112,11 +114,7 @@ fun HomeScreen(
                     onChatTitleChange = { if(it.length<=maxChar) chatTitle = it },
                     onCloseClick = { isNewChatDialogVisible = false},
                     onAcceptClick = {
-                        homeViewModel.addNewChat(
-                            chatTitle = chatTitle,
-                            selectedModel = selectedModel,
-                            systemPrompt = systemPrompt
-                            )
+                        onAddNewChatClick(chatTitle, systemPrompt, selectedModel)
                         isNewChatDialogVisible = false
                     },
                     onSystemPromptChange = { if(it.length<=maxChar*6) systemPrompt = it},
@@ -135,7 +133,7 @@ fun HomeScreen(
                         Box(modifier = Modifier.fillMaxWidth().animateItem()) {
                             SwipeActions(
                                 onDeleteClick = {
-                                    homeViewModel.deleteChat(chatItem)
+                                    onDeleteChatClick(chatItem)
                                 },
                                 isSelected = selectedChats.contains(chatItem.chatId)
                             )
