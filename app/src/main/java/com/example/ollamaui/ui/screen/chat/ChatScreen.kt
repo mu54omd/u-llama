@@ -85,7 +85,6 @@ fun ChatScreen(
     val selectedImages = remember { mutableStateListOf<File>() }
     val selectedDocs = remember { mutableStateListOf<File>() }
 
-
     Scaffold(
         topBar = {
             ChatTopBar(
