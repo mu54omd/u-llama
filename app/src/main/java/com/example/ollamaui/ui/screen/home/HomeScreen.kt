@@ -30,6 +30,7 @@ import com.example.ollamaui.ui.screen.home.components.HomeTopBar
 import com.example.ollamaui.ui.screen.home.components.NewChatItem
 import com.example.ollamaui.ui.screen.home.components.NewChatModal
 import com.example.ollamaui.ui.screen.home.components.SwipeActions
+import com.example.ollamaui.utils.Constants.USER_ROLE
 import kotlinx.coroutines.launch
 
 @Composable
@@ -152,6 +153,7 @@ fun HomeScreen(
                             NewChatItem(
                                 modelName = chatItem.modelName,
                                 chatTitle = chatItem.chatTitle,
+                                lastMessage = chatItem.chatMessages.messageModels.lastOrNull { it.role != USER_ROLE }?.content ?: "",
                                 onItemClick = {
                                     when {
                                         selectedChats.contains(chatItem.chatId) -> {

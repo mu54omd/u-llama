@@ -1,7 +1,6 @@
 package com.example.ollamaui.ui.screen.nav
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.foundation.background
@@ -12,7 +11,7 @@ import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
-import androidx.compose.material3.adaptive.navigation.BackNavigationBehavior
+import androidx.compose.material3.adaptive.layout.PaneMotionDefaults
 import androidx.compose.material3.adaptive.navigation.NavigableListDetailPaneScaffold
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
@@ -22,7 +21,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -183,10 +181,14 @@ fun AppNavigation(
             composable(
                 route = Screens.SettingScreen.route,
                 enterTransition = {
-                    slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.End)
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Right
+                    )
                 },
                 exitTransition = {
-                    slideOutOfContainer(towards = AnimatedContentTransitionScope.SlideDirection.Start)
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Start
+                    )
                 }
                 ){
                 SettingScreen(
@@ -226,10 +228,14 @@ fun AppNavigation(
             composable(
                 route = Screens.LogScreen.route,
                 enterTransition = {
-                    slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Start)
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                    )
                 },
                 exitTransition = {
-                    slideOutOfContainer(towards = AnimatedContentTransitionScope.SlideDirection.End)
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.End
+                    )
                 }
             ){
                 LogScreen(

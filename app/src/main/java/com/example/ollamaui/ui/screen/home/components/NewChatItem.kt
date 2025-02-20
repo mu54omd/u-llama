@@ -2,7 +2,7 @@ package com.example.ollamaui.ui.screen.home.components
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
-import androidx.annotation.DrawableRes
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.Spring
@@ -11,10 +11,11 @@ import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.rememberTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.MarqueeSpacing
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -32,15 +33,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -56,12 +54,14 @@ const val ANIMATION_DURATION = 350
 const val MIN_DRAG_AMOUNT = 30
 
 
+@OptIn(ExperimentalFoundationApi::class)
 @SuppressLint("UnusedTransitionTargetStateParameter")
 @Composable
 fun NewChatItem(
     modifier: Modifier = Modifier,
     modelName: String,
     chatTitle: String,
+    lastMessage: String,
     isNewMessageReceived: Boolean,
     newMessageStatus: Int,
     onItemClick: () -> Unit,
@@ -75,15 +75,15 @@ fun NewChatItem(
 ) {
 
     val animatedColor by animateColorAsState(
-        if(isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+        targetValue = if(isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
         label = "Animated Color",
     )
     val animatedSize by animateIntAsState(
-        if(isSelected) 5 else 10,
+        targetValue = if(isSelected) 5 else 10,
         label = "Animated Size"
     )
     val indicatorAnimation by animateColorAsState(
-        if(isNewMessageReceived) {
+        targetValue = if(isNewMessageReceived) {
             if(newMessageStatus == 1) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.error
         } else MaterialTheme.colorScheme.surfaceContainer,
         animationSpec = spring(dampingRatio = Spring.DampingRatioHighBouncy, stiffness = Spring.StiffnessMedium),
@@ -96,7 +96,7 @@ fun NewChatItem(
             targetState = !isRevealed
         }
     }
-    val transition = rememberTransition(transitionState, "cardTransition")
+    val transition = rememberTransition(transitionState = transitionState, label = "cardTransition")
 
     val offsetTransition by transition.animateFloat(
         label = "cardOffsetTransition",
@@ -120,16 +120,14 @@ fun NewChatItem(
                     }
                 }
             }
-            .pointerInput(Unit){
-                detectTapGestures(
-                    onLongPress = {
-                        onItemLongPress()
-                    },
-                    onTap = {
-                        onItemClick()
-                    }
-                )
-            }
+            .combinedClickable(
+                onClick = {
+                    onItemClick()
+                },
+                onLongClick = {
+                    onItemLongPress()
+                }
+            )
     ){
 
         Row(
@@ -154,20 +152,33 @@ fun NewChatItem(
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-                Text(
-                    text = modelName,
-                    style = MaterialTheme.typography.labelSmall,
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1,
-                    modifier = Modifier.basicMarquee(spacing = MarqueeSpacing(10.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = chatTitle,
+                        style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                        modifier = Modifier.basicMarquee()
                     )
-                Text(
-                    text = chatTitle,
-                    style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1,
-                    modifier = Modifier.basicMarquee()
-                )
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(
+                        text = modelName,
+                        style = MaterialTheme.typography.labelSmall,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                        modifier = Modifier.basicMarquee(spacing = MarqueeSpacing(10.dp))
+                    )
+                }
+                AnimatedVisibility(visible = lastMessage != "") {
+                    Text(
+                        text = lastMessage,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1
+                    )
+                }
             }
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -196,12 +207,13 @@ fun NewChatItem(
 private fun NewChatItemPreview() {
     OllamaUITheme {
         NewChatItem(
+            modelName = "llama3.1",
+            chatTitle = "Title",
+            lastMessage = "Last Message will place here despite of its length!",
             onItemClick = {},
             onItemLongPress = {},
             onSelectedItemClick = {},
-            isSelected = false,
-            modelName = "llama3.1",
-            chatTitle = "Title",
+            isSelected = true,
             isNewMessageReceived = true,
             newMessageStatus = 1,
             isRevealed = true,
