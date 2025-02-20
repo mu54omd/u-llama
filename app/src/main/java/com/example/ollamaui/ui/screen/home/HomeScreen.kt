@@ -1,5 +1,6 @@
 package com.example.ollamaui.ui.screen.home
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
@@ -10,6 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -17,6 +20,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,6 +30,7 @@ import com.example.ollamaui.ui.screen.home.components.HomeTopBar
 import com.example.ollamaui.ui.screen.home.components.NewChatItem
 import com.example.ollamaui.ui.screen.home.components.NewChatModal
 import com.example.ollamaui.ui.screen.home.components.SwipeActions
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
@@ -39,6 +44,7 @@ fun HomeScreen(
     chatsList: ChatsList,
     isChatReady: Boolean,
     modelList: List<String>,
+    onBackClick: () -> Unit,
 ) {
     var isNewChatDialogVisible by remember { mutableStateOf(false) }
     var userName by remember { mutableStateOf("") }
@@ -48,9 +54,12 @@ fun HomeScreen(
     val selectedChats = remember { mutableStateListOf<Int>() }
     var selectedModel by remember { mutableStateOf("") }
     val isSelectedChatsEmpty by remember(selectedChats) { derivedStateOf { selectedChats.isEmpty() } }
-//    val activity = (LocalContext.current as? Activity)
     val maxChar = 25
     var isRevealed by remember { mutableIntStateOf(-1) }
+    var backHandlerCounter by remember { mutableIntStateOf(0) }
+
+    val scope = rememberCoroutineScope()
+    val snackbarHostState  = remember { SnackbarHostState() }
 
     Scaffold(
         topBar = {
@@ -95,6 +104,9 @@ fun HomeScreen(
                 }
             )
         },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        }
     ) { paddingValues ->
         Box(
             contentAlignment = Alignment.Center,
@@ -179,7 +191,7 @@ fun HomeScreen(
                                     if(selectedChats.isEmpty())
                                         isRevealed = chatItem.chatId
                                            },
-                                onCollapse = { isRevealed = -1},
+                                onCollapse = { isRevealed = -1 },
                                 isRevealed = isRevealed == chatItem.chatId
                             )
                         }
@@ -187,4 +199,16 @@ fun HomeScreen(
                 }
             }
         }
+    BackHandler {
+        backHandlerCounter++
+        if(backHandlerCounter >= 2) {
+            onBackClick()
+        }else {
+            scope.launch {
+                snackbarHostState.showSnackbar(
+                    message = "Perform back function again to exit the app!"
+                )
+            }
+        }
     }
+}
