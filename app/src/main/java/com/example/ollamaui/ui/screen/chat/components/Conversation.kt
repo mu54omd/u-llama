@@ -26,7 +26,7 @@ fun Conversation(
     listState: LazyListState,
 ) {
     LaunchedEffect(messagesModel.messageModels.size) {
-        listState.scrollToItem(index = messagesModel.messageModels.size)
+        listState.scrollToItem(index = messagesModel.messageModels.lastIndex)
     }
     LazyColumn(
         modifier = modifier.padding(bottom = 10.dp),

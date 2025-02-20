@@ -106,7 +106,6 @@ fun HomeTopBar(
                                 )
                             }
                     }
-
                 }
             }
         }

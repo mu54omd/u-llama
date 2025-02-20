@@ -35,7 +35,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
@@ -69,9 +68,8 @@ fun ChatScreen(
     val selectedDialogs = remember { mutableStateMapOf<Int, MessageModel>() }
     val visibleDetails = remember { mutableStateMapOf<Int, MessageModel>() }
     val clipboard: ClipboardManager = LocalClipboardManager.current
-    val focusRequester = remember { FocusRequester() }
     val listState = rememberLazyListState(
-        initialFirstVisibleItemIndex = chatState.chatModel.chatMessages.messageModels.size
+        initialFirstVisibleItemIndex = chatState.chatModel.chatMessages.messageModels.lastIndex
     )
     val scope = rememberCoroutineScope()
     val isFabVisible by remember {
@@ -118,7 +116,6 @@ fun ChatScreen(
                 isModelSelected = chatState.chatModel.modelName != "",
                 isSendingFailed = chatState.isSendingFailed,
                 isResponding = chatState.isRespondingList.contains(chatState.chatModel.chatId),
-                focusRequester = focusRequester
             )
         },
         floatingActionButton = {
