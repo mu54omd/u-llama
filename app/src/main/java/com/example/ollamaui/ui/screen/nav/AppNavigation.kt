@@ -1,6 +1,8 @@
 package com.example.ollamaui.ui.screen.nav
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.safeDrawingPadding
@@ -10,6 +12,7 @@ import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
+import androidx.compose.material3.adaptive.navigation.BackNavigationBehavior
 import androidx.compose.material3.adaptive.navigation.NavigableListDetailPaneScaffold
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
@@ -19,6 +22,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -67,6 +71,9 @@ fun AppNavigation(
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
     val scope = rememberCoroutineScope()
     var selectedChatId by rememberSaveable { mutableIntStateOf(-1) }
+
+    val activity = LocalActivity.current
+
 
     Scaffold {
         NavHost(
@@ -131,6 +138,9 @@ fun AppNavigation(
                                 },
                                 isChatReady = mainState.isModelListLoaded and (mainState.ollamaStatus == OLLAMA_IS_RUNNING),
                                 modelList = mainState.filteredModelList,
+                                onBackClick = {
+                                    activity?.finish()
+                                }
                             )
                         }
                     },
@@ -158,7 +168,7 @@ fun AppNavigation(
                                 EmptyChatScreen()
                             }
                         }
-                    }
+                    },
                 )
             }
             composable(route = Screens.LoadingScreen.route){

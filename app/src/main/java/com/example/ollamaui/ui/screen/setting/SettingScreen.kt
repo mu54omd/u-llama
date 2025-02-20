@@ -277,9 +277,6 @@ fun SettingScreen(
             ) {
                 Button(
                     onClick = {
-//                    ipAddress = "127.0.0.1"
-//                    port = "11434"
-//                    selectedEmbeddingModel = ""
                         sliderPositions[0] = DefaultModelParameters.default.temperature
                         sliderPositions[1] = DefaultModelParameters.default.numCtx.toFloat()
                         sliderPositions[2] = DefaultModelParameters.default.presencePenalty
