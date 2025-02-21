@@ -7,16 +7,18 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
-import androidx.compose.material3.adaptive.layout.PaneMotionDefaults
 import androidx.compose.material3.adaptive.navigation.NavigableListDetailPaneScaffold
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -71,9 +73,13 @@ fun AppNavigation(
     var selectedChatId by rememberSaveable { mutableIntStateOf(-1) }
 
     val activity = LocalActivity.current
+    val snackbarHostState  = remember { SnackbarHostState() }
 
-
-    Scaffold {
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        }
+    ) {
         NavHost(
             navController = navController,
             startDestination = Screens.LoadingScreen.route,
@@ -136,8 +142,16 @@ fun AppNavigation(
                                 },
                                 isChatReady = mainState.isModelListLoaded and (mainState.ollamaStatus == OLLAMA_IS_RUNNING),
                                 modelList = mainState.filteredModelList,
-                                onBackClick = {
-                                    activity?.finish()
+                                onBackClick = { backHandlerCounter ->
+                                    if(backHandlerCounter >= 2) {
+                                        activity?.finish()
+                                    }else {
+                                        scope.launch {
+                                            snackbarHostState.showSnackbar(
+                                                message = "Perform back function again to exit the app!"
+                                            )
+                                        }
+                                    }
                                 }
                             )
                         }

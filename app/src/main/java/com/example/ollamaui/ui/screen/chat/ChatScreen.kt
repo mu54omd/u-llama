@@ -238,12 +238,12 @@ fun ChatScreen(
                         }else {
                             selectedDialogs[index] = message
                         }
-                }
+                    }
                               },
                 onSelectedItemClick = { index, _ -> selectedDialogs.remove(index) },
                 onLongPressItem = { index, message -> if(selectedDialogs.contains(index)) selectedDialogs.remove(index) else selectedDialogs[index] = message },
-                isSelected = { index, _ -> selectedDialogs.contains(index) },
-                isVisible = { index, _ -> visibleDetails.contains(index) },
+                isSelected = { index, messageModel -> selectedDialogs.contains(index) && selectedDialogs[index]?.messageId == messageModel.messageId },
+                isVisible = { index, messageModel -> visibleDetails.contains(index) && visibleDetails[index]?.messageId == messageModel.messageId  },
                 listState = listState
             )
             Column (

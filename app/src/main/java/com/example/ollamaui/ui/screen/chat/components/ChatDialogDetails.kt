@@ -22,9 +22,9 @@ fun ChatDialogDetails(
     date: String,
     time: String,
 ) {
-    val finalDate = when{
-        date == LocalDate.now().toString() -> { "Today" }
-        date == LocalDate.now().minusDays(1).toString() -> {"Yesterday"}
+    val finalDate = when (date) {
+        LocalDate.now().toString() -> { "Today" }
+        LocalDate.now().minusDays(1).toString() -> {"Yesterday"}
         else -> date
     }
     Box(
