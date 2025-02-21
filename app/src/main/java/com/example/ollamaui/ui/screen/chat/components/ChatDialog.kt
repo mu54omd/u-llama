@@ -29,6 +29,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ollamaui.domain.model.MessageModel
+import com.example.ollamaui.ui.common.filterAssistantMessage
+import com.example.ollamaui.ui.common.filterUserMessage
 import com.example.ollamaui.ui.common.isFromMe
 import com.example.ollamaui.ui.theme.OllamaUITheme
 import com.example.ollamaui.utils.Constants.USER_ROLE
@@ -115,20 +117,10 @@ fun ChatDialog(
                     horizontalAlignment = if (isFromMe) Alignment.End else Alignment.Start,
                 ) {
                     if(messageModel.role == USER_ROLE) {
-                        val regex = Regex("Using this data: \\{(\n*.*)\\}. Respond to this prompt: \\{(\n*.*)\\}.")
-                        val match = regex.find(messageModel.content)
-                        if(match != null){
-                            match.groups[2]?.let {
-                                Text(
-                                    text = it.value
-                                )
-                            }
-                        }else{
-                            Text(text = messageModel.content)
-                        }
+                        Text(text = filterUserMessage(messageModel.content)?:messageModel.content)
                     }else{
-                        val thinking = messageModel.content.split("</think>")
-                        if(thinking.size == 1){
+                        val thinkingText = filterAssistantMessage(assistantMessage = messageModel.content)
+                        if(thinkingText.first != null){
                             RichText(
                                 style = richTextStyle
                             ) {
@@ -139,10 +131,9 @@ fun ChatDialog(
                                 BasicMarkdown(astNode)
                             }
                         }else{
-                            val thinkingText = thinking[0].substring(8).trim()
-                            if(thinkingText.isNotEmpty()) {
+                            if(thinkingText.second?.isNotEmpty() == true) {
                                 Text(
-                                    text = thinkingText,
+                                    text = thinkingText.second!!,
                                     style = MaterialTheme.typography.bodySmall,
                                     modifier = Modifier
                                         .padding(bottom = 4.dp)
@@ -163,7 +154,7 @@ fun ChatDialog(
                             ) {
                                 val parser = remember { CommonmarkAstNodeParser() }
                                 val astNode = remember(parser) {
-                                    parser.parse(thinking[1].trim())
+                                    parser.parse(thinkingText.third!!)
                                 }
                                 BasicMarkdown(astNode)
                             }
