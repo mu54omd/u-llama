@@ -15,6 +15,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.MarqueeSpacing
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -112,6 +113,7 @@ fun NewChatItem(
             .offset { IntOffset(-offsetTransition.roundToInt(), 0) }
             .clip(shape = MaterialTheme.shapes.large)
             .background(color = animatedColor)
+            .border(width = 2.dp, color = MaterialTheme.colorScheme.inversePrimary, shape = MaterialTheme.shapes.large)
             .pointerInput(Unit){
                 detectHorizontalDragGestures { _, dragAmount ->
                     when {
@@ -154,16 +156,17 @@ fun NewChatItem(
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.background(color = MaterialTheme.colorScheme.surface).padding(2.dp)
                 ) {
                     Text(
                         text = chatTitle,
                         style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
                         overflow = TextOverflow.Ellipsis,
                         maxLines = 1,
-                        modifier = Modifier.basicMarquee()
+                        modifier = Modifier.basicMarquee().background(color = MaterialTheme.colorScheme.primaryContainer)
                     )
-                    Spacer(modifier = Modifier.width(10.dp))
+                    Spacer(modifier = Modifier.width(5.dp))
                     Text(
                         text = modelName,
                         style = MaterialTheme.typography.labelSmall,

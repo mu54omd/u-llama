@@ -25,6 +25,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.ollamaui.domain.model.chat.ChatModel
+import com.example.ollamaui.ui.common.filterAssistantMessage
+import com.example.ollamaui.ui.common.printLastMessage
 import com.example.ollamaui.ui.screen.home.components.CustomFabButton
 import com.example.ollamaui.ui.screen.home.components.HomeTopBar
 import com.example.ollamaui.ui.screen.home.components.NewChatItem
@@ -45,7 +47,7 @@ fun HomeScreen(
     chatsList: ChatsList,
     isChatReady: Boolean,
     modelList: List<String>,
-    onBackClick: () -> Unit,
+    onBackClick: (Int) -> Unit,
 ) {
     var isNewChatDialogVisible by remember { mutableStateOf(false) }
     var userName by remember { mutableStateOf("") }
@@ -59,8 +61,7 @@ fun HomeScreen(
     var isRevealed by remember { mutableIntStateOf(-1) }
     var backHandlerCounter by remember { mutableIntStateOf(0) }
 
-    val scope = rememberCoroutineScope()
-    val snackbarHostState  = remember { SnackbarHostState() }
+
 
     Scaffold(
         topBar = {
@@ -105,9 +106,6 @@ fun HomeScreen(
                 }
             )
         },
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
-        }
     ) { paddingValues ->
         Box(
             contentAlignment = Alignment.Center,
@@ -153,7 +151,7 @@ fun HomeScreen(
                             NewChatItem(
                                 modelName = chatItem.modelName,
                                 chatTitle = chatItem.chatTitle,
-                                lastMessage = chatItem.chatMessages.messageModels.lastOrNull { it.role != USER_ROLE }?.content ?: "",
+                                lastMessage = printLastMessage(chatItem.chatMessages),
                                 onItemClick = {
                                     when {
                                         selectedChats.contains(chatItem.chatId) -> {
@@ -203,14 +201,6 @@ fun HomeScreen(
         }
     BackHandler {
         backHandlerCounter++
-        if(backHandlerCounter >= 2) {
-            onBackClick()
-        }else {
-            scope.launch {
-                snackbarHostState.showSnackbar(
-                    message = "Perform back function again to exit the app!"
-                )
-            }
-        }
+        onBackClick(backHandlerCounter)
     }
 }
