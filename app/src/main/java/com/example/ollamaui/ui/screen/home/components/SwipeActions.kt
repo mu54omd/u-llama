@@ -26,7 +26,7 @@ fun SwipeActions(
     isSelected: Boolean
 ) {
     val animatedSize by animateIntAsState(
-        if(isSelected) 2 else 3,
+        if(isSelected) 3 else 5,
         label = "Animated Size"
     )
     Row(

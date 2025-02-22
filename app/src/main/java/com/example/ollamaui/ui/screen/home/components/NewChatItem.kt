@@ -75,11 +75,11 @@ fun NewChatItem(
 ) {
 
     val animatedColor by animateColorAsState(
-        targetValue = if(isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+        targetValue = if(isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.background,
         label = "Animated Color",
     )
     val animatedSize by animateIntAsState(
-        targetValue = if(isSelected) 2 else 3,
+        targetValue = if(isSelected) 3 else 5,
         label = "Animated Size"
     )
     val indicatorAnimation by animateColorAsState(
@@ -112,6 +112,7 @@ fun NewChatItem(
             .offset { IntOffset(-offsetTransition.roundToInt(), 0) }
             .clip(shape = MaterialTheme.shapes.large)
             .background(color = animatedColor)
+//            .border(width = 2.dp, color = MaterialTheme.colorScheme.surfaceVariant, shape = MaterialTheme.shapes.large)
             .pointerInput(Unit){
                 detectHorizontalDragGestures { _, dragAmount ->
                     when {
@@ -158,7 +159,7 @@ fun NewChatItem(
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier.background(color = MaterialTheme.colorScheme.surface).padding(2.dp)
+                    modifier = Modifier.background(color = MaterialTheme.colorScheme.surfaceVariant).padding(2.dp)
                 ) {
                     Text(
                         text = chatTitle,
