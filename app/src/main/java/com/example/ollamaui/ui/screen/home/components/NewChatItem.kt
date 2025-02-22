@@ -5,12 +5,12 @@ import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.rememberTransition
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.MarqueeSpacing
 import androidx.compose.foundation.background
@@ -18,7 +18,6 @@ import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -80,14 +79,14 @@ fun NewChatItem(
         label = "Animated Color",
     )
     val animatedSize by animateIntAsState(
-        targetValue = if(isSelected) 5 else 10,
+        targetValue = if(isSelected) 2 else 3,
         label = "Animated Size"
     )
     val indicatorAnimation by animateColorAsState(
         targetValue = if(isNewMessageReceived) {
-            if(newMessageStatus == 1) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.error
+            if(newMessageStatus == 1) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.errorContainer
         } else MaterialTheme.colorScheme.surfaceContainer,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioHighBouncy, stiffness = Spring.StiffnessMedium),
+        animationSpec = tween(delayMillis = 100),
         label = "Indicator",
     )
 
@@ -108,12 +107,11 @@ fun NewChatItem(
 
     Box(
         modifier = modifier
-            .padding(start = animatedSize.dp, end = animatedSize.dp, top = animatedSize.dp)
+            .padding(animatedSize.dp)
             .fillMaxWidth()
             .offset { IntOffset(-offsetTransition.roundToInt(), 0) }
             .clip(shape = MaterialTheme.shapes.large)
             .background(color = animatedColor)
-            .border(width = 2.dp, color = MaterialTheme.colorScheme.inversePrimary, shape = MaterialTheme.shapes.large)
             .pointerInput(Unit){
                 detectHorizontalDragGestures { _, dragAmount ->
                     when {
@@ -133,7 +131,8 @@ fun NewChatItem(
     ){
 
         Row(
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(end = 5.dp)
         ) {
 
             Box(
@@ -141,12 +140,14 @@ fun NewChatItem(
                     .padding(5.dp)
                     .clip(RoundedCornerShape(100))
                     .background(color = indicatorAnimation)
+                    .border(width = 5.dp, color = MaterialTheme.colorScheme.background, shape = RoundedCornerShape(100))
                     .size(75.dp),
                 contentAlignment = Alignment.Center
             ){
                 Text(
-                    text = "${modelName[0]}${modelName[1]}${modelName[2]}",
+                    text = modelName,
                     modifier = Modifier,
+                    maxLines = 1,
                     style = MaterialTheme.typography.displayMedium.copy(textAlign = TextAlign.Center)
                 )
             }
@@ -178,29 +179,27 @@ fun NewChatItem(
                 AnimatedVisibility(visible = lastMessage != "") {
                     Text(
                         text = lastMessage,
+                        style = MaterialTheme.typography.bodySmall,
                         overflow = TextOverflow.Ellipsis,
-                        maxLines = 1
+                        maxLines = 2
                     )
                 }
             }
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier.padding(end = 10.dp)
-            ) {
-                if (isSelected) {
-                    CustomButton(
-                        description = "Clear Select",
-                        onButtonClick = { onSelectedItemClick() },
-                        icon = R.drawable.baseline_clear_24,
-                        containerColor = Color.Transparent,
-                        buttonSize = 30
-                    )
-                }
+            AnimatedVisibility(
+                visible = isSelected,
+                modifier = Modifier.padding(end = 10.dp),
+                enter = scaleIn(),
+                exit = scaleOut()
+                ) {
+                CustomButton(
+                    description = "Clear Select",
+                    onButtonClick = { onSelectedItemClick() },
+                    icon = R.drawable.baseline_clear_24,
+                    containerColor = Color.Transparent,
+                    buttonSize = 30
+                )
             }
-
         }
-
     }
 }
 
@@ -210,16 +209,16 @@ fun NewChatItem(
 private fun NewChatItemPreview() {
     OllamaUITheme {
         NewChatItem(
-            modelName = "llama3.1",
+            modelName = "llama3.1:1b",
             chatTitle = "Title",
-            lastMessage = "Last Message will place here despite of its length!",
+            lastMessage = "Last Message will place here despite of its length! The sentences maybe become so large that it can't show completely!",
             onItemClick = {},
             onItemLongPress = {},
             onSelectedItemClick = {},
-            isSelected = true,
+            isSelected = false,
             isNewMessageReceived = true,
             newMessageStatus = 1,
-            isRevealed = true,
+            isRevealed = false,
             cardOffset = 80f,
             onExpand = {},
             onCollapse = {},
