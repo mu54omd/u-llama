@@ -13,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -27,16 +26,15 @@ fun SwipeActions(
     isSelected: Boolean
 ) {
     val animatedSize by animateIntAsState(
-        if(isSelected) 5 else 10,
+        if(isSelected) 3 else 5,
         label = "Animated Size"
     )
     Row(
         modifier = Modifier
-            .padding(top = animatedSize.dp, end = animatedSize.dp, start = animatedSize.dp)
+            .padding(animatedSize.dp)
             .fillMaxWidth()
             .height(85.dp)
-            .clip(shape = MaterialTheme.shapes.large)
-            .background(Color(0xFFFF1744)),
+            .background(Color(0xFFFF3259), shape = MaterialTheme.shapes.extraLarge),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
