@@ -138,7 +138,7 @@ fun ChatDialog(
                                     modifier = Modifier
                                         .padding(bottom = 4.dp)
                                         .background(
-                                            color = MaterialTheme.colorScheme.surfaceVariant,
+                                            color = MaterialTheme.colorScheme.background,
                                             shape = MaterialTheme.shapes.small
                                         )
                                         .border(

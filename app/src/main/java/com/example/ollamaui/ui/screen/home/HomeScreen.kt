@@ -5,11 +5,14 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -24,6 +27,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.example.ollamaui.domain.model.chat.ChatModel
 import com.example.ollamaui.ui.common.filterAssistantMessage
 import com.example.ollamaui.ui.common.printLastMessage
@@ -141,59 +145,69 @@ fun HomeScreen(
                         items = chatsList.items,
                         key = { chatItem -> chatItem.chatId }
                     ) { chatItem ->
-                        Box(modifier = Modifier.fillMaxWidth().animateItem()) {
-                            SwipeActions(
-                                onDeleteClick = {
-                                    onDeleteChatClick(chatItem)
-                                },
-                                isSelected = selectedChats.contains(chatItem.chatId)
-                            )
-                            NewChatItem(
-                                modelName = chatItem.modelName,
-                                chatTitle = chatItem.chatTitle,
-                                lastMessage = printLastMessage(chatItem.chatMessages),
-                                onItemClick = {
-                                    when {
-                                        selectedChats.contains(chatItem.chatId) -> {
-                                            selectedChats.remove(chatItem.chatId)
-                                        }
-                                        isRevealed != -1 -> { isRevealed = -1}
-                                        else -> {
+                        Column {
+                            Box(modifier = Modifier.fillMaxWidth().animateItem()) {
+                                SwipeActions(
+                                    onDeleteClick = {
+                                        onDeleteChatClick(chatItem)
+                                    },
+                                    isSelected = selectedChats.contains(chatItem.chatId)
+                                )
+                                NewChatItem(
+                                    modelName = chatItem.modelName,
+                                    chatTitle = chatItem.chatTitle,
+                                    lastMessage = printLastMessage(chatItem.chatMessages),
+                                    onItemClick = {
+                                        when {
+                                            selectedChats.contains(chatItem.chatId) -> {
+                                                selectedChats.remove(chatItem.chatId)
+                                            }
 
-                                            if (selectedChats.isEmpty()) {
-                                                onChatClick(chatItem)
-                                            } else {
-                                                if (selectedChats.contains(chatItem.chatId)) {
-                                                    selectedChats.remove(chatItem.chatId)
+                                            isRevealed != -1 -> {
+                                                isRevealed = -1
+                                            }
+
+                                            else -> {
+
+                                                if (selectedChats.isEmpty()) {
+                                                    onChatClick(chatItem)
                                                 } else {
+                                                    if (selectedChats.contains(chatItem.chatId)) {
+                                                        selectedChats.remove(chatItem.chatId)
+                                                    } else {
+                                                        selectedChats.add(chatItem.chatId)
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    onItemLongPress = {
+                                        when {
+                                            isRevealed != -1 -> {
+                                                isRevealed = -1
+                                            }
+
+                                            else -> {
+                                                if (!selectedChats.contains(chatItem.chatId)) {
                                                     selectedChats.add(chatItem.chatId)
                                                 }
                                             }
                                         }
-                                    }
-                                },
-                                onItemLongPress = {
-                                    when{
-                                        isRevealed != -1 -> { isRevealed = -1}
-                                        else -> {
-                                            if (!selectedChats.contains(chatItem.chatId)) {
-                                                selectedChats.add(chatItem.chatId)
-                                            }
-                                        }
-                                    }
-                                },
-                                onSelectedItemClick = { selectedChats.remove(chatItem.chatId) },
-                                isSelected = selectedChats.contains(chatItem.chatId),
-                                isNewMessageReceived = chatItem.newMessageStatus != 0,
-                                newMessageStatus = chatItem.newMessageStatus,
-                                cardOffset = 120f,
-                                onExpand = {
-                                    if(selectedChats.isEmpty())
-                                        isRevealed = chatItem.chatId
-                                           },
-                                onCollapse = { isRevealed = -1 },
-                                isRevealed = isRevealed == chatItem.chatId
-                            )
+                                    },
+                                    onSelectedItemClick = { selectedChats.remove(chatItem.chatId) },
+                                    isSelected = selectedChats.contains(chatItem.chatId),
+                                    isNewMessageReceived = chatItem.newMessageStatus != 0,
+                                    newMessageStatus = chatItem.newMessageStatus,
+                                    cardOffset = 120f,
+                                    onExpand = {
+                                        if (selectedChats.isEmpty())
+                                            isRevealed = chatItem.chatId
+                                    },
+                                    onCollapse = { isRevealed = -1 },
+                                    isRevealed = isRevealed == chatItem.chatId
+                                )
+                            }
+                            HorizontalDivider(modifier = Modifier.padding(start = 30.dp, end = 30.dp))
                         }
                     }
                 }
