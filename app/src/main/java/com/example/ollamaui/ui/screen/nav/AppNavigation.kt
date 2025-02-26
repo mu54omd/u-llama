@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -164,7 +165,8 @@ fun AppNavigation(
                                     }else {
                                         scope.launch {
                                             snackbarHostState.showSnackbar(
-                                                message = "Perform back function again to exit the app!"
+                                                message = "Perform back function again to exit the app!",
+                                                duration = SnackbarDuration.Short
                                             )
                                         }
                                     }

@@ -1,5 +1,6 @@
 package com.example.ollamaui.ui.screen.chat
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
@@ -65,8 +66,8 @@ fun ChatScreen(
 ) {
     var textValue by rememberSaveable { mutableStateOf("") }
     var textValueBackup by rememberSaveable { mutableStateOf("") }
-    val selectedDialogs = remember { mutableStateMapOf<Int, MessageModel>() }
-    val visibleDetails = remember { mutableStateMapOf<Int, MessageModel>() }
+    val selectedDialogs = remember(chatState.chatModel.chatId) { mutableStateMapOf<Int, MessageModel>() }
+    val visibleDetails = remember(chatState.chatModel.chatId) { mutableStateMapOf<Int, MessageModel>() }
     val clipboard: ClipboardManager = LocalClipboardManager.current
     val listState = rememberLazyListState(
         initialFirstVisibleItemIndex = chatState.chatModel.chatMessages.messageModels.lastIndex
@@ -80,8 +81,8 @@ fun ChatScreen(
     var isEnabled by remember { mutableStateOf(false) }
     var isFileDetailsVisible by remember { mutableStateOf(false) }
     val file = remember { mutableStateOf(File()) }
-    val selectedImages = remember { mutableStateListOf<File>() }
-    val selectedDocs = remember { mutableStateListOf<File>() }
+    val selectedImages = remember(chatState.chatModel.chatId) { mutableStateListOf<File>() }
+    val selectedDocs = remember(chatState.chatModel.chatId) { mutableStateListOf<File>() }
 
     Scaffold(
         topBar = {
@@ -225,23 +226,29 @@ fun ChatScreen(
             Conversation(
                 messagesModel = chatState.chatModel.chatMessages ,
                 modifier = Modifier.weight(1f),
-                onItemClick = {index, message ->
+                onItemClick = { index, messageModel ->
                     if(selectedDialogs.isEmpty()) {
                         if(visibleDetails.contains(index)){
                             visibleDetails.remove(index)
                         }else{
-                            visibleDetails[index] = message
+                            visibleDetails[index] = messageModel
                         }
                     }else{
                         if(selectedDialogs.contains(index)) {
                             selectedDialogs.remove(index)
                         }else {
-                            selectedDialogs[index] = message
+                            selectedDialogs[index] = messageModel
                         }
                     }
-                              },
+                },
                 onSelectedItemClick = { index, _ -> selectedDialogs.remove(index) },
-                onLongPressItem = { index, message -> if(selectedDialogs.contains(index)) selectedDialogs.remove(index) else selectedDialogs[index] = message },
+                onLongPressItem = { index, messageModel ->
+                    if(selectedDialogs.contains(index)) {
+                        selectedDialogs.remove(index)
+                    } else {
+                        selectedDialogs[index] = messageModel
+                    }
+                },
                 isSelected = { index, messageModel -> selectedDialogs.contains(index) && selectedDialogs[index]?.messageId == messageModel.messageId },
                 isVisible = { index, messageModel -> visibleDetails.contains(index) && visibleDetails[index]?.messageId == messageModel.messageId  },
                 listState = listState

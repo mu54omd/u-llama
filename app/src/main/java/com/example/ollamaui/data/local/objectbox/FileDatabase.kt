@@ -21,6 +21,10 @@ class FileDatabase @Inject constructor() {
         fileBox.remove(fileId)
     }
 
+    fun getFileIds(chatId: Int):List<Long>{
+        return fileBox.query(File_.chatId.equal(chatId)).build().find().map { it.fileId }
+    }
+
     fun getFilesCount(): Long {
         return fileBox.count()
     }
