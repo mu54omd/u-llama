@@ -7,13 +7,16 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -21,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -90,7 +94,19 @@ fun SettingScreen(
 
     Scaffold(
         snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
+            SnackbarHost(hostState = snackbarHostState){ snackbarData ->
+                Snackbar(
+                    shape = RoundedCornerShape(100),
+                    modifier = Modifier.fillMaxWidth(0.5f)
+                ){
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(text = snackbarData.visuals.message, modifier = Modifier.align(Alignment.Center))
+                    }
+                }
+            }
         }
     ) { padding ->
         Column(
@@ -163,7 +179,7 @@ fun SettingScreen(
                         isSelectedModelPulled = isEmbeddingModelPulled(selectedEmbeddingModel)
                     },
                     defaultValue = selectedEmbeddingModel,
-                    modifier = Modifier.padding(start = 10.dp, top = 20.dp, bottom = 10.dp)
+                    modifier = Modifier.padding(start = 10.dp, top = 20.dp, bottom = 5.dp)
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Row(

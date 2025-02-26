@@ -4,11 +4,16 @@ import android.annotation.SuppressLint
 import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.layout.AnimatedPane
@@ -22,7 +27,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -77,7 +84,17 @@ fun AppNavigation(
 
     Scaffold(
         snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
+            SnackbarHost(hostState = snackbarHostState){ snackbarData ->
+                Snackbar(
+                    shape = RectangleShape,
+                ){
+                    Box(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(text = snackbarData.visuals.message, modifier = Modifier.align(Alignment.Center))
+                    }
+                }
+            }
         }
     ) {
         NavHost(
@@ -148,7 +165,8 @@ fun AppNavigation(
                                     }else {
                                         scope.launch {
                                             snackbarHostState.showSnackbar(
-                                                message = "Perform back function again to exit the app!"
+                                                message = "Perform back function again to exit the app!",
+                                                duration = SnackbarDuration.Short
                                             )
                                         }
                                     }

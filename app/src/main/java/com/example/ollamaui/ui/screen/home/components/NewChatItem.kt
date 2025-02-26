@@ -112,7 +112,6 @@ fun NewChatItem(
             .offset { IntOffset(-offsetTransition.roundToInt(), 0) }
             .clip(shape = MaterialTheme.shapes.large)
             .background(color = animatedColor)
-//            .border(width = 2.dp, color = MaterialTheme.colorScheme.surfaceVariant, shape = MaterialTheme.shapes.large)
             .pointerInput(Unit){
                 detectHorizontalDragGestures { _, dragAmount ->
                     when {
@@ -186,19 +185,25 @@ fun NewChatItem(
                     )
                 }
             }
-            AnimatedVisibility(
-                visible = isSelected,
-                modifier = Modifier.padding(end = 10.dp),
-                enter = scaleIn(),
-                exit = scaleOut()
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.size(45.dp)
+            ) {
+                AnimatedVisibility(
+                    visible = isSelected,
+                    modifier = Modifier.padding(end = 10.dp),
+                    enter = scaleIn(),
+                    exit = scaleOut()
                 ) {
-                CustomButton(
-                    description = "Clear Select",
-                    onButtonClick = { onSelectedItemClick() },
-                    icon = R.drawable.baseline_clear_24,
-                    containerColor = Color.Transparent,
-                    buttonSize = 30
-                )
+                    CustomButton(
+                        description = "Clear Select",
+                        onButtonClick = { onSelectedItemClick() },
+                        icon = R.drawable.baseline_clear_24,
+                        containerColor = Color.Transparent,
+                        buttonSize = 30
+                    )
+                }
             }
         }
     }
@@ -216,7 +221,7 @@ private fun NewChatItemPreview() {
             onItemClick = {},
             onItemLongPress = {},
             onSelectedItemClick = {},
-            isSelected = false,
+            isSelected = true,
             isNewMessageReceived = true,
             newMessageStatus = 1,
             isRevealed = false,
