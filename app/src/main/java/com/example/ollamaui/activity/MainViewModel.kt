@@ -1,6 +1,5 @@
 package com.example.ollamaui.activity
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ollamaui.domain.model.LogModel
@@ -10,14 +9,18 @@ import com.example.ollamaui.domain.model.pull.PullInputModel
 import com.example.ollamaui.domain.model.tag.EmptyTagResponse
 import com.example.ollamaui.domain.preferences.LocalUserManager
 import com.example.ollamaui.domain.repository.OllamaRepository
+import com.example.ollamaui.helper.NetworkObserver
+import com.example.ollamaui.helper.NetworkStatus
 import com.example.ollamaui.utils.Constants.OLLAMA_BASE_ENDPOINT
-import com.example.ollamaui.utils.Constants.OLLAMA_EMBED_ENDPOINT
+import com.example.ollamaui.utils.Constants.OLLAMA_FETCH_EMBEDDING_URL
 import com.example.ollamaui.utils.Constants.OLLAMA_LIST_ENDPOINT
 import com.example.ollamaui.utils.Constants.OLLAMA_PULL_ENDPOINT
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
@@ -35,6 +38,11 @@ class MainViewModel @Inject constructor(
     private val userLocalUserManager: LocalUserManager,
 ):ViewModel() {
 
+    private val networkObserver = NetworkObserver(ollamaRepository)
+    private val _networkStatus = MutableStateFlow(NetworkStatus.UNKNOWN)
+    val networkStatus: StateFlow<NetworkStatus> = _networkStatus
+    private var observationJob: Job? = null
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
     private val _baseAddress = userLocalUserManager.readOllamaUrl().map {
         BaseAddress(
             ollamaBaseAddress = it.ollamaBaseAddress,
@@ -90,17 +98,27 @@ class MainViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5000L),
             initialValue = MainStates()
         )
+
     //Public methods
     /*---------------------------------------------------------------------------------------------*/
     /*---------------------------------------------------------------------------------------------*/
     /*---------------------------------------------------------------------------------------------*/
 
+    private fun startNetworkObserving(url: String){
+        observationJob?.cancel()
+        observationJob = viewModelScope.launch {
+            networkObserver.observeConnectivity(url).collect { isConnected ->
+                _networkStatus.value = isConnected
+            }
+        }
+    }
     fun refresh(){
         viewModelScope.launch {
             _mainState.update { it.copy(isModelListLoaded = false) }
             fetchEmbeddingModelList()
             getOllamaStatus(baseAddress.value.ollamaBaseAddress)
             getOllamaModelsList()
+            startNetworkObserving(url = baseAddress.value.ollamaBaseAddress)
         }
     }
 
@@ -147,7 +165,7 @@ class MainViewModel @Inject constructor(
     fun fetchEmbeddingModelList(){
         viewModelScope.launch {
             try{
-                val url = "https://ollama.com/search?c=embedding"
+                val url = OLLAMA_FETCH_EMBEDDING_URL
                 ollamaRepository.insertLogToDb(
                     LogModel(
                         date = LocalDateTime.now().toString(),
