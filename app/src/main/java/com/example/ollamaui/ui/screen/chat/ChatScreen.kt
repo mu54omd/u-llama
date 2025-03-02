@@ -1,6 +1,5 @@
 package com.example.ollamaui.ui.screen.chat
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
@@ -62,7 +61,7 @@ fun ChatScreen(
     attachedFilesList: AttachedFilesList,
     embeddingModel: String,
     isEmbeddingModelSet: Boolean,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
 ) {
     var textValue by rememberSaveable { mutableStateOf("") }
     var textValueBackup by rememberSaveable { mutableStateOf("") }

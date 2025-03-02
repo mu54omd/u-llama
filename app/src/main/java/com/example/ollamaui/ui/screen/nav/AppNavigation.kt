@@ -21,6 +21,7 @@ import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.material3.adaptive.navigation.NavigableListDetailPaneScaffold
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -40,6 +41,7 @@ import androidx.window.core.layout.WindowWidthSizeClass
 import com.example.ollamaui.activity.MainStates
 import com.example.ollamaui.activity.MainViewModel
 import com.example.ollamaui.domain.model.chat.ModelParameters
+import com.example.ollamaui.helper.NetworkStatus
 import com.example.ollamaui.ui.screen.chat.ChatScreen
 import com.example.ollamaui.ui.screen.chat.ChatViewModel
 import com.example.ollamaui.ui.screen.chat.components.EmptyChatScreen
@@ -49,7 +51,6 @@ import com.example.ollamaui.ui.screen.home.components.LogScreen
 import com.example.ollamaui.ui.screen.loading.LoadingScreen
 import com.example.ollamaui.ui.screen.log.LogViewModel
 import com.example.ollamaui.ui.screen.setting.SettingScreen
-import com.example.ollamaui.utils.Constants.OLLAMA_IS_RUNNING
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
@@ -73,6 +74,8 @@ fun AppNavigation(
     val attachedImagesList = chatViewModel.attachedImages.collectAsStateWithLifecycle().value
     val logViewModel: LogViewModel = hiltViewModel()
     val logs = logViewModel.logs.collectAsStateWithLifecycle().value
+
+    val networkStatus = mainViewModel.networkStatus.collectAsState()
 
     val navigator = rememberListDetailPaneScaffoldNavigator<Int>()
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
@@ -157,7 +160,8 @@ fun AppNavigation(
                                         route = Screens.LogScreen.route
                                     )
                                 },
-                                isChatReady = mainState.isModelListLoaded and (mainState.ollamaStatus == OLLAMA_IS_RUNNING),
+                                networkStatus = networkStatus.value,
+                                isChatReady = mainState.isModelListLoaded and (networkStatus.value == NetworkStatus.CONNECTED),
                                 modelList = mainState.filteredModelList,
                                 onBackClick = { backHandlerCounter ->
                                     if(backHandlerCounter >= 2) {
@@ -241,7 +245,6 @@ fun AppNavigation(
                         mainViewModel.saveOllamaAddress(url = url)
                         mainViewModel.saveOllamaEmbeddingModel(modelName = embeddingModelName)
                         mainViewModel.saveOllamaTuningParameters(modelParameters = modelParameters)
-                        mainViewModel.refresh()
                     },
                     onCheckClick = {url ->
                         mainViewModel.checkOllamaAddress(url)
@@ -250,6 +253,7 @@ fun AppNavigation(
                     onPullEmbeddingModelClick = { mainViewModel.pullEmbeddingModel(it) },
                     ollamaStatus = mainState.ollamaStatus,
                     onBackClick = {
+                        mainViewModel.refresh()
                         navigateToTab(
                             navController = navController,
                             route = Screens.HomeScreen.route

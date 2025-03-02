@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.ollamaui.domain.model.chat.ChatModel
+import com.example.ollamaui.helper.NetworkStatus
 import com.example.ollamaui.ui.common.printLastMessage
 import com.example.ollamaui.ui.screen.home.components.CustomFabButton
 import com.example.ollamaui.ui.screen.home.components.HomeTopBar
@@ -42,6 +43,7 @@ fun HomeScreen(
     onDeleteChatClick: (ChatModel) -> Unit,
     onRefreshClick: () -> Unit,
     chatsList: ChatsList,
+    networkStatus: NetworkStatus,
     isChatReady: Boolean,
     modelList: List<String>,
     onBackClick: (Int) -> Unit,
@@ -57,7 +59,6 @@ fun HomeScreen(
     val maxChar = 25
     var isRevealed by remember { mutableIntStateOf(-1) }
     var backHandlerCounter by remember { mutableIntStateOf(0) }
-
 
     Scaffold(
         topBar = {
@@ -80,7 +81,8 @@ fun HomeScreen(
                             selectedChats.clear()
                         },
                         isSelectedChatsEmpty = isSelectedChatsEmpty,
-                        chatsListSize = chatsList.items.size
+                        chatsListSize = chatsList.items.size,
+                        networkStatus = networkStatus
                     )
                  },
         bottomBar = {},
