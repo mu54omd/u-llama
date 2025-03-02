@@ -1,6 +1,7 @@
 package com.example.ollamaui.ui.screen.home.components
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,11 +13,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ollamaui.R
+import com.example.ollamaui.helper.NetworkStatus
 import com.example.ollamaui.ui.screen.common.CustomButton
 import com.example.ollamaui.ui.theme.OllamaUITheme
 import com.example.ollamaui.utils.Constants.TOP_BAR_HEIGHT
@@ -31,7 +34,16 @@ fun HomeTopBar(
     onSelectClick: () -> Unit,
     isSelectedChatsEmpty: Boolean,
     chatsListSize: Int,
+    networkStatus: NetworkStatus
 ) {
+    val animatedDividerColor by animateColorAsState(
+        targetValue = when(networkStatus){
+            NetworkStatus.CONNECTED -> MaterialTheme.colorScheme.tertiary
+            NetworkStatus.DISCONNECTED -> MaterialTheme.colorScheme.error
+            NetworkStatus.UNKNOWN -> MaterialTheme.colorScheme.primary
+        },
+        label = "Animated Divider Color"
+    )
     Column {
         Box(
             modifier = modifier
@@ -52,7 +64,7 @@ fun HomeTopBar(
                 lightLogo = R.drawable.icon_light,
                 darkLogo = R.drawable.icon_dark,
                 text = "Ollama UI",
-                modifier = Modifier.align(Alignment.Center)
+                modifier = Modifier.align(Alignment.Center),
             )
             Row(
                 horizontalArrangement = Arrangement.Center,
@@ -109,7 +121,7 @@ fun HomeTopBar(
                 }
             }
         }
-        HorizontalDivider(thickness = 2.dp)
+        HorizontalDivider(thickness = 2.dp, color = animatedDividerColor)
     }
 }
 
@@ -124,7 +136,8 @@ private fun HomeTopBarPreview() {
             onDeselectClick = {},
             onSelectClick = {},
             isSelectedChatsEmpty = true,
-            chatsListSize = 0
+            chatsListSize = 0,
+            networkStatus = NetworkStatus.CONNECTED
         )
     }
 }
