@@ -44,7 +44,7 @@ fun SwipeActions(
             description = "Delete chat",
             iconSize = 30,
             onButtonClick = onDeleteClick,
-            modifier = Modifier.padding(10.dp),
+            modifierButton = Modifier.padding(10.dp),
             containerColor = Color.Transparent
         )
     }
