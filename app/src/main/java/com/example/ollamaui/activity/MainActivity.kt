@@ -18,19 +18,19 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val mainViewModel: MainViewModel = hiltViewModel()
-            val mainState = mainViewModel.mainState.collectAsStateWithLifecycle().value
-            val baseAddress = mainViewModel.baseAddress.collectAsStateWithLifecycle().value
-            val embeddingModel = mainViewModel.embeddingModel.collectAsStateWithLifecycle().value
-            val modelParameters = mainViewModel.tuningParameters.collectAsStateWithLifecycle().value
+            val mainState = mainViewModel.mainState.collectAsStateWithLifecycle()
+            val baseAddress = mainViewModel.baseAddress.collectAsStateWithLifecycle()
+            val embeddingModel = mainViewModel.embeddingModel.collectAsStateWithLifecycle()
+            val modelParameters = mainViewModel.tuningParameters.collectAsStateWithLifecycle()
             OllamaUITheme {
                 AppNavigation(
                     mainViewModel = mainViewModel,
-                    mainState = mainState,
-                    ollamaAddress = baseAddress.ollamaBaseAddress,
-                    isLocalSettingsLoaded = baseAddress.isLocalSettingsLoaded,
-                    isEmbeddingModelSet = embeddingModel.isEmbeddingModelSet,
-                    embeddingModel = embeddingModel.embeddingModelName,
-                    modelParameters = modelParameters
+                    mainState = mainState.value,
+                    ollamaAddress = baseAddress.value.ollamaBaseAddress,
+                    isLocalSettingsLoaded = baseAddress.value.isLocalSettingsLoaded,
+                    isEmbeddingModelSet = embeddingModel.value.isEmbeddingModelSet,
+                    embeddingModel = embeddingModel.value.embeddingModelName,
+                    modelParameters = modelParameters.value
                 )
             }
         }

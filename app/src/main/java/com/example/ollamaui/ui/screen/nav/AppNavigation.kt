@@ -67,13 +67,13 @@ fun AppNavigation(
 ) {
     val navController = rememberNavController()
     val homeViewModel: HomeViewModel = hiltViewModel()
-    val chatsList = homeViewModel.chatsList.collectAsStateWithLifecycle().value
+    val chatsList = homeViewModel.chatsList.collectAsStateWithLifecycle()
     val chatViewModel: ChatViewModel = hiltViewModel()
-    val chatState = chatViewModel.chatState.collectAsStateWithLifecycle().value
-    val attachedDocsList = chatViewModel.attachedDocs.collectAsStateWithLifecycle().value
-    val attachedImagesList = chatViewModel.attachedImages.collectAsStateWithLifecycle().value
+    val chatState = chatViewModel.chatState.collectAsStateWithLifecycle()
+    val attachedDocsList = chatViewModel.attachedDocs.collectAsStateWithLifecycle()
+    val attachedImagesList = chatViewModel.attachedImages.collectAsStateWithLifecycle()
     val logViewModel: LogViewModel = hiltViewModel()
-    val logs = logViewModel.logs.collectAsStateWithLifecycle().value
+    val logsState = logViewModel.logs.collectAsStateWithLifecycle()
 
     val networkStatus = mainViewModel.networkStatus.collectAsState()
 
@@ -116,7 +116,7 @@ fun AppNavigation(
                     listPane = {
                         AnimatedPane {
                             HomeScreen(
-                                chatsList = chatsList,
+                                chatsList = chatsList.value,
                                 onChatClick = {
                                     val chatModel = homeViewModel.findChat(chatId = it.chatId) ?: it
                                     chatViewModel.loadStates(
@@ -183,9 +183,9 @@ fun AppNavigation(
                             if (selectedChatId == navigator.currentDestination?.contentKey) {
                                 ChatScreen(
                                     chatViewModel = chatViewModel,
-                                    chatState = chatState,
-                                    attachedFilesList = attachedDocsList,
-                                    attachedImagesList = attachedImagesList,
+                                    chatState = chatState.value,
+                                    attachedFilesList = attachedDocsList.value,
+                                    attachedImagesList = attachedImagesList.value,
                                     embeddingModel = embeddingModel,
                                     isEmbeddingModelSet = isEmbeddingModelSet,
                                     onBackClick = {
@@ -275,7 +275,7 @@ fun AppNavigation(
                 }
             ){
                 LogScreen(
-                    logs = logs,
+                    logsState = logsState,
                     onClearLogClick = {
                         logViewModel.deleteLogs()
                     },
