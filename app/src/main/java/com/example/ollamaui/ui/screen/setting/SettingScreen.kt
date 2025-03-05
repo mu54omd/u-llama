@@ -113,10 +113,10 @@ fun SettingScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
-                .verticalScroll(state = rememberScrollState())
                 .background(color = MaterialTheme.colorScheme.background)
                 .padding(paddingValues = padding)
                 .fillMaxSize()
+                .verticalScroll(state = rememberScrollState())
         ) {
             CustomSettingBox(
                 title = "Ollama Address",

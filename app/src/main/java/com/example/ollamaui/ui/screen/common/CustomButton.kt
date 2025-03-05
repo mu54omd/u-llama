@@ -8,6 +8,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -18,7 +19,8 @@ import com.example.ollamaui.ui.theme.OllamaUITheme
 
 @Composable
 fun CustomButton(
-    modifier: Modifier = Modifier,
+    modifierButton: Modifier = Modifier,
+    modifierIcon: Modifier = Modifier,
     onButtonClick: () -> Unit,
     isButtonEnabled: Boolean = true,
     buttonSize: Int = 25,
@@ -30,9 +32,9 @@ fun CustomButton(
     @DrawableRes icon: Int,
 ) {
     Button(
-        onClick = { onButtonClick() },
+        onClick = onButtonClick,
         enabled = isButtonEnabled,
-        modifier = modifier.size(buttonSize.dp),
+        modifier = modifierButton.size(buttonSize.dp),
         contentPadding = PaddingValues(0.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = containerColor,
@@ -45,7 +47,7 @@ fun CustomButton(
         Icon(
             painter = painterResource(icon),
             contentDescription = description,
-            modifier = Modifier.size(iconSize.dp),
+            modifier = modifierIcon.size(iconSize.dp),
             tint = if(isButtonEnabled) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onBackground.copy(red = 0.5f, blue = 0.5f, green = 0.5f)
         )
     }

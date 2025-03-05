@@ -21,6 +21,7 @@ import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.material3.adaptive.navigation.NavigableListDetailPaneScaffold
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -38,6 +39,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.window.core.layout.WindowWidthSizeClass
+import com.example.ollamaui.activity.BaseAddress
+import com.example.ollamaui.activity.EmbeddingModel
 import com.example.ollamaui.activity.MainStates
 import com.example.ollamaui.activity.MainViewModel
 import com.example.ollamaui.domain.model.chat.ModelParameters
@@ -58,22 +61,19 @@ import kotlinx.coroutines.launch
 @Composable
 fun AppNavigation(
     mainViewModel: MainViewModel,
-    mainState: MainStates,
-    ollamaAddress: String,
-    isEmbeddingModelSet: Boolean,
-    embeddingModel: String,
-    modelParameters: ModelParameters,
-    isLocalSettingsLoaded: Boolean
+    mainState: State<MainStates>,
+    baseAddress: State<BaseAddress>,
+    embeddingModel: State<EmbeddingModel>,
+    modelParameters: State<ModelParameters>,
 ) {
     val navController = rememberNavController()
     val homeViewModel: HomeViewModel = hiltViewModel()
-    val chatsList = homeViewModel.chatsList.collectAsStateWithLifecycle().value
+    val chatsList = homeViewModel.chatsList.collectAsStateWithLifecycle()
     val chatViewModel: ChatViewModel = hiltViewModel()
-    val chatState = chatViewModel.chatState.collectAsStateWithLifecycle().value
-    val attachedDocsList = chatViewModel.attachedDocs.collectAsStateWithLifecycle().value
-    val attachedImagesList = chatViewModel.attachedImages.collectAsStateWithLifecycle().value
+    val chatState = chatViewModel.chatState.collectAsStateWithLifecycle()
+    val attachedDocsList = chatViewModel.attachedDocs.collectAsStateWithLifecycle()
+    val attachedImagesList = chatViewModel.attachedImages.collectAsStateWithLifecycle()
     val logViewModel: LogViewModel = hiltViewModel()
-    val logs = logViewModel.logs.collectAsStateWithLifecycle().value
 
     val networkStatus = mainViewModel.networkStatus.collectAsState()
 
@@ -116,13 +116,13 @@ fun AppNavigation(
                     listPane = {
                         AnimatedPane {
                             HomeScreen(
-                                chatsList = chatsList,
+                                chatsList = chatsList.value,
                                 onChatClick = {
                                     val chatModel = homeViewModel.findChat(chatId = it.chatId) ?: it
                                     chatViewModel.loadStates(
                                         chatModel = chatModel,
-                                        url = ollamaAddress,
-                                        modelParameters = modelParameters
+                                        url = baseAddress.value.ollamaBaseAddress,
+                                        modelParameters = modelParameters.value
                                     )
                                     selectedChatId = chatModel.chatId
                                     scope.launch {
@@ -161,8 +161,8 @@ fun AppNavigation(
                                     )
                                 },
                                 networkStatus = networkStatus.value,
-                                isChatReady = mainState.isModelListLoaded and (networkStatus.value == NetworkStatus.CONNECTED),
-                                modelList = mainState.filteredModelList,
+                                isChatReady = mainState.value.isModelListLoaded and (networkStatus.value == NetworkStatus.CONNECTED),
+                                modelList = mainState.value.filteredModelList,
                                 onBackClick = { backHandlerCounter ->
                                     if(backHandlerCounter >= 2) {
                                         activity?.finish()
@@ -183,11 +183,11 @@ fun AppNavigation(
                             if (selectedChatId == navigator.currentDestination?.contentKey) {
                                 ChatScreen(
                                     chatViewModel = chatViewModel,
-                                    chatState = chatState,
-                                    attachedFilesList = attachedDocsList,
-                                    attachedImagesList = attachedImagesList,
-                                    embeddingModel = embeddingModel,
-                                    isEmbeddingModelSet = isEmbeddingModelSet,
+                                    chatState = chatState.value,
+                                    attachedFilesList = attachedDocsList.value,
+                                    attachedImagesList = attachedImagesList.value,
+                                    embeddingModel = embeddingModel.value.embeddingModelName,
+                                    isEmbeddingModelSet = embeddingModel.value.isEmbeddingModelSet,
                                     onBackClick = {
                                         chatViewModel.clearStates()
                                         selectedChatId = if(windowSizeClass.windowWidthSizeClass != WindowWidthSizeClass.EXPANDED) -2 else -1
@@ -207,7 +207,7 @@ fun AppNavigation(
             }
             composable(route = Screens.LoadingScreen.route){
                 LoadingScreen(
-                    isLocalSettingLoaded = isLocalSettingsLoaded,
+                    isLocalSettingLoaded = baseAddress.value.isLocalSettingsLoaded,
                     onDispose = {
                         mainViewModel.refresh()
                         navigateToTab(navController = navController , route = Screens.HomeScreen.route)
@@ -229,17 +229,17 @@ fun AppNavigation(
                 ){
                 SettingScreen(
                     savedParameters = listOf(
-                        ollamaAddress,
-                        embeddingModel,
-                        modelParameters.temperature.toString(),
-                        modelParameters.numCtx.toString(),
-                        modelParameters.presencePenalty.toString(),
-                        modelParameters.frequencyPenalty.toString(),
-                        modelParameters.topK.toString(),
-                        modelParameters.topP.toString(),
-                        modelParameters.minP.toString(),
+                        baseAddress.value.ollamaBaseAddress,
+                        embeddingModel.value.embeddingModelName,
+                        modelParameters.value.temperature.toString(),
+                        modelParameters.value.numCtx.toString(),
+                        modelParameters.value.presencePenalty.toString(),
+                        modelParameters.value.frequencyPenalty.toString(),
+                        modelParameters.value.topK.toString(),
+                        modelParameters.value.topP.toString(),
+                        modelParameters.value.minP.toString(),
                     ),
-                    embeddingModelList = mainState.embeddingModelList,
+                    embeddingModelList = mainState.value.embeddingModelList,
                     isEmbeddingModelPulled = { mainViewModel.checkIfEmbeddingModelPulled(it) },
                     onSaveClick = { url, embeddingModelName, modelParameters->
                         mainViewModel.saveOllamaAddress(url = url)
@@ -251,7 +251,7 @@ fun AppNavigation(
                     },
                     onFetchEmbeddingModelClick = { mainViewModel.fetchEmbeddingModelList() },
                     onPullEmbeddingModelClick = { mainViewModel.pullEmbeddingModel(it) },
-                    ollamaStatus = mainState.ollamaStatus,
+                    ollamaStatus = mainState.value.ollamaStatus,
                     onBackClick = {
                         mainViewModel.refresh()
                         navigateToTab(
@@ -275,10 +275,7 @@ fun AppNavigation(
                 }
             ){
                 LogScreen(
-                    logs = logs,
-                    onClearLogClick = {
-                        logViewModel.deleteLogs()
-                    },
+                    logViewModel = logViewModel,
                     onBackClick = {
                         navigateToTab(
                             navController = navController,
