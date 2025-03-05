@@ -1,4 +1,4 @@
-package com.example.ollamaui.ui.screen.home.components
+package com.example.ollamaui.ui.screen.log
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
@@ -35,8 +35,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.ollamaui.BuildConfig
 import com.example.ollamaui.R
 import com.example.ollamaui.ui.screen.common.CustomButton
-import com.example.ollamaui.ui.screen.log.LogViewModel
 import com.example.ollamaui.utils.Constants.TOP_BAR_HEIGHT
+import kotlinx.coroutines.delay
 
 @Composable
 fun LogScreen(
@@ -45,15 +45,6 @@ fun LogScreen(
 ) {
     val logsState = logViewModel.logs.collectAsStateWithLifecycle()
     val logLazyListState = rememberLazyListState()
-    LaunchedEffect(logsState) {
-        snapshotFlow { logsState.value }
-            .collect{ logs ->
-                if(logs.isNotEmpty()){
-                    logLazyListState.animateScrollToItem(logsState.value.size-1)
-
-                }
-            }
-    }
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -99,6 +90,15 @@ fun LogScreen(
                 icon = R.drawable.baseline_delete_outline_24,
                 onButtonClick = logViewModel::deleteLogs
             )
+        }
+        LaunchedEffect(logsState) {
+            snapshotFlow { logsState.value }
+                .collect{ logs ->
+                    if(logs.isNotEmpty() && !logLazyListState.isScrollInProgress){
+                        delay(300)
+                        logLazyListState.animateScrollToItem(logsState.value.size-1)
+                    }
+                }
         }
         LazyColumn(
             state = logLazyListState,
