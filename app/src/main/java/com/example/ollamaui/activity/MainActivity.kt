@@ -25,12 +25,10 @@ class MainActivity : ComponentActivity() {
             OllamaUITheme {
                 AppNavigation(
                     mainViewModel = mainViewModel,
-                    mainState = mainState.value,
-                    ollamaAddress = baseAddress.value.ollamaBaseAddress,
-                    isLocalSettingsLoaded = baseAddress.value.isLocalSettingsLoaded,
-                    isEmbeddingModelSet = embeddingModel.value.isEmbeddingModelSet,
-                    embeddingModel = embeddingModel.value.embeddingModelName,
-                    modelParameters = modelParameters.value
+                    mainState = mainState,
+                    baseAddress = baseAddress,
+                    embeddingModel = embeddingModel,
+                    modelParameters = modelParameters
                 )
             }
         }

@@ -19,41 +19,41 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.toMutableStateList
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.ollamaui.BuildConfig
 import com.example.ollamaui.R
-import com.example.ollamaui.domain.model.DumbLogModel
-import com.example.ollamaui.domain.model.LogModel
 import com.example.ollamaui.ui.screen.common.CustomButton
-import com.example.ollamaui.ui.theme.OllamaUITheme
+import com.example.ollamaui.ui.screen.log.LogViewModel
 import com.example.ollamaui.utils.Constants.TOP_BAR_HEIGHT
 
 @Composable
 fun LogScreen(
-    logsState: State<List<LogModel>>,
-    onClearLogClick: () -> Unit,
+    logViewModel: LogViewModel,
     onBackClick: () -> Unit,
 ) {
+    val logsState = logViewModel.logs.collectAsStateWithLifecycle()
+    val logLazyListState = rememberLazyListState()
+    LaunchedEffect(logsState) {
+        snapshotFlow { logsState.value }
+            .collect{ logs ->
+                if(logs.isNotEmpty()){
+                    logLazyListState.animateScrollToItem(logsState.value.size-1)
 
-    val textValueLogs = logsState.value.joinToString("\n") { ">>" + it.date + " " + it.type + " " + it.content }
-    val logLazyListState = rememberLazyListState(initialFirstVisibleItemIndex = textValueLogs.lastIndex)
+                }
+            }
+    }
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -97,9 +97,7 @@ fun LogScreen(
                 description = "Clear Log",
                 iconSize = 15,
                 icon = R.drawable.baseline_delete_outline_24,
-                onButtonClick = {
-                    onClearLogClick()
-                }
+                onButtonClick = logViewModel::deleteLogs
             )
         }
         LazyColumn(
@@ -121,7 +119,7 @@ fun LogScreen(
         ) {
             items(
                 items = logsState.value,
-                key = { it.logId }
+                key = { log -> log.logId }
             ) { log ->
                 BasicTextField(
                     value = ">>" + log.date + " " + log.type + " " + log.content,
@@ -138,16 +136,3 @@ fun LogScreen(
         onBackClick()
     }
 }
-
-//@Preview(showBackground = true)
-//@Composable
-//private fun LogScreenPreview() {
-//    OllamaUITheme {
-//        val logs = remember { mutableStateListOf(DumbLogModel.dumb, DumbLogModel.dumb, DumbLogModel.dumb) }
-//        LogScreen(
-//            logs = logs,
-//            onClearLogClick = {},
-//            onBackClick = {}
-//        )
-//    }
-//}
