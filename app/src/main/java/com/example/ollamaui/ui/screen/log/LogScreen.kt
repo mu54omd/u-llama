@@ -1,11 +1,15 @@
-package com.example.ollamaui.ui.screen.home.components
+package com.example.ollamaui.ui.screen.log
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,19 +17,26 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -35,8 +46,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.ollamaui.BuildConfig
 import com.example.ollamaui.R
 import com.example.ollamaui.ui.screen.common.CustomButton
-import com.example.ollamaui.ui.screen.log.LogViewModel
 import com.example.ollamaui.utils.Constants.TOP_BAR_HEIGHT
+import kotlinx.coroutines.launch
 
 @Composable
 fun LogScreen(
@@ -45,19 +56,25 @@ fun LogScreen(
 ) {
     val logsState = logViewModel.logs.collectAsStateWithLifecycle()
     val logLazyListState = rememberLazyListState()
-    LaunchedEffect(logsState) {
-        snapshotFlow { logsState.value }
-            .collect{ logs ->
-                if(logs.isNotEmpty()){
-                    logLazyListState.animateScrollToItem(logsState.value.size-1)
+    var isAutoScrollEnabled by remember { mutableStateOf(true) }
+    var isProgrammaticScroll by remember { mutableStateOf(false) }
 
+
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        snapshotFlow { logLazyListState.isScrollInProgress }
+            .collect { isScrollInProgress ->
+                if (isScrollInProgress && !isProgrammaticScroll) {
+                    isAutoScrollEnabled = false
                 }
             }
     }
+
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize().background(color = MaterialTheme.colorScheme.background)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -100,12 +117,11 @@ fun LogScreen(
                 onButtonClick = logViewModel::deleteLogs
             )
         }
-        LazyColumn(
-            state = logLazyListState,
+        Box(
             modifier = Modifier
                 .padding(10.dp)
                 .background(
-                    color = if(isSystemInDarkTheme()) Color.DarkGray else Color.White,
+                    color = if (isSystemInDarkTheme()) Color.DarkGray else Color.White,
                     shape = MaterialTheme.shapes.small
                 )
                 .border(
@@ -117,18 +133,65 @@ fun LogScreen(
                 .fillMaxHeight()
                 .padding(5.dp)
         ) {
-            items(
-                items = logsState.value,
-                key = { log -> log.logId }
-            ) { log ->
-                BasicTextField(
-                    value = ">>" + log.date + " " + log.type + " " + log.content,
-                    onValueChange = {},
-                    readOnly = true,
-                    textStyle = MaterialTheme.typography.bodySmall.copy(
-                        color = MaterialTheme.colorScheme.onSurface,
+            LaunchedEffect(Unit) {
+                snapshotFlow { logsState.value }
+                    .collect{ logs ->
+                        if(isAutoScrollEnabled && logs.isNotEmpty() && !logLazyListState.isScrollInProgress){
+                            isProgrammaticScroll = true
+                            logLazyListState.scrollToItem(logsState.value.size - 1 )
+                            isProgrammaticScroll = false
+                        }
+                    }
+            }
+            LazyColumn(
+                state = logLazyListState,
+            ) {
+                items(
+                    items = logsState.value,
+                    key = { log -> log.logId }
+                ) { log ->
+                    Text(
+                        text = ">> ${log.date} ${log.type} ${log.content}",
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = MaterialTheme.colorScheme.onSurface,
+                        ),
                     )
-                )
+                }
+            }
+            val showScrollButton by remember {
+                derivedStateOf { isAutoScrollEnabled }
+            }
+
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .size(50.dp)
+                    .offset(x = (-10).dp, y = (-10).dp)
+                    .align(
+                        BiasAlignment(1f, 1f)
+                    )
+            ) {
+                AnimatedVisibility(
+                    visible = !showScrollButton,
+                    enter = scaleIn(),
+                    exit = scaleOut()
+                ) {
+                    CustomButton(
+                        icon = R.drawable.baseline_expand_more_24,
+                        iconSize = 30,
+                        buttonSize = 50,
+                        description = "Tap to scroll",
+                        onButtonClick = {
+                            scope.launch {
+                                isProgrammaticScroll = true
+                                logLazyListState.scrollToItem(logsState.value.size - 1)
+                                isProgrammaticScroll = false
+                                isAutoScrollEnabled = true
+                            }
+                        },
+                    )
+                }
             }
         }
     }

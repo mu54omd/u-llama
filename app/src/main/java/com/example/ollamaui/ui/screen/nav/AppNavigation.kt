@@ -50,7 +50,7 @@ import com.example.ollamaui.ui.screen.chat.ChatViewModel
 import com.example.ollamaui.ui.screen.chat.components.EmptyChatScreen
 import com.example.ollamaui.ui.screen.home.HomeScreen
 import com.example.ollamaui.ui.screen.home.HomeViewModel
-import com.example.ollamaui.ui.screen.home.components.LogScreen
+import com.example.ollamaui.ui.screen.log.LogScreen
 import com.example.ollamaui.ui.screen.loading.LoadingScreen
 import com.example.ollamaui.ui.screen.log.LogViewModel
 import com.example.ollamaui.ui.screen.setting.SettingScreen
