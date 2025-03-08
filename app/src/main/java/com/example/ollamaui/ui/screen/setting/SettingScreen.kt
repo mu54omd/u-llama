@@ -107,13 +107,13 @@ fun SettingScreen(
                     }
                 }
             }
-        }
+        },
+        modifier = Modifier.background(color = MaterialTheme.colorScheme.background)
     ) { padding ->
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
-                .background(color = MaterialTheme.colorScheme.background)
                 .padding(paddingValues = padding)
                 .fillMaxSize()
                 .verticalScroll(state = rememberScrollState())
