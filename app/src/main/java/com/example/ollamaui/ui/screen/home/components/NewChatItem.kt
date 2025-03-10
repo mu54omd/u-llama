@@ -5,10 +5,7 @@ import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.rememberTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
@@ -52,6 +49,8 @@ import com.example.ollamaui.R
 import com.example.ollamaui.ui.screen.common.CustomButton
 import com.example.ollamaui.ui.theme.OllamaUITheme
 import kotlin.math.roundToInt
+import androidx.compose.animation.core.Animatable
+import androidx.compose.runtime.LaunchedEffect
 
 const val ANIMATION_DURATION = 350
 const val MIN_DRAG_AMOUNT = 30
@@ -96,19 +95,14 @@ fun NewChatItem(
     )
 
     /////////////////////////////////////////
-    val transitionState = remember {
-        MutableTransitionState(isRevealed).apply {
-            targetState = !isRevealed
-        }
-    }
-
-    val transition = rememberTransition(transitionState = transitionState, label = "cardTransition")
-
-    val offsetTransition by transition.animateFloat(
-        label = "cardOffsetTransition",
-        transitionSpec = { tween(durationMillis = ANIMATION_DURATION) },
-        targetValueByState = { if (isRevealed) cardOffset else 0f },
+    val offsetAnimatable = remember { Animatable(0f) }
+    LaunchedEffect(isRevealed) {
+        val targetOffset = if (isRevealed) cardOffset else 0f
+        offsetAnimatable.animateTo(
+            targetValue = targetOffset,
+            animationSpec = tween(durationMillis = ANIMATION_DURATION)
         )
+    }
 
     val marqueeSpacing = remember { MarqueeSpacing(10.dp) }
     /////////////////////////////////////////
@@ -118,7 +112,7 @@ fun NewChatItem(
             .padding(5.dp)
             .fillMaxWidth()
             .offset {
-                IntOffset(-offsetTransition.roundToInt(), 0)
+                IntOffset(-offsetAnimatable.value.roundToInt(), 0)
             }
             .graphicsLayer {
                 clip = true
