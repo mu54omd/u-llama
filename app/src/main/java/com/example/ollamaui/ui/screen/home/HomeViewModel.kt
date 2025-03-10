@@ -23,12 +23,12 @@ class HomeViewModel @Inject constructor(
     private val chunkDatabase: ChunkDatabase
 ):ViewModel(){
 
-    private val _chatsList = ollamaRepository.getChats().map { ChatsList(items = it) }
+    private val _chatsList = ollamaRepository.getChats().map { it }
     val chatsList = _chatsList
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000L),
-            initialValue = ChatsList()
+            initialValue = emptyList()
         )
 
     //Public methods
@@ -73,7 +73,7 @@ class HomeViewModel @Inject constructor(
         }
     }
     fun findChat(chatId: Int): ChatModel?{
-        return chatsList.value.items.find { item -> item.chatId == chatId }
+        return chatsList.value.find { item -> item.chatId == chatId }
     }
 
 

@@ -116,7 +116,7 @@ fun AppNavigation(
                     listPane = {
                         AnimatedPane {
                             HomeScreen(
-                                chatsList = chatsList.value,
+                                chatsList = chatsList,
                                 onChatClick = {
                                     val chatModel = homeViewModel.findChat(chatId = it.chatId) ?: it
                                     chatViewModel.loadStates(

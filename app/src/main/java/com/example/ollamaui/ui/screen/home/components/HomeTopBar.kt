@@ -57,7 +57,7 @@ fun HomeTopBar(
                 onButtonClick = onSettingClick,
                 icon = R.drawable.baseline_settings_24,
                 buttonSize = 50,
-                modifierButton = Modifier.align(Alignment.CenterStart),
+                modifier = Modifier.align(Alignment.CenterStart),
                 containerColor = MaterialTheme.colorScheme.background
             )
             LogoTitle(

@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -42,7 +43,7 @@ fun HomeScreen(
     onDeleteChatByIdClick: (Int) -> Unit,
     onDeleteChatClick: (ChatModel) -> Unit,
     onRefreshClick: () -> Unit,
-    chatsList: ChatsList,
+    chatsList: State<List<ChatModel>>,
     networkStatus: NetworkStatus,
     isChatReady: Boolean,
     modelList: List<String>,
@@ -73,7 +74,7 @@ fun HomeScreen(
                         },
                         onSelectClick = {
                             isRevealed = -1
-                            chatsList.items.forEach { chat ->
+                            chatsList.value.forEach { chat ->
                                 selectedChats.add(chat.chatId)
                             }
                         },
@@ -81,7 +82,7 @@ fun HomeScreen(
                             selectedChats.clear()
                         },
                         isSelectedChatsEmpty = isSelectedChatsEmpty,
-                        chatsListSize = chatsList.items.size,
+                        chatsListSize = chatsList.value.size,
                         networkStatus = networkStatus
                     )
                  },
@@ -136,7 +137,7 @@ fun HomeScreen(
                     .align(Alignment.TopCenter),
             ) {
                     items(
-                        items = chatsList.items,
+                        items = chatsList.value,
                         key = { chatItem -> chatItem.chatId }
                     ) { chatItem ->
                         Column {
