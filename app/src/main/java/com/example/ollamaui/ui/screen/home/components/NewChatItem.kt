@@ -4,10 +4,8 @@ import android.annotation.SuppressLint
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.animateIntAsState
-import androidx.compose.animation.core.rememberTransition
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
@@ -37,7 +35,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -49,6 +49,8 @@ import com.example.ollamaui.R
 import com.example.ollamaui.ui.screen.common.CustomButton
 import com.example.ollamaui.ui.theme.OllamaUITheme
 import kotlin.math.roundToInt
+import androidx.compose.animation.core.Animatable
+import androidx.compose.runtime.LaunchedEffect
 
 const val ANIMATION_DURATION = 350
 const val MIN_DRAG_AMOUNT = 30
@@ -73,15 +75,17 @@ fun NewChatItem(
     onExpand: () -> Unit,
     onCollapse: () -> Unit,
 ) {
-
     val animatedColor by animateColorAsState(
         targetValue = if(isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.background,
         label = "Animated Color",
     )
-    val animatedSize by animateIntAsState(
-        targetValue = if(isSelected) 3 else 5,
-        label = "Animated Size"
+
+    val scale by animateFloatAsState(
+        targetValue = if (isSelected) 0.98f else 1f, // Adds a pop effect
+        animationSpec = tween(300, easing = FastOutSlowInEasing),
+        label = "Scale Animation"
     )
+
     val indicatorAnimation by animateColorAsState(
         targetValue = if(isNewMessageReceived) {
             if(newMessageStatus == 1) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.errorContainer
@@ -90,28 +94,38 @@ fun NewChatItem(
         label = "Indicator",
     )
 
-    ///////////////////////////////////////
-    val transitionState = remember {
-        MutableTransitionState(isRevealed).apply {
-            targetState = !isRevealed
-        }
-    }
-    val transition = rememberTransition(transitionState = transitionState, label = "cardTransition")
-
-    val offsetTransition by transition.animateFloat(
-        label = "cardOffsetTransition",
-        transitionSpec = { tween(durationMillis = ANIMATION_DURATION) },
-        targetValueByState = { if (isRevealed) cardOffset else 0f },
+    /////////////////////////////////////////
+    val offsetAnimatable = remember { Animatable(0f) }
+    LaunchedEffect(isRevealed) {
+        val targetOffset = if (isRevealed) cardOffset else 0f
+        offsetAnimatable.animateTo(
+            targetValue = targetOffset,
+            animationSpec = tween(durationMillis = ANIMATION_DURATION)
         )
+    }
+
+    val marqueeSpacing = remember { MarqueeSpacing(10.dp) }
     /////////////////////////////////////////
 
     Box(
         modifier = modifier
-            .padding(animatedSize.dp)
+            .padding(5.dp)
             .fillMaxWidth()
-            .offset { IntOffset(-offsetTransition.roundToInt(), 0) }
-            .clip(shape = MaterialTheme.shapes.large)
-            .background(color = animatedColor)
+            .offset {
+                IntOffset(-offsetAnimatable.value.roundToInt(), 0)
+            }
+            .graphicsLayer {
+                clip = true
+                shape = RoundedCornerShape(16.dp)
+                scaleX = scale
+                scaleY = scale
+            }
+            .drawBehind {
+                drawRoundRect(
+                    color = animatedColor,
+                    cornerRadius = CornerRadius(16.dp.toPx()),
+                    )
+            }
             .pointerInput(Unit){
                 detectHorizontalDragGestures { _, dragAmount ->
                     when {
@@ -139,7 +153,11 @@ fun NewChatItem(
                 modifier = Modifier
                     .padding(5.dp)
                     .clip(RoundedCornerShape(100))
-                    .background(color = indicatorAnimation)
+                    .drawBehind {
+                        drawRoundRect(
+                            color = indicatorAnimation
+                        )
+                    }
                     .border(width = 5.dp, color = MaterialTheme.colorScheme.background, shape = RoundedCornerShape(100))
                     .size(75.dp),
                 contentAlignment = Alignment.Center
@@ -173,7 +191,7 @@ fun NewChatItem(
                         style = MaterialTheme.typography.labelSmall,
                         overflow = TextOverflow.Ellipsis,
                         maxLines = 1,
-                        modifier = Modifier.basicMarquee(spacing = MarqueeSpacing(10.dp))
+                        modifier = Modifier.basicMarquee(spacing = marqueeSpacing)
                     )
                 }
                 AnimatedVisibility(visible = lastMessage != "") {
@@ -200,7 +218,7 @@ fun NewChatItem(
                         description = "Clear Select",
                         onButtonClick = { onSelectedItemClick() },
                         icon = R.drawable.baseline_clear_24,
-                        containerColor = Color.Transparent,
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
                         buttonSize = 30
                     )
                 }
