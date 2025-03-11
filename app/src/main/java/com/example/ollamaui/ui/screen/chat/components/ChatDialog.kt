@@ -16,11 +16,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.SpanStyle
@@ -51,7 +53,7 @@ fun ChatDialog(
     isSelected: Boolean,
     isVisible: Boolean,
 ) {
-    val isFromMe = isFromMe(messageModel)
+    val isFromMe by remember { derivedStateOf { isFromMe(messageModel) } }
     val animatedColorMyMessage by animateColorAsState(
         if(isSelected) MaterialTheme.colorScheme.tertiaryContainer.copy(red = MaterialTheme.colorScheme.tertiaryContainer.red + 30f) else MaterialTheme.colorScheme.primaryContainer,
         label = "Animated Color My Message",
@@ -83,7 +85,7 @@ fun ChatDialog(
     ) {
             Box(
                 modifier = Modifier
-                    .align(if (isFromMe(messageModel)) Alignment.End else Alignment.Start)
+                    .align(if (isFromMe) Alignment.End else Alignment.Start)
                     .clip(
                         RoundedCornerShape(
                             topStart = if (isFromMe) 50f else 0f,
@@ -109,7 +111,11 @@ fun ChatDialog(
                             }
                         )
                     }
-                    .background(color = if (isFromMe) animatedColorMyMessage else animatedColorBotMessage)
+                    .drawBehind{
+                        drawRoundRect(
+                            color = if (isFromMe) animatedColorMyMessage else animatedColorBotMessage
+                        )
+                    }
                     .padding(16.dp)
 
             ) {
