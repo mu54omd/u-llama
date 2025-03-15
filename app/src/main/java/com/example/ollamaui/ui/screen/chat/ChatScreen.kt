@@ -4,6 +4,8 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -148,77 +150,89 @@ fun ChatScreen(
                     bottom = contentPadding.calculateBottomPadding()
                 )
         ) {
-            AnimatedVisibility(
-                visible = attachedImagesList.item.any { it.chatId == chatState.chatModel.chatId }, enter = scaleIn(), exit = scaleOut()
+            Column(
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.height(64.dp)
             ) {
-                LazyRow(modifier = Modifier.height(32.dp)) {
-                    itemsIndexed(attachedImagesList.item.filter { it.chatId == chatState.chatModel.chatId }){ index, item ->
-                        AttachedFilesItem(
-                            item = item,
-                            index = index,
-                            onFilesLongPress = {
-                                if(!selectedImages.contains(it)) {
-                                    selectedImages.add(it)
-                                }
-                            },
-                            onFilesClick = {
-                                if(selectedImages.isEmpty()) {
-                                    isFileDetailsVisible = true
-                                    file.value = it
-                                }else{
-                                    if(selectedImages.contains(it)){
-                                        selectedImages.remove(it)
-                                    }else{
+                AnimatedVisibility(
+                    visible = attachedImagesList.item.any { it.chatId == chatState.chatModel.chatId },
+                    enter = slideInVertically(),
+                    exit = shrinkHorizontally()
+                ) {
+                    LazyRow(
+                        modifier = Modifier.height(32.dp),
+                        ) {
+                        itemsIndexed(attachedImagesList.item.filter { it.chatId == chatState.chatModel.chatId }) { index, item ->
+                            AttachedFilesItem(
+                                item = item,
+                                index = index,
+                                onFilesLongPress = {
+                                    if (!selectedImages.contains(it)) {
                                         selectedImages.add(it)
                                     }
-                                }
-                            },
-                            onSelectedItemClick = {
-                                selectedImages.remove(it)
-                            },
-                            onRemoveClick = { _, isImage ->
-                                selectedImages.remove(item)
-                                chatViewModel.removeAttachedFile(index, isImage)
-                                            },
-                            isSelected = selectedImages.contains(item)
-                        )
+                                },
+                                onFilesClick = {
+                                    if (selectedImages.isEmpty()) {
+                                        isFileDetailsVisible = true
+                                        file.value = it
+                                    } else {
+                                        if (selectedImages.contains(it)) {
+                                            selectedImages.remove(it)
+                                        } else {
+                                            selectedImages.add(it)
+                                        }
+                                    }
+                                },
+                                onSelectedItemClick = {
+                                    selectedImages.remove(it)
+                                },
+                                onRemoveClick = { _, isImage ->
+                                    selectedImages.remove(item)
+                                    chatViewModel.removeAttachedFile(index, isImage)
+                                },
+                                isSelected = selectedImages.contains(item)
+                            )
+                        }
                     }
                 }
-            }
-            AnimatedVisibility(
-                visible = attachedFilesList.item.any { it.chatId == chatState.chatModel.chatId }, enter = scaleIn(), exit = scaleOut()
-            ) {
-                LazyRow(modifier = Modifier.height(32.dp)) {
-                    itemsIndexed(attachedFilesList.item.filter { it.chatId == chatState.chatModel.chatId }){ index, item ->
-                        AttachedFilesItem(
-                            item =item,
-                            index = index,
-                            onFilesLongPress = {
-                                if(!selectedDocs.contains(it)) {
-                                    selectedDocs.add(it)
-                                }
-                            },
-                            onFilesClick = {
-                                if(selectedDocs.isEmpty()) {
-                                    isFileDetailsVisible = true
-                                    file.value = it
-                                }else{
-                                    if(selectedDocs.contains(it)){
-                                        selectedDocs.remove(it)
-                                    }else{
+                AnimatedVisibility(
+                    visible = attachedFilesList.item.any { it.chatId == chatState.chatModel.chatId },
+                    enter = slideInVertically(),
+                    exit = shrinkHorizontally()
+                ) {
+                    LazyRow(modifier = Modifier.height(32.dp)) {
+                        itemsIndexed(attachedFilesList.item.filter { it.chatId == chatState.chatModel.chatId }) { index, item ->
+                            AttachedFilesItem(
+                                item = item,
+                                index = index,
+                                onFilesLongPress = {
+                                    if (!selectedDocs.contains(it)) {
                                         selectedDocs.add(it)
                                     }
-                                }
-                            },
-                            onSelectedItemClick = {
-                                selectedDocs.remove(it)
-                            },
-                            onRemoveClick = { _, isImage ->
-                                selectedDocs.remove(item)
-                                chatViewModel.removeAttachedFile(index, isImage)
-                                            },
-                            isSelected = selectedDocs.contains(item)
-                        )
+                                },
+                                onFilesClick = {
+                                    if (selectedDocs.isEmpty()) {
+                                        isFileDetailsVisible = true
+                                        file.value = it
+                                    } else {
+                                        if (selectedDocs.contains(it)) {
+                                            selectedDocs.remove(it)
+                                        } else {
+                                            selectedDocs.add(it)
+                                        }
+                                    }
+                                },
+                                onSelectedItemClick = {
+                                    selectedDocs.remove(it)
+                                },
+                                onRemoveClick = { _, isImage ->
+                                    selectedDocs.remove(item)
+                                    chatViewModel.removeAttachedFile(index, isImage)
+                                },
+                                isSelected = selectedDocs.contains(item)
+                            )
+                        }
                     }
                 }
             }

@@ -69,7 +69,12 @@ class HomeViewModel @Inject constructor(
     }
     fun deleteChatById(chatId: Int){
         viewModelScope.launch {
+            val fileIds = fileDatabase.getFileIds(chatId)
             ollamaRepository.deleteFromDbById(chatId)
+            fileIds.forEach {
+                fileDatabase.removeFile(fileId = it)
+                chunkDatabase.removeChunk(docId = it)
+            }
         }
     }
     fun findChat(chatId: Int): ChatModel?{
