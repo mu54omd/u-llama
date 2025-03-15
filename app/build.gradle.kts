@@ -13,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.ollamaui"
-        minSdk = 21
+        minSdk = 26
         targetSdk = 35
         versionCode = 1021
         versionName = "1.0.21"
@@ -59,6 +59,10 @@ android {
 }
 
 dependencies {
+
+    //Apache-Poi
+    implementation(libs.poi)
+    implementation(libs.poi.ooxml)
 
     //Desugaring
     coreLibraryDesugaring(libs.desugar.jdk.libs)
