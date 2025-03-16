@@ -1,6 +1,5 @@
 package com.example.ollamaui.ui.screen.chat
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
@@ -51,7 +50,6 @@ import com.example.ollamaui.ui.screen.chat.components.ChatBottomBar
 import com.example.ollamaui.ui.screen.chat.components.ChatTopBar
 import com.example.ollamaui.ui.screen.chat.components.Conversation
 import com.example.ollamaui.ui.screen.chat.components.DotsPulsing
-import com.example.ollamaui.ui.screen.chat.components.FileDetails
 import com.example.ollamaui.ui.screen.common.CustomButton
 import kotlinx.coroutines.launch
 
@@ -64,6 +62,7 @@ fun ChatScreen(
     embeddingModel: String,
     isEmbeddingModelSet: Boolean,
     onBackClick: () -> Unit,
+    onFileClick: (File) -> Unit,
 ) {
     var textValue by rememberSaveable { mutableStateOf("") }
     var textValueBackup by rememberSaveable { mutableStateOf("") }
@@ -80,8 +79,6 @@ fun ChatScreen(
         }
     }
     var isEnabled by remember { mutableStateOf(false) }
-    var isFileDetailsVisible by remember { mutableStateOf(false) }
-    val file = remember { mutableStateOf(File()) }
     val selectedImages = remember(chatState.chatModel.chatId) { mutableStateListOf<File>() }
     val selectedDocs = remember(chatState.chatModel.chatId) { mutableStateListOf<File>() }
 
@@ -174,8 +171,7 @@ fun ChatScreen(
                                 },
                                 onFilesClick = {
                                     if (selectedImages.isEmpty()) {
-                                        isFileDetailsVisible = true
-                                        file.value = it
+                                        onFileClick(it)
                                     } else {
                                         if (selectedImages.contains(it)) {
                                             selectedImages.remove(it)
@@ -213,8 +209,7 @@ fun ChatScreen(
                                 },
                                 onFilesClick = {
                                     if (selectedDocs.isEmpty()) {
-                                        isFileDetailsVisible = true
-                                        file.value = it
+                                        onFileClick(it)
                                     } else {
                                         if (selectedDocs.contains(it)) {
                                             selectedDocs.remove(it)
@@ -322,18 +317,7 @@ fun ChatScreen(
                         )
                 }
             )
-            AnimatedVisibility(
-                visible = isFileDetailsVisible
-            ) {
-                FileDetails(
-                    onDismissRequest = { isFileDetailsVisible = false},
-                    file = file.value
-                )
-            }
         }
 
-        BackHandler {
-            onBackClick()
-        }
     }
 }

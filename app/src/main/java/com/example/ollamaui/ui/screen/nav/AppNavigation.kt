@@ -18,6 +18,7 @@ import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
+import androidx.compose.material3.adaptive.layout.PaneAdaptedValue
 import androidx.compose.material3.adaptive.navigation.NavigableListDetailPaneScaffold
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
@@ -25,6 +26,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -44,15 +46,17 @@ import com.example.ollamaui.activity.EmbeddingModel
 import com.example.ollamaui.activity.MainStates
 import com.example.ollamaui.activity.MainViewModel
 import com.example.ollamaui.domain.model.chat.ModelParameters
+import com.example.ollamaui.domain.model.objectbox.File
 import com.example.ollamaui.helper.NetworkStatus
 import com.example.ollamaui.ui.screen.chat.ChatScreen
 import com.example.ollamaui.ui.screen.chat.ChatViewModel
 import com.example.ollamaui.ui.screen.chat.components.EmptyChatScreen
 import com.example.ollamaui.ui.screen.home.HomeScreen
 import com.example.ollamaui.ui.screen.home.HomeViewModel
-import com.example.ollamaui.ui.screen.log.LogScreen
 import com.example.ollamaui.ui.screen.loading.LoadingScreen
+import com.example.ollamaui.ui.screen.log.LogScreen
 import com.example.ollamaui.ui.screen.log.LogViewModel
+import com.example.ollamaui.ui.screen.preview.PreviewScreen
 import com.example.ollamaui.ui.screen.setting.SettingScreen
 import kotlinx.coroutines.launch
 
@@ -84,6 +88,7 @@ fun AppNavigation(
 
     val activity = LocalActivity.current
     val snackbarHostState  = remember { SnackbarHostState() }
+    var selectedFile by remember { mutableStateOf(File()) }
 
     Scaffold(
         snackbarHost = {
@@ -104,7 +109,7 @@ fun AppNavigation(
             navController = navController,
             startDestination = Screens.LoadingScreen.route,
             modifier = Modifier
-                .background( color = MaterialTheme.colorScheme.background )
+                .background(color = MaterialTheme.colorScheme.background)
                 .safeDrawingPadding(),
 
         ) {
@@ -189,11 +194,26 @@ fun AppNavigation(
                                     embeddingModel = embeddingModel.value.embeddingModelName,
                                     isEmbeddingModelSet = embeddingModel.value.isEmbeddingModelSet,
                                     onBackClick = {
-                                        chatViewModel.clearStates()
-                                        selectedChatId = if(windowSizeClass.windowWidthSizeClass != WindowWidthSizeClass.EXPANDED) -2 else -1
+                                        if(navigator.scaffoldState.currentState.tertiary == PaneAdaptedValue.Hidden){
+                                            chatViewModel.clearStates()
+                                            selectedChatId = if(windowSizeClass.windowWidthSizeClass != WindowWidthSizeClass.EXPANDED) -2 else -1
+                                            scope.launch {
+                                                navigator.navigateTo(
+                                                    pane = ListDetailPaneScaffoldRole.List,
+                                                )
+                                            }
+                                        }else{
+                                            scope.launch {
+                                                navigator.navigateBack()
+                                            }
+                                        }
+                                    },
+                                    onFileClick = { file ->
+                                        selectedFile = file
                                         scope.launch {
                                             navigator.navigateTo(
-                                                pane = ListDetailPaneScaffoldRole.List,
+                                                pane = ListDetailPaneScaffoldRole.Extra,
+                                                contentKey = selectedChatId
                                             )
                                         }
                                     }
@@ -201,6 +221,11 @@ fun AppNavigation(
                             } else if( selectedChatId == -1 || windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.EXPANDED) {
                                 EmptyChatScreen()
                             }
+                        }
+                    },
+                    extraPane = {
+                        AnimatedPane {
+                            PreviewScreen(selectedFile)
                         }
                     },
                 )
