@@ -2,7 +2,6 @@ package com.example.ollamaui.domain.readers
 
 import android.graphics.BitmapFactory
 import com.example.ollamaui.ui.common.bitmapToBase64
-import java.io.IOException
 import java.io.InputStream
 
 class ImageReader: DocumentReader() {
@@ -12,7 +11,7 @@ class ImageReader: DocumentReader() {
         try {
             result = bitmapToBase64(bitmap)
             return Pair(result, null)
-        }catch (e: IOException){
+        }catch (e: Exception){
             result = e.printStackTrace().toString()
             return Pair(null, result)
         }

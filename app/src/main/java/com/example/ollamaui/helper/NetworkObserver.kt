@@ -35,13 +35,6 @@ class NetworkObserver(
                 val request = Request.Builder().url(url).get().build()
                 val response = client.newCall(request).execute()
                 val responseBody = response.body?.string()
-                ollamaRepository.insertLogToDb(
-                    LogModel(
-                        date = LocalDateTime.now().toString(),
-                        type = "Network-check",
-                        content = "Result: Success - ${responseBody.toString()}",
-                    )
-                )
                 response.isSuccessful && responseBody?.contains(OLLAMA_IS_RUNNING) == true
             }
         }catch (e: Exception){

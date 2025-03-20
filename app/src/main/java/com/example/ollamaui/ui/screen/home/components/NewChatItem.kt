@@ -1,9 +1,9 @@
 package com.example.ollamaui.ui.screen.home.components
 
-import android.annotation.SuppressLint
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -30,6 +30,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -49,15 +50,12 @@ import com.example.ollamaui.R
 import com.example.ollamaui.ui.screen.common.CustomButton
 import com.example.ollamaui.ui.theme.OllamaUITheme
 import kotlin.math.roundToInt
-import androidx.compose.animation.core.Animatable
-import androidx.compose.runtime.LaunchedEffect
 
 const val ANIMATION_DURATION = 350
 const val MIN_DRAG_AMOUNT = 30
 
 
 @OptIn(ExperimentalFoundationApi::class)
-@SuppressLint("UnusedTransitionTargetStateParameter")
 @Composable
 fun NewChatItem(
     modifier: Modifier = Modifier,

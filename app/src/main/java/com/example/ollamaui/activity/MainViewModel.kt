@@ -115,17 +115,21 @@ class MainViewModel @Inject constructor(
     fun refresh(){
         viewModelScope.launch {
             _mainState.update { it.copy(isModelListLoaded = false) }
-            fetchEmbeddingModelList()
-            getOllamaStatus(baseAddress.value.ollamaBaseAddress)
-            getOllamaModelsList()
-            startNetworkObserving(url = baseAddress.value.ollamaBaseAddress)
+            withContext(Dispatchers.IO) {
+                fetchEmbeddingModelList()
+                getOllamaStatus(baseAddress.value.ollamaBaseAddress)
+                getOllamaModelsList()
+                startNetworkObserving(url = baseAddress.value.ollamaBaseAddress)
+            }
         }
     }
 
     fun checkOllamaAddress(url: String){
         _mainState.update { it.copy(ollamaStatus = "", statusError = null) }
         viewModelScope.launch {
-            getOllamaStatus(url = url)
+            withContext(Dispatchers.IO) {
+                getOllamaStatus(url = url)
+            }
         }
     }
 
@@ -133,7 +137,9 @@ class MainViewModel @Inject constructor(
         _mainState.update { it.copy(pullResponse = EmptyPullResponse.empty, pullError = null) }
         if(checkIfEmbeddingModelPulled(modelName)) {
             viewModelScope.launch {
-                ollamaPostPull(modelName = modelName)
+                withContext(Dispatchers.IO) {
+                    ollamaPostPull(modelName = modelName)
+                }
             }
         }else{
             _mainState.update { it.copy(isEmbeddingModelPulled = true) }
@@ -165,15 +171,15 @@ class MainViewModel @Inject constructor(
     fun fetchEmbeddingModelList(){
         viewModelScope.launch {
             try{
-                val url = OLLAMA_FETCH_EMBEDDING_URL
-                ollamaRepository.insertLogToDb(
-                    LogModel(
-                        date = LocalDateTime.now().toString(),
-                        type = "ollama-fetch",
-                        content = "fetch: $url",
-                    )
-                )
                 withContext(Dispatchers.IO) {
+                    val url = OLLAMA_FETCH_EMBEDDING_URL
+                    ollamaRepository.insertLogToDb(
+                        LogModel(
+                            date = LocalDateTime.now().toString(),
+                            type = "ollama-fetch",
+                            content = "fetch: $url",
+                        )
+                    )
                     val doc = Jsoup.connect(url).get()
                     val result = doc
                         .getElementsByClass("truncate text-xl font-medium underline-offset-2 group-hover:underline md:text-2xl")
