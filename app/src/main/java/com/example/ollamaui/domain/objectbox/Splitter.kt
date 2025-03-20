@@ -39,7 +39,7 @@ class Splitter {
                     chunks.add(currChunk)
                 }
                 val overlappingChunks = ArrayList<String>(chunks)
-                if (chunkOverlap > 1 && chunks.size > 0) {
+                if (chunkOverlap > 1 && chunks.isNotEmpty()) {
                     for (i in 0..<chunks.size - 1) {
                         val overlapStart = max(0, chunks[i].length - chunkOverlap)
                         val overlapEnd = min(chunkOverlap, chunks[i + 1].length)

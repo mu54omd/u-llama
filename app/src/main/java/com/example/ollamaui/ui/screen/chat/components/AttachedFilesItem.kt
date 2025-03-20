@@ -2,15 +2,15 @@ package com.example.ollamaui.ui.screen.chat.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -19,9 +19,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.ollamaui.R
 import com.example.ollamaui.domain.model.objectbox.File
@@ -39,14 +41,19 @@ fun AttachedFilesItem(
     isSelected: Boolean
 ) {
     val animateColor by animateColorAsState(
-        targetValue = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainer,
+        targetValue = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.8f),
         label = "Animate Attached File Item"
     )
     Box(
         modifier = Modifier
+            .requiredHeight(32.dp)
             .padding(2.dp)
-            .clip(shape = RoundedCornerShape(5))
-            .background(animateColor)
+            .clip(shape = RoundedCornerShape(100))
+            .drawBehind{
+                drawRoundRect(
+                    color = animateColor,
+                )
+            }
             .pointerInput(Unit){ detectTapGestures(
                 onLongPress = {
                     onFilesLongPress(item)
@@ -62,12 +69,13 @@ fun AttachedFilesItem(
                     }
                 }
             ) },
+        contentAlignment = Alignment.Center
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            modifier = Modifier.padding(start = 10.dp, end = 10.dp)
         ) {
-            Spacer(modifier = Modifier.width(10.dp))
             if(item.isImage) {
                 item.attachResult.let {
                     Box(
@@ -83,15 +91,19 @@ fun AttachedFilesItem(
                     }
                 }
             }
-            Spacer(modifier = Modifier.width(10.dp))
-            Text(text = item.fileName)
-            Spacer(modifier = Modifier.width(10.dp))
+            Text(
+                text = item.fileName,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.widthIn(max = 150.dp).basicMarquee(),
+                maxLines = 1
+            )
             CustomButton(
                 onButtonClick = { onRemoveClick(index, item.isImage) },
                 icon = R.drawable.baseline_clear_24,
                 description = "Remove Attached File",
-                containerColor = animateColor,
-                iconSize = 20
+                iconSize = 20,
+                buttonSize = 20,
             )
         }
     }

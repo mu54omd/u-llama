@@ -17,7 +17,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -55,15 +55,20 @@ fun LoadingScreen(
             Image(
                 painter = painterResource(if(isSystemInDarkTheme()) R.drawable.icon_dark else R.drawable.icon_light),
                 contentDescription = "App Logo Light",
-                modifier = Modifier.size(width = 350.dp, height = 200.dp),
-                alpha = imageAlpha
+                modifier = Modifier
+                    .size(width = 350.dp, height = 200.dp)
+                    .graphicsLayer{
+                        alpha = imageAlpha
+                    },
             )
 
         Row {
             Text(
                 text = "Ollama UI",
                 style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
-                modifier = Modifier.alpha(textAlpha)
+                modifier = Modifier.graphicsLayer{
+                    alpha = textAlpha
+                }
             )
         }
         LaunchedEffect(isLocalSettingLoaded) {

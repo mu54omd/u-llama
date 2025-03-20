@@ -18,6 +18,7 @@ import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
+import androidx.compose.material3.adaptive.layout.PaneAdaptedValue
 import androidx.compose.material3.adaptive.navigation.NavigableListDetailPaneScaffold
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
@@ -48,10 +49,12 @@ import com.example.ollamaui.helper.NetworkStatus
 import com.example.ollamaui.ui.screen.chat.ChatScreen
 import com.example.ollamaui.ui.screen.chat.ChatViewModel
 import com.example.ollamaui.ui.screen.chat.components.EmptyChatScreen
+import com.example.ollamaui.ui.screen.files.FilesScreen
+import com.example.ollamaui.ui.screen.files.FilesViewModel
 import com.example.ollamaui.ui.screen.home.HomeScreen
 import com.example.ollamaui.ui.screen.home.HomeViewModel
-import com.example.ollamaui.ui.screen.log.LogScreen
 import com.example.ollamaui.ui.screen.loading.LoadingScreen
+import com.example.ollamaui.ui.screen.log.LogScreen
 import com.example.ollamaui.ui.screen.log.LogViewModel
 import com.example.ollamaui.ui.screen.setting.SettingScreen
 import kotlinx.coroutines.launch
@@ -71,9 +74,11 @@ fun AppNavigation(
     val chatsList = homeViewModel.chatsList.collectAsStateWithLifecycle()
     val chatViewModel: ChatViewModel = hiltViewModel()
     val chatState = chatViewModel.chatState.collectAsStateWithLifecycle()
-    val attachedDocsList = chatViewModel.attachedDocs.collectAsStateWithLifecycle()
-    val attachedImagesList = chatViewModel.attachedImages.collectAsStateWithLifecycle()
+    val attachedFilesList = chatViewModel.attachedFiles.collectAsStateWithLifecycle()
     val logViewModel: LogViewModel = hiltViewModel()
+    val fileViewModel: FilesViewModel = hiltViewModel()
+    val fileContent = fileViewModel.output.collectAsState()
+    val selectedFile = fileViewModel.selectedFile.collectAsState()
 
     val networkStatus = mainViewModel.networkStatus.collectAsState()
 
@@ -104,7 +109,7 @@ fun AppNavigation(
             navController = navController,
             startDestination = Screens.LoadingScreen.route,
             modifier = Modifier
-                .background( color = MaterialTheme.colorScheme.background )
+                .background(color = MaterialTheme.colorScheme.background)
                 .safeDrawingPadding(),
 
         ) {
@@ -184,16 +189,31 @@ fun AppNavigation(
                                 ChatScreen(
                                     chatViewModel = chatViewModel,
                                     chatState = chatState.value,
-                                    attachedFilesList = attachedDocsList.value,
-                                    attachedImagesList = attachedImagesList.value,
+                                    attachedFilesList = attachedFilesList.value,
                                     embeddingModel = embeddingModel.value.embeddingModelName,
                                     isEmbeddingModelSet = embeddingModel.value.isEmbeddingModelSet,
                                     onBackClick = {
-                                        chatViewModel.clearStates()
-                                        selectedChatId = if(windowSizeClass.windowWidthSizeClass != WindowWidthSizeClass.EXPANDED) -2 else -1
+                                        if(navigator.scaffoldState.currentState.tertiary == PaneAdaptedValue.Hidden){
+                                            chatViewModel.clearStates()
+                                            selectedChatId = if(windowSizeClass.windowWidthSizeClass != WindowWidthSizeClass.EXPANDED) -2 else -1
+                                            scope.launch {
+                                                navigator.navigateTo(
+                                                    pane = ListDetailPaneScaffoldRole.List,
+                                                )
+                                            }
+                                        }else{
+                                            scope.launch {
+                                                navigator.navigateBack()
+                                            }
+                                        }
+                                    },
+                                    onFileClick = { file ->
+                                        fileViewModel.selectFile(file)
+                                        fileViewModel.prepareFile(file = file)
                                         scope.launch {
                                             navigator.navigateTo(
-                                                pane = ListDetailPaneScaffoldRole.List,
+                                                pane = ListDetailPaneScaffoldRole.Extra,
+                                                contentKey = selectedChatId
                                             )
                                         }
                                     }
@@ -201,6 +221,14 @@ fun AppNavigation(
                             } else if( selectedChatId == -1 || windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.EXPANDED) {
                                 EmptyChatScreen()
                             }
+                        }
+                    },
+                    extraPane = {
+                        AnimatedPane {
+                            FilesScreen(
+                                fileContent = fileContent.value,
+                                file = selectedFile.value
+                            )
                         }
                     },
                 )

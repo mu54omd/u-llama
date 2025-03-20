@@ -10,10 +10,12 @@ import com.example.ollamaui.domain.model.chat.ChatModel
 import com.example.ollamaui.domain.repository.OllamaRepository
 import com.example.ollamaui.utils.Constants.SYSTEM_ROLE
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,7 +25,7 @@ class HomeViewModel @Inject constructor(
     private val chunkDatabase: ChunkDatabase
 ):ViewModel(){
 
-    private val _chatsList = ollamaRepository.getChats().map { it }
+    private val _chatsList = ollamaRepository.getChats().flowOn(Dispatchers.IO)
     val chatsList = _chatsList
         .stateIn(
             viewModelScope,
@@ -52,24 +54,35 @@ class HomeViewModel @Inject constructor(
                 modelName = selectedModel,
                 chatMessages = MessagesModel(messageModels = listOf(startMessage)),
             )
-            ollamaRepository.insertToDb(chatModel)
+            withContext(Dispatchers.IO) {
+                ollamaRepository.insertToDb(chatModel)
+            }
 
         }
     }
 
     fun deleteChat(chatModel: ChatModel){
         viewModelScope.launch {
-            val fileIds = fileDatabase.getFileIds(chatModel.chatId)
-            ollamaRepository.deleteFromDb(chatModel)
-            fileIds.forEach {
-                fileDatabase.removeFile(fileId = it)
-                chunkDatabase.removeChunk(docId = it)
+            withContext(Dispatchers.IO) {
+                val fileIds = fileDatabase.getFileIds(chatModel.chatId)
+                ollamaRepository.deleteFromDb(chatModel)
+                fileIds.forEach {
+                    fileDatabase.removeFile(fileId = it)
+                    chunkDatabase.removeChunk(docId = it)
+                }
             }
         }
     }
     fun deleteChatById(chatId: Int){
         viewModelScope.launch {
-            ollamaRepository.deleteFromDbById(chatId)
+            withContext(Dispatchers.IO) {
+                val fileIds = fileDatabase.getFileIds(chatId)
+                ollamaRepository.deleteFromDbById(chatId)
+                fileIds.forEach {
+                    fileDatabase.removeFile(fileId = it)
+                    chunkDatabase.removeChunk(docId = it)
+                }
+            }
         }
     }
     fun findChat(chatId: Int): ChatModel?{

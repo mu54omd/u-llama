@@ -13,7 +13,9 @@ class ChunkDatabase @Inject constructor() {
     }
 
     fun removeChunk(docId: Long){
-        chunksBox.removeByIds(chunksBox.query(Chunk_.docId.equal(docId)).build().findIds().toList())
+        val query = chunksBox.query(Chunk_.docId.equal(docId)).build()
+        query.remove()
+//        chunksBox.removeByIds(chunksBox.query(Chunk_.docId.equal(docId)).build().findIds().toList())
     }
 
     fun getSimilarChunks(docIds: List<Long>, queryEmbedding: FloatArray, n: Int = 5): List<Pair<Float, Chunk>> {
@@ -26,7 +28,7 @@ class ChunkDatabase @Inject constructor() {
          */
         val result = mutableListOf<Pair<Float, Chunk>>()
         docIds.forEach { docId ->
-            result += chunksBox.query(Chunk_.docId.equal(docId) and  Chunk_.chunkEmbedding.nearestNeighbors(queryEmbedding, 25))
+            result += chunksBox.query(Chunk_.docId.equal(docId) and  Chunk_.chunkEmbedding.nearestNeighbors(queryEmbedding, 100))
                 .build()
                 .findWithScores()
                 .map { Pair(it.score.toFloat(), it.get()) }

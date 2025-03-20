@@ -1,6 +1,5 @@
 package com.example.ollamaui.ui.common
 
-import com.example.ollamaui.domain.model.MessageModel
 import com.example.ollamaui.domain.model.MessagesModel
 import com.example.ollamaui.utils.Constants.SYSTEM_ROLE
 import com.example.ollamaui.utils.Constants.USER_ROLE
