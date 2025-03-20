@@ -26,7 +26,6 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -46,17 +45,17 @@ import com.example.ollamaui.activity.EmbeddingModel
 import com.example.ollamaui.activity.MainStates
 import com.example.ollamaui.activity.MainViewModel
 import com.example.ollamaui.domain.model.chat.ModelParameters
-import com.example.ollamaui.domain.model.objectbox.File
 import com.example.ollamaui.helper.NetworkStatus
 import com.example.ollamaui.ui.screen.chat.ChatScreen
 import com.example.ollamaui.ui.screen.chat.ChatViewModel
 import com.example.ollamaui.ui.screen.chat.components.EmptyChatScreen
+import com.example.ollamaui.ui.screen.files.FilesScreen
+import com.example.ollamaui.ui.screen.files.FilesViewModel
 import com.example.ollamaui.ui.screen.home.HomeScreen
 import com.example.ollamaui.ui.screen.home.HomeViewModel
 import com.example.ollamaui.ui.screen.loading.LoadingScreen
 import com.example.ollamaui.ui.screen.log.LogScreen
 import com.example.ollamaui.ui.screen.log.LogViewModel
-import com.example.ollamaui.ui.screen.preview.PreviewScreen
 import com.example.ollamaui.ui.screen.setting.SettingScreen
 import kotlinx.coroutines.launch
 
@@ -75,9 +74,11 @@ fun AppNavigation(
     val chatsList = homeViewModel.chatsList.collectAsStateWithLifecycle()
     val chatViewModel: ChatViewModel = hiltViewModel()
     val chatState = chatViewModel.chatState.collectAsStateWithLifecycle()
-    val attachedDocsList = chatViewModel.attachedDocs.collectAsStateWithLifecycle()
-    val attachedImagesList = chatViewModel.attachedImages.collectAsStateWithLifecycle()
+    val attachedFilesList = chatViewModel.attachedFiles.collectAsStateWithLifecycle()
     val logViewModel: LogViewModel = hiltViewModel()
+    val fileViewModel: FilesViewModel = hiltViewModel()
+    val fileContent = fileViewModel.output.collectAsState()
+    val selectedFile = fileViewModel.selectedFile.collectAsState()
 
     val networkStatus = mainViewModel.networkStatus.collectAsState()
 
@@ -88,7 +89,6 @@ fun AppNavigation(
 
     val activity = LocalActivity.current
     val snackbarHostState  = remember { SnackbarHostState() }
-    var selectedFile by remember { mutableStateOf(File()) }
 
     Scaffold(
         snackbarHost = {
@@ -189,8 +189,7 @@ fun AppNavigation(
                                 ChatScreen(
                                     chatViewModel = chatViewModel,
                                     chatState = chatState.value,
-                                    attachedFilesList = attachedDocsList.value,
-                                    attachedImagesList = attachedImagesList.value,
+                                    attachedFilesList = attachedFilesList.value,
                                     embeddingModel = embeddingModel.value.embeddingModelName,
                                     isEmbeddingModelSet = embeddingModel.value.isEmbeddingModelSet,
                                     onBackClick = {
@@ -209,7 +208,8 @@ fun AppNavigation(
                                         }
                                     },
                                     onFileClick = { file ->
-                                        selectedFile = file
+                                        fileViewModel.selectFile(file)
+                                        fileViewModel.prepareFile(file = file)
                                         scope.launch {
                                             navigator.navigateTo(
                                                 pane = ListDetailPaneScaffoldRole.Extra,
@@ -225,7 +225,10 @@ fun AppNavigation(
                     },
                     extraPane = {
                         AnimatedPane {
-                            PreviewScreen(selectedFile)
+                            FilesScreen(
+                                fileContent = fileContent.value,
+                                file = selectedFile.value
+                            )
                         }
                     },
                 )

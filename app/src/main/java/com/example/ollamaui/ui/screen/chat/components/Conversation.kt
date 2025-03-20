@@ -32,7 +32,7 @@ fun Conversation(
         modifier = modifier.padding(bottom = 10.dp),
         verticalArrangement = Arrangement.Bottom,
         state = listState,
-        contentPadding = PaddingValues(start = 10.dp, end = 10.dp)
+        contentPadding = PaddingValues(top = 32.dp, start = 10.dp, end = 10.dp)
     ) {
         itemsIndexed(
             items = messagesModel.messageModels,

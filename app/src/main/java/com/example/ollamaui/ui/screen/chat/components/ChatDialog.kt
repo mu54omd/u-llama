@@ -78,6 +78,7 @@ fun ChatDialog(
             )
         )
     )
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -123,7 +124,7 @@ fun ChatDialog(
                     horizontalAlignment = if (isFromMe) Alignment.End else Alignment.Start,
                 ) {
                     if(messageModel.role == USER_ROLE) {
-                        Text(text = filterUserMessage(messageModel.content)?:messageModel.content)
+                        Text(text = filterUserMessage(messageModel.content)?:messageModel.content )
                     }else{
                         val thinkingText = filterAssistantMessage(assistantMessage = messageModel.content)
                         if(thinkingText.first != null){

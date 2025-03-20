@@ -42,85 +42,79 @@
       "relations": []
     },
     {
-      "id": "2:1883999539185832377",
-      "lastPropertyId": "6:2335962827771912206",
-      "name": "Document",
+      "id": "4:7613969510566583652",
+      "lastPropertyId": "8:4587980091670474094",
+      "name": "File",
       "properties": [
         {
-          "id": "1:3517755974992953303",
-          "name": "docId",
+          "id": "1:5185461439005539302",
+          "name": "fileId",
           "type": 6,
           "flags": 1
         },
         {
-          "id": "2:4466243995213441617",
-          "name": "docText",
-          "type": 9
-        },
-        {
-          "id": "3:4035165117434687144",
-          "name": "docFileName",
-          "type": 9
-        },
-        {
-          "id": "5:6211152473660129065",
+          "id": "2:7177282549509591070",
           "name": "chatId",
           "type": 5
         },
         {
-          "id": "6:2335962827771912206",
-          "name": "docAddedTime",
-          "type": 6
-        }
-      ],
-      "relations": []
-    },
-    {
-      "id": "3:6891484496465247065",
-      "lastPropertyId": "6:2307618426907758378",
-      "name": "Image",
-      "properties": [
-        {
-          "id": "1:7895891454985083661",
-          "name": "imageId",
-          "type": 6,
-          "flags": 1
-        },
-        {
-          "id": "2:6053360830184176093",
-          "name": "chatId",
-          "type": 5
-        },
-        {
-          "id": "3:4459179256332931735",
-          "name": "imageBase64",
+          "id": "3:8545986451784715732",
+          "name": "attachResult",
           "type": 9
         },
         {
-          "id": "4:8308118114519410362",
-          "name": "imageFileName",
+          "id": "4:3019622546392529999",
+          "name": "fileName",
           "type": 9
         },
         {
-          "id": "6:2307618426907758378",
-          "name": "imageAddedTime",
+          "id": "5:8834198946946911958",
+          "name": "fileType",
+          "type": 9
+        },
+        {
+          "id": "6:6926956305358326972",
+          "name": "fileAddedTime",
           "type": 6
+        },
+        {
+          "id": "7:7007163848058568618",
+          "name": "isImage",
+          "type": 1
+        },
+        {
+          "id": "8:4587980091670474094",
+          "name": "hashCode",
+          "type": 9
         }
       ],
       "relations": []
     }
   ],
-  "lastEntityId": "3:6891484496465247065",
+  "lastEntityId": "4:7613969510566583652",
   "lastIndexId": "2:1189714503797245299",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
   "modelVersion": 5,
   "modelVersionParserMinimum": 5,
-  "retiredEntityUids": [],
+  "retiredEntityUids": [
+    6891484496465247065,
+    1883999539185832377
+  ],
   "retiredIndexUids": [],
   "retiredPropertyUids": [
     1815499880776418715,
-    544254492154363220
+    544254492154363220,
+    7895891454985083661,
+    6053360830184176093,
+    4459179256332931735,
+    8308118114519410362,
+    2307618426907758378,
+    3517755974992953303,
+    4466243995213441617,
+    4035165117434687144,
+    6211152473660129065,
+    2335962827771912206
   ],
   "retiredRelationUids": [],
   "version": 1
