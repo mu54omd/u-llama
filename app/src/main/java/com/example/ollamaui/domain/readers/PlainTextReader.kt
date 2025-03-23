@@ -4,7 +4,7 @@ import java.io.IOException
 import java.io.InputStream
 
 class PlainTextReader: DocumentReader() {
-    override fun readFromInputStream(inputStream: InputStream): Pair<String?,String?> {
+    override fun readFromInputStream(inputStream: InputStream, process: (Int) -> Unit): Pair<String?,String?> {
         val size: Int
         var result: String
         try {

@@ -107,13 +107,12 @@ class ChatViewModel @Inject constructor(
                     getSimilarChunk(
                         fileIds = selectedFiles.filter { !it.isImage }.map{ it.fileId },
                         query = text.trim(),
-                        n = 5,
                         embeddingModel = if (embeddingModel != "") embeddingModel else chatState.value.chatModel.modelName,
                     )
                 job.invokeOnCompletion {
                     messages.add(
                         MessageModel(
-                            content = "Using this data: {${chatState.value.retrievedContext}}. Respond to this prompt: {${text.trim()}}.",
+                            content = "Using this data: {${chatState.value.retrievedContext.trimIndent()}}. Respond to this prompt: {${text.trimIndent()}}.",
                             role = USER_ROLE,
                         )
                     )
@@ -452,7 +451,7 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun getSimilarChunk(fileIds: List<Long>, query: String, n: Int, embeddingModel: String):Job{
+    private fun getSimilarChunk(fileIds: List<Long>, query: String, embeddingModel: String):Job{
         val job = viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 _chatState.update { it.copy(isRetrievedContextReady = false) }
@@ -471,7 +470,6 @@ class ChatViewModel @Inject constructor(
                             chunkDatabase.getSimilarChunks(
                                 docIds = fileIds,
                                 queryEmbedding = queryEmbedding,
-                                n = n
                             ).forEach {
                                 jointContext += " " + it.second.chunkData
                             }

@@ -5,7 +5,7 @@ import com.example.ollamaui.ui.common.bitmapToBase64
 import java.io.InputStream
 
 class ImageReader: DocumentReader() {
-    override fun readFromInputStream(inputStream: InputStream): Pair<String?, String?> {
+    override fun readFromInputStream(inputStream: InputStream, process: (Int) -> Unit): Pair<String?, String?> {
         val bitmap = BitmapFactory.decodeStream(inputStream)
         var result: String?
         try {

@@ -1,7 +1,7 @@
 package com.example.ollamaui.ui.common
 
 fun filterUserMessage(userMessage: String):String?{
-    val regex = Regex("Using this data: \\{(\n*.*)\\}. Respond to this prompt: \\{(\n*.*)\\}.")
+    val regex = Regex("Using this data:\\s*\\{([\\s\\S]*?)\\}\\s*\\.\\s*Respond to this prompt:\\s*\\{([\\s\\S]*?)\\}\\s*\\.")
     val match = regex.find(userMessage)
-    return if(match != null) match.groups[2]?.value else null
+    return match?.groups?.get(2)?.value
 }

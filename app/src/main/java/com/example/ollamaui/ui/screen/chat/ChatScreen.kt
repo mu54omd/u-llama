@@ -24,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -43,6 +44,7 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import com.example.ollamaui.R
+import com.example.ollamaui.activity.EmbeddingModel
 import com.example.ollamaui.domain.model.MessageModel
 import com.example.ollamaui.domain.model.objectbox.File
 import com.example.ollamaui.ui.common.messageModelToText
@@ -58,20 +60,18 @@ import kotlinx.coroutines.launch
 @Composable
 fun ChatScreen(
     chatViewModel: ChatViewModel,
-    chatState: ChatStates,
-    attachedFilesList: AttachedFilesList,
-    embeddingModel: String,
-    isEmbeddingModelSet: Boolean,
+    chatState: State<ChatStates>,
+    attachedFilesList: State<AttachedFilesList>,
+    embeddingModel: State<EmbeddingModel>,
     onBackClick: () -> Unit,
     onFileClick: (File) -> Unit,
 ) {
     var textValue by rememberSaveable { mutableStateOf("") }
-    var textValueBackup by rememberSaveable { mutableStateOf("") }
-    val selectedDialogs = remember(chatState.chatModel.chatId) { mutableStateMapOf<Int, MessageModel>() }
-    val visibleDetails = remember(chatState.chatModel.chatId) { mutableStateMapOf<Int, MessageModel>() }
+    val selectedDialogs = remember(chatState.value.chatModel.chatId) { mutableStateMapOf<Int, MessageModel>() }
+    val visibleDetails = remember(chatState.value.chatModel.chatId) { mutableStateMapOf<Int, MessageModel>() }
     val clipboard: ClipboardManager = LocalClipboardManager.current
     val listState = rememberLazyListState(
-        initialFirstVisibleItemIndex = chatState.chatModel.chatMessages.messageModels.lastIndex
+        initialFirstVisibleItemIndex = chatState.value.chatModel.chatMessages.messageModels.lastIndex
     )
     val scope = rememberCoroutineScope()
     val isFabVisible by remember {
@@ -80,13 +80,15 @@ fun ChatScreen(
         }
     }
     var isEnabled by remember { mutableStateOf(false) }
-    val selectedFiles = remember(chatState.chatModel.chatId) { mutableStateListOf<File>() }
+    val selectedFiles = remember(chatState.value.chatModel.chatId) { mutableStateListOf<File>() }
+    val isAnyFileAttached by remember { derivedStateOf { attachedFilesList.value.item.any { it.chatId == chatState.value.chatModel.chatId } }}
+    val attachedFileItems by remember { derivedStateOf { attachedFilesList.value.item.filter { it.chatId == chatState.value.chatModel.chatId } }}
 
     Scaffold(
         topBar = {
             ChatTopBar(
-                modelName = chatState.chatModel.modelName,
-                chatTitle = chatState.chatModel.chatTitle,
+                modelName = chatState.value.chatModel.modelName,
+                chatTitle = chatState.value.chatModel.chatTitle,
                 onBackClick = onBackClick,
                 onCopyClick = {
                     clipboard.setText(AnnotatedString(text = messageModelToText(selectedDialogs)))
@@ -101,20 +103,19 @@ fun ChatScreen(
                 onValueChange = { textValue = it },
                 onSendClick = {
                     when{
-                     chatState.isSendingFailed -> { chatViewModel.retry() }
-                     chatState.isRespondingList.contains(chatState.chatModel.chatId) -> { chatViewModel.stop(chatId = chatState.chatModel.chatId) }
+                     chatState.value.isSendingFailed -> { chatViewModel.retry() }
+                     chatState.value.isRespondingList.contains(chatState.value.chatModel.chatId) -> { chatViewModel.stop(chatId = chatState.value.chatModel.chatId) }
                      else -> {
-                         chatViewModel.sendButton(text = textValue, selectedFiles = selectedFiles, embeddingModel = embeddingModel)
+                         chatViewModel.sendButton(text = textValue, selectedFiles = selectedFiles, embeddingModel = embeddingModel.value.embeddingModelName)
                          textValue = ""
-                         textValueBackup = textValue
                      }
                     }
                 },
                 onClearClick = { textValue = "" },
                 onAttachClick = { isEnabled = true },
-                isModelSelected = chatState.chatModel.modelName != "",
-                isSendingFailed = chatState.isSendingFailed,
-                isResponding = chatState.isRespondingList.contains(chatState.chatModel.chatId),
+                isModelSelected = chatState.value.chatModel.modelName != "",
+                isSendingFailed = chatState.value.isSendingFailed,
+                isResponding = chatState.value.isRespondingList.contains(chatState.value.chatModel.chatId),
             )
         },
         floatingActionButton = {
@@ -125,7 +126,7 @@ fun ChatScreen(
             ) {
                 CustomButton(
                     onButtonClick = {
-                        scope.launch { listState.animateScrollToItem(index = chatState.chatModel.chatMessages.messageModels.size)}
+                        scope.launch { listState.animateScrollToItem(index = chatState.value.chatModel.chatMessages.messageModels.size)}
                                     },
                     icon = R.drawable.baseline_expand_more_24,
                     description = "Scroll Down",
@@ -154,7 +155,7 @@ fun ChatScreen(
                 )
         ) {
             Conversation(
-                messagesModel = chatState.chatModel.chatMessages ,
+                messagesModel = chatState.value.chatModel.chatMessages ,
                 onItemClick = { index, messageModel ->
                     if(selectedDialogs.isEmpty()) {
                         if(visibleDetails.contains(index)){
@@ -195,13 +196,13 @@ fun ChatScreen(
                     .align(Alignment.TopCenter)
             ) {
                 AnimatedVisibility(
-                    visible = attachedFilesList.item.any { it.chatId == chatState.chatModel.chatId },
+                    visible = isAnyFileAttached,
                     enter = slideInVertically(),
                     exit = shrinkHorizontally()
                 ) {
                     LazyRow(modifier = Modifier.height(32.dp)) {
                         itemsIndexed(
-                            items = attachedFilesList.item.filter { it.chatId == chatState.chatModel.chatId },
+                            items = attachedFileItems,
                             key = { _, item -> item.fileId}
                         ) { index, item ->
                             AttachedFilesItem(
@@ -244,10 +245,10 @@ fun ChatScreen(
                     .height(20.dp)
                     .align(Alignment.BottomCenter)
             ) {
-                AnimatedVisibility(visible = chatState.isRespondingList.contains(chatState.chatModel.chatId) && !chatState.isSendingFailed) {
+                AnimatedVisibility(visible = chatState.value.isRespondingList.contains(chatState.value.chatModel.chatId) && !chatState.value.isSendingFailed) {
                     PulsingDots()
                 }
-                AnimatedVisibility(visible = chatState.isSendingFailed) {
+                AnimatedVisibility(visible = chatState.value.isSendingFailed) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center,
@@ -261,7 +262,7 @@ fun ChatScreen(
                                 .background(color = MaterialTheme.colorScheme.tertiaryContainer)
                                 .padding(2.dp)
                                 .clickable {
-                                    textValue = chatState.chatModel.chatMessages.messageModels.last().content
+                                    textValue = chatState.value.chatModel.chatMessages.messageModels.last().content
                                     chatViewModel.removeLastDialogFromDatabase()
                                 }
                         ) {
@@ -291,8 +292,8 @@ fun ChatScreen(
                         documentType = documentType,
                         hash = hash,
                         fileName = fileName,
-                        embeddingModel = embeddingModel,
-                        isEmbeddingModelSet = isEmbeddingModelSet
+                        embeddingModel = embeddingModel.value.embeddingModelName,
+                        isEmbeddingModelSet = embeddingModel.value.isEmbeddingModelSet
                         )
                 }
             )
