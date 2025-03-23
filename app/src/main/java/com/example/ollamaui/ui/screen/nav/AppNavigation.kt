@@ -188,10 +188,9 @@ fun AppNavigation(
                             if (selectedChatId == navigator.currentDestination?.contentKey) {
                                 ChatScreen(
                                     chatViewModel = chatViewModel,
-                                    chatState = chatState.value,
-                                    attachedFilesList = attachedFilesList.value,
-                                    embeddingModel = embeddingModel.value.embeddingModelName,
-                                    isEmbeddingModelSet = embeddingModel.value.isEmbeddingModelSet,
+                                    chatState = chatState,
+                                    attachedFilesList = attachedFilesList,
+                                    embeddingModel = embeddingModel,
                                     onBackClick = {
                                         if(navigator.scaffoldState.currentState.tertiary == PaneAdaptedValue.Hidden){
                                             chatViewModel.clearStates()
@@ -226,8 +225,8 @@ fun AppNavigation(
                     extraPane = {
                         AnimatedPane {
                             FilesScreen(
-                                fileContent = fileContent.value,
-                                file = selectedFile.value
+                                fileContent = fileContent,
+                                file = selectedFile
                             )
                         }
                     },
@@ -271,7 +270,9 @@ fun AppNavigation(
                     isEmbeddingModelPulled = { mainViewModel.checkIfEmbeddingModelPulled(it) },
                     onSaveClick = { url, embeddingModelName, modelParameters->
                         mainViewModel.saveOllamaAddress(url = url)
-                        mainViewModel.saveOllamaEmbeddingModel(modelName = embeddingModelName)
+                        if(embeddingModelName.isNotEmpty()) {
+                            mainViewModel.saveOllamaEmbeddingModel(modelName = embeddingModelName)
+                        }
                         mainViewModel.saveOllamaTuningParameters(modelParameters = modelParameters)
                     },
                     onCheckClick = {url ->

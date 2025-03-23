@@ -7,8 +7,8 @@ fun filterAssistantMessage(assistantMessage: String): Triple<String?,String?, St
     }else {
         Triple(
             first = null,
-            second = thinking[0].substring(8).trim(),
-            third = thinking[1].trim()
+            second = thinking[0].substring(8).trimIndent(),
+            third = thinking[1].trimIndent()
         )
     }
 }

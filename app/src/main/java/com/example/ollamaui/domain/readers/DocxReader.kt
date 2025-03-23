@@ -5,12 +5,15 @@ import java.io.IOException
 import java.io.InputStream
 
 class DocxReader: DocumentReader() {
-    override fun readFromInputStream(inputStream: InputStream): Pair<String?, String?> {
+    override fun readFromInputStream(inputStream: InputStream, process: (Int) -> Unit): Pair<String?, String?> {
         try {
             val document = XWPFDocument(inputStream)
             val paragraphs = document.paragraphs
             val result = StringBuilder()
-            paragraphs.forEach { result.append(" ").append(it.text) }
+            for(i in 0..paragraphs.size -1){
+                process(((i.toFloat()/paragraphs.size.toFloat())*100).toInt())
+                result.append(" ").append(paragraphs[i].text)
+            }
             return Pair(result.toString(), null)
         }catch (e: IOException){
             return Pair(null, e.printStackTrace().toString())

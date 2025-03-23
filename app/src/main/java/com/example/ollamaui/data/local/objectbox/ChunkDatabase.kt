@@ -13,9 +13,11 @@ class ChunkDatabase @Inject constructor() {
     }
 
     fun removeChunk(docId: Long){
-        val query = chunksBox.query(Chunk_.docId.equal(docId)).build()
-        query.remove()
-//        chunksBox.removeByIds(chunksBox.query(Chunk_.docId.equal(docId)).build().findIds().toList())
+//        chunksBox.query(Chunk_.docId.equal(docId)).build().remove()
+        val chunksToDelete = chunksBox.query().equal(Chunk_.docId, docId).build().find()
+        chunksToDelete.chunked(1000).forEach { batch ->
+            chunksBox.remove(batch)
+        }
     }
 
     fun getSimilarChunks(docIds: List<Long>, queryEmbedding: FloatArray, n: Int = 5): List<Pair<Float, Chunk>> {
