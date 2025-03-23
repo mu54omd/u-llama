@@ -6,11 +6,13 @@ import java.io.IOException
 import java.io.InputStream
 
 class PDFReader:DocumentReader() {
-    override fun readFromInputStream(inputStream: InputStream): Pair<String?, String?> {
+    override fun readFromInputStream(inputStream: InputStream, process: (Int) -> Unit): Pair<String?, String?> {
         val pdfReader = PdfReader(inputStream)
+        val pdfPages = pdfReader.numberOfPages
         var result = ""
         try {
-            for (i in 1..pdfReader.numberOfPages) {
+            for (i in 1..pdfPages) {
+                process(((i.toFloat()/pdfPages.toFloat())*100).toInt())
                 result += "\n" + PdfTextExtractor.getTextFromPage(pdfReader, i)
             }
             return Pair(result, null)

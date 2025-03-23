@@ -13,18 +13,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BasicAlertDialog
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.ollamaui.domain.readers.Readers
 import com.example.ollamaui.ui.common.sha256Hash
@@ -38,12 +43,14 @@ import kotlinx.coroutines.withContext
 fun AttachDocs(isEnabled: Boolean, onDispose: () -> Unit, onSelectClick: (String?, String?, String, String, String) -> Unit) {
     val context = LocalContext.current
     var isImporting = remember { mutableStateOf(false) }
+    var fileSize by remember { mutableIntStateOf(0) }
+    var fileName by remember { mutableStateOf("") }
+    var percentage by remember { mutableIntStateOf(0) }
+
 
     val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { activityResult ->
         activityResult.data?.data?.let { uri ->
-            var fileName = ""
             var documentType = ""
-            var fileSize = 0
             var sha256Hash = ""
 
             context.contentResolver.query(uri, null, null, null)?.use { cursor ->
@@ -59,7 +66,7 @@ fun AttachDocs(isEnabled: Boolean, onDispose: () -> Unit, onSelectClick: (String
                     isImporting.value = true
                     CoroutineScope(Dispatchers.IO).launch {
                         val (result, error) = Readers.getReaderForDocType(documentType = documentType)
-                            .readFromInputStream(inputStream)
+                            .readFromInputStream(inputStream = inputStream, process = { percentage = it})
                         result?.let { sha256Hash = sha256Hash(it) ?: "" }
                         withContext(Dispatchers.IO) {
                             onSelectClick(result, error, documentType, fileName, sha256Hash)
@@ -85,10 +92,14 @@ fun AttachDocs(isEnabled: Boolean, onDispose: () -> Unit, onSelectClick: (String
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
+                    modifier = Modifier.padding(10.dp)
                 ) {
                     Text("Importing file...")
+                    Text(fileName, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.bodySmall, maxLines = 1)
+                    Text("Total size: $fileSize bytes", style = MaterialTheme.typography.bodySmall)
+                    Text("Done: $percentage/100%", style = MaterialTheme.typography.bodySmall)
                     Spacer(modifier = Modifier.height(20.dp))
-                    CircularProgressIndicator()
+                    LinearProgressIndicator()
                 }
             }
         }

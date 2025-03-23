@@ -221,7 +221,7 @@ private fun ChatDialogPreview() {
             )
             ChatDialog(
                 messageModel = MessageModel(
-                    content = "Using this data: {some data}. Respond to this prompt: {some prompt}.",
+                    content = "Using this data: {/n/n/n/some data}. Respond to this prompt: {some prompt}.",
                     role = "user",
                     time = "17:43",
                     date = "2025-05-17",

@@ -23,11 +23,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.ollamaui.domain.model.objectbox.File
 import com.example.ollamaui.ui.common.base64ToBitmap
+import androidx.compose.runtime.State
 
 @Composable
 fun FilesScreen(
-    fileContent: List<String>,
-    file: File
+    fileContent: State<List<String>>,
+    file: State<File>
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -43,9 +44,9 @@ fun FilesScreen(
                 .weight(1f),
             contentAlignment = Alignment.Center
         ) {
-            if (file.isImage) {
+            if (file.value.isImage) {
                 Image(
-                    bitmap = base64ToBitmap(file.attachResult).asImageBitmap(),
+                    bitmap = base64ToBitmap(file.value.attachResult).asImageBitmap(),
                     contentDescription = "Image Preview",
                     modifier = Modifier
                         .fillMaxSize()
@@ -59,7 +60,7 @@ fun FilesScreen(
                         .align(Alignment.Center)
                 ) {
                     items(
-                        items = fileContent
+                        items = fileContent.value
                     ) {
                         Text(text = it)
                     }
@@ -69,7 +70,7 @@ fun FilesScreen(
         Card(
             modifier = Modifier.padding(10.dp)
         ) {
-            Text(text = file.fileName, textAlign = TextAlign.Center, modifier = Modifier.padding(5.dp))
+            Text(text = file.value.fileName, textAlign = TextAlign.Center, modifier = Modifier.padding(5.dp))
         }
     }
 }

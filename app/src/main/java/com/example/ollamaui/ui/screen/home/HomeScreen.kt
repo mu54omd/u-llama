@@ -30,7 +30,7 @@ import com.example.ollamaui.helper.NetworkStatus
 import com.example.ollamaui.ui.common.printLastMessage
 import com.example.ollamaui.ui.screen.home.components.CustomFabButton
 import com.example.ollamaui.ui.screen.home.components.HomeTopBar
-import com.example.ollamaui.ui.screen.home.components.NewChatItem
+import com.example.ollamaui.ui.screen.home.components.ChatListItem
 import com.example.ollamaui.ui.screen.home.components.NewChatModal
 import com.example.ollamaui.ui.screen.home.components.SwipeActions
 
@@ -60,6 +60,7 @@ fun HomeScreen(
     val maxChar = 25
     var isRevealed by remember { mutableIntStateOf(-1) }
     var backHandlerCounter by remember { mutableIntStateOf(0) }
+    val chatListItems by remember { derivedStateOf { chatsList.value }}
 
     Scaffold(
         topBar = {
@@ -137,7 +138,7 @@ fun HomeScreen(
                     .align(Alignment.TopCenter),
             ) {
                     items(
-                        items = chatsList.value,
+                        items = chatListItems,
                         key = { chatItem -> chatItem.chatId }
                     ) { chatItem ->
                         Column {
@@ -148,7 +149,7 @@ fun HomeScreen(
                                     },
                                     isSelected = selectedChats.contains(chatItem.chatId)
                                 )
-                                NewChatItem(
+                                ChatListItem(
                                     modelName = chatItem.modelName,
                                     chatTitle = chatItem.chatTitle,
                                     lastMessage = printLastMessage(chatItem.chatMessages),

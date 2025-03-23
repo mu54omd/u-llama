@@ -57,7 +57,7 @@ const val MIN_DRAG_AMOUNT = 30
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun NewChatItem(
+fun ChatListItem(
     modifier: Modifier = Modifier,
     modelName: String,
     chatTitle: String,
@@ -228,9 +228,9 @@ fun NewChatItem(
 @Preview(uiMode = UI_MODE_NIGHT_YES)
 @Preview
 @Composable
-private fun NewChatItemPreview() {
+private fun ChatListItemPreview() {
     OllamaUITheme {
-        NewChatItem(
+        ChatListItem(
             modelName = "llama3.1:1b",
             chatTitle = "Title",
             lastMessage = "Last Message will place here despite of its length! The sentences maybe become so large that it can't show completely!",
