@@ -24,6 +24,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,6 +39,7 @@ import com.example.ollamaui.ui.screen.chat.components.AttachDocs
 import com.example.ollamaui.ui.screen.common.CustomButton
 import com.example.ollamaui.ui.screen.filemanager.components.EmptyFileManager
 import com.example.ollamaui.ui.screen.filemanager.components.FileItem
+import kotlinx.coroutines.launch
 
 @Composable
 fun FileManagerScreen(
@@ -46,12 +48,14 @@ fun FileManagerScreen(
     embeddingModel: State<EmbeddingModel>,
     baseAddress: State<BaseAddress>,
     onFileClick: (StableFile) -> Unit,
+    isEmbeddingModelPulled: Boolean,
     onBackClick: () -> Unit,
 ) {
     var isFileExplorerEnable by remember { mutableStateOf(false) }
-    val isEmbeddingModelSet by remember { derivedStateOf { embeddingModel.value.isEmbeddingModelSet } }
+    val isEmbeddingSettingsSet by remember { derivedStateOf { embeddingModel.value.isEmbeddingModelSet && isEmbeddingModelPulled } }
     val isAttachedFilesEmpty by remember { derivedStateOf { attachedFiles.value.item.isEmpty() } }
     val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
@@ -77,7 +81,7 @@ fun FileManagerScreen(
         },
         floatingActionButton = {
             CustomButton(
-                isButtonEnabled = isEmbeddingModelSet,
+                isButtonEnabled = isEmbeddingSettingsSet,
                 description = "Import File",
                 icon = R.drawable.baseline_add_24,
                 buttonSize = 40,
@@ -89,10 +93,10 @@ fun FileManagerScreen(
             SnackbarHost(hostState = snackbarHostState)
         }
     ) { paddingValue ->
-        LaunchedEffect(isEmbeddingModelSet) {
-            if(!isEmbeddingModelSet) {
+        LaunchedEffect(isEmbeddingSettingsSet) {
+            if(!isEmbeddingSettingsSet) {
                 snackbarHostState.showSnackbar(
-                    message = "Please choose an embedding model in the setting menu!",
+                    message = "Please choose and pull an embedding model in the settings menu!",
                     duration = SnackbarDuration.Indefinite
                 )
             }
@@ -138,6 +142,13 @@ fun FileManagerScreen(
                 embeddingModel = embeddingModel.value.embeddingModelName,
                 ollamaBaseAddress = baseAddress.value.ollamaBaseAddress,
             )
+        },
+        exceededAlert = { fileSize ->
+            scope.launch {
+                snackbarHostState.showSnackbar(
+                    message = "Selected file size: ${(fileSize/1024)/1024}MB > Allowed file size: 5MB"
+                )
+            }
         }
     )
     BackHandler {

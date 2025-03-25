@@ -24,6 +24,7 @@ import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaf
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -92,6 +93,7 @@ fun AppNavigation(
 
     val activity = LocalActivity.current
     val snackbarHostState  = remember { SnackbarHostState() }
+    val isEmbeddingModelPulled by remember(embeddingModel.value.embeddingModelName) { derivedStateOf { mainViewModel.checkIfEmbeddingModelPulled(embeddingModel.value.embeddingModelName) } }
 
     Scaffold(
         snackbarHost = {
@@ -344,6 +346,7 @@ fun AppNavigation(
                     embeddingModel = embeddingModel,
                     baseAddress = baseAddress,
                     attachedFiles = attachedFiles,
+                    isEmbeddingModelPulled = isEmbeddingModelPulled,
                     onFileClick = { },
                     onBackClick = {
                         navigateToTab(
