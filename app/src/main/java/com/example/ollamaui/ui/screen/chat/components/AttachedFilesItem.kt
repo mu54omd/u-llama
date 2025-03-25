@@ -25,19 +25,15 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.example.ollamaui.R
-import com.example.ollamaui.domain.model.objectbox.File
+import com.example.ollamaui.domain.model.objectbox.StableFile
 import com.example.ollamaui.ui.common.base64ToBitmap
-import com.example.ollamaui.ui.screen.common.CustomButton
 
 @Composable
 fun AttachedFilesItem(
-    item: File,
-    index: Int,
-    onFilesClick: (File) -> Unit,
-    onFilesLongPress: (File) -> Unit,
-    onRemoveClick: (Int, Boolean) -> Unit,
-    onSelectedItemClick: (File) -> Unit,
+    item: StableFile,
+    onFilesClick: (StableFile) -> Unit,
+    onFilesLongPress: (StableFile) -> Unit,
+    onSelectedItemClick: (StableFile) -> Unit,
     isSelected: Boolean
 ) {
     val animateColor by animateColorAsState(
@@ -97,13 +93,6 @@ fun AttachedFilesItem(
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.widthIn(max = 150.dp).basicMarquee(),
                 maxLines = 1
-            )
-            CustomButton(
-                onButtonClick = { onRemoveClick(index, item.isImage) },
-                icon = R.drawable.baseline_clear_24,
-                description = "Remove Attached File",
-                iconSize = 20,
-                buttonSize = 20,
             )
         }
     }

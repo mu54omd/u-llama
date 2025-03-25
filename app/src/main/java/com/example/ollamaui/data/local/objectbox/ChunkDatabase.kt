@@ -13,7 +13,6 @@ class ChunkDatabase @Inject constructor() {
     }
 
     fun removeChunk(docId: Long){
-//        chunksBox.query(Chunk_.docId.equal(docId)).build().remove()
         val chunksToDelete = chunksBox.query().equal(Chunk_.docId, docId).build().find()
         chunksToDelete.chunked(1000).forEach { batch ->
             chunksBox.remove(batch)

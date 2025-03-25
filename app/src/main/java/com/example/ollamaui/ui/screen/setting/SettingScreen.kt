@@ -195,16 +195,22 @@ fun SettingScreen(
                         icon = R.drawable.baseline_refresh_24,
                         containerColor = Color.Transparent
                     )
-                    CustomButton(
-                        onButtonClick = {
-                            onPullEmbeddingModelClick(selectedEmbeddingModel)
-                        },
-                        description = "pull",
-                        icon = R.drawable.baseline_cloud_download_24,
-                        containerColor = Color.Transparent
-                    )
                     AnimatedVisibility(
-                        visible = isSelectedModelPulled,
+                        visible = selectedEmbeddingModel != "Select a Model",
+                        enter = scaleIn(),
+                        exit = scaleOut()
+                    ) {
+                        CustomButton(
+                            onButtonClick = {
+                                onPullEmbeddingModelClick(selectedEmbeddingModel)
+                            },
+                            description = "pull",
+                            icon = R.drawable.baseline_cloud_download_24,
+                            containerColor = Color.Transparent
+                        )
+                    }
+                    AnimatedVisibility(
+                        visible = isSelectedModelPulled && selectedEmbeddingModel != "Select a Model",
                         enter = scaleIn(),
                         exit = scaleOut()
                     ) {

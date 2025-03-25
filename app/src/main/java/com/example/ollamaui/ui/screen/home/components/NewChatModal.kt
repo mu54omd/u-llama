@@ -95,6 +95,7 @@ fun NewChatModal(
                     .padding(bottom = 5.dp)
             ) {
                 Button(
+                    enabled = isModelSelected,
                     onClick = onAcceptClick
                 ){
                     Text(text = "Accept")
