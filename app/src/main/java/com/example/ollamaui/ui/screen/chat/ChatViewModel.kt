@@ -1,9 +1,9 @@
 package com.example.ollamaui.ui.screen.chat
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ollamaui.data.local.objectbox.ChunkDatabase
-import com.example.ollamaui.data.local.objectbox.FileDatabase
 import com.example.ollamaui.domain.model.ApiError
 import com.example.ollamaui.domain.model.LogModel
 import com.example.ollamaui.domain.model.MessageModel
@@ -15,9 +15,7 @@ import com.example.ollamaui.domain.model.chat.EmptyChatModel
 import com.example.ollamaui.domain.model.chat.EmptyChatResponse
 import com.example.ollamaui.domain.model.chat.ModelParameters
 import com.example.ollamaui.domain.model.embed.EmbedInputModel
-import com.example.ollamaui.domain.model.objectbox.Chunk
-import com.example.ollamaui.domain.model.objectbox.File
-import com.example.ollamaui.domain.objectbox.Splitter
+import com.example.ollamaui.domain.model.objectbox.StableFile
 import com.example.ollamaui.domain.repository.OllamaRepository
 import com.example.ollamaui.utils.Constants.OLLAMA_CHAT_ENDPOINT
 import com.example.ollamaui.utils.Constants.OLLAMA_EMBED_ENDPOINT
@@ -26,33 +24,22 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 import javax.inject.Inject
 
+@Stable
 @HiltViewModel
 class ChatViewModel @Inject constructor(
     private val ollamaRepository: OllamaRepository,
     private val chunkDatabase: ChunkDatabase,
-    private val fileDatabase: FileDatabase,
 ):ViewModel() {
 
     private val _chatState = MutableStateFlow(ChatStates())
     val chatState = _chatState.asStateFlow()
-
-    private val _attachedFiles = fileDatabase.getAllFiles().map { file -> AttachedFilesList(item = file) }
-    val attachedFiles = _attachedFiles
-        .stateIn(
-            scope = viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            initialValue = AttachedFilesList()
-        )
 
     private val isRespondingList = mutableListOf<Int>()
     private val jobs = mutableMapOf<Int, Job>()
@@ -61,7 +48,7 @@ class ChatViewModel @Inject constructor(
     /*---------------------------------------------------------------------------------------------*/
     /*---------------------------------------------------------------------------------------------*/
     /*---------------------------------------------------------------------------------------------*/
-    fun sendButton(text: String, selectedFiles: List<File>, embeddingModel: String){
+    fun sendButton(text: String, selectedFiles: List<StableFile>, embeddingModel: String){
         val messages = chatState.value.chatModel.chatMessages.messageModels.toMutableList()
         val oldChatModel = chatState.value.chatModel
         val imageList = selectedFiles.filter{ it.isImage }.map { it.attachResult }
@@ -107,7 +94,7 @@ class ChatViewModel @Inject constructor(
                     getSimilarChunk(
                         fileIds = selectedFiles.filter { !it.isImage }.map{ it.fileId },
                         query = text.trim(),
-                        embeddingModel = if (embeddingModel != "") embeddingModel else chatState.value.chatModel.modelName,
+                        embeddingModel = embeddingModel,
                     )
                 job.invokeOnCompletion {
                     messages.add(
@@ -211,92 +198,6 @@ class ChatViewModel @Inject constructor(
             }
         }
     }
-
-    fun attachFileToChat(
-        attachResult: String?,
-        attachError: String?,
-        embeddingModel: String,
-        fileName: String,
-        documentType: String,
-        hash: String,
-        isEmbeddingModelSet: Boolean
-    ) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                val isImage = documentType in listOf("png", "jpg", "jpeg")
-                attachResult?.let { result ->
-                    val filteredList = attachedFiles.value.item.filter {
-                        (it.attachResult == attachResult)
-                                && (it.fileName == fileName)
-                                && (it.fileType == documentType)
-                                && (it.chatId == chatState.value.chatModel.chatId)
-                                && (it.hash == hash)
-                    }
-                    if (filteredList.isEmpty()) {
-                        val fileId = fileDatabase.addFile(
-                            file = File(
-                                attachResult = result,
-                                fileName = fileName,
-                                fileType = documentType,
-                                fileAddedTime = System.currentTimeMillis(),
-                                chatId = chatState.value.chatModel.chatId,
-                                hash = hash,
-                                isImage = isImage
-                            )
-                        )
-                        if (!isImage) {
-                            val chunks = Splitter.createChunks(
-                                docText = result,
-                                chunkSize = 100,
-                                chunkOverlap = 5
-                            )
-                            ollamaPostEmbed(
-                                text = chunks,
-                                embeddingModel = if (isEmbeddingModelSet) embeddingModel else chatState.value.chatModel.modelName,
-                                docId = fileId,
-                                fileName = fileName
-                            )
-                        }
-                    }
-                }
-                when {
-                    attachResult != null -> ollamaRepository.insertLogToDb(
-                        LogModel(
-                            date = LocalDateTime.now().toString(),
-                            type = "attach-file",
-                            content = "Result: Success - $fileName",
-                        )
-                    )
-
-                    attachError != null -> ollamaRepository.insertLogToDb(
-                        LogModel(
-                            date = LocalDateTime.now().toString(),
-                            type = "attach-file",
-                            content = "Result: Failed - $fileName - $attachError",
-                        )
-                    )
-                }
-            }
-        }
-    }
-
-    fun removeAttachedFile(index: Int, isImage: Boolean) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                if (!isImage) {
-                    attachedFiles.value.item[index].fileId.let {
-                        fileDatabase.removeFile(fileId = it)
-                        chunkDatabase.removeChunk(docId = it)
-
-                    }
-                } else {
-                    attachedFiles.value.item[index].fileId.let {
-                        fileDatabase.removeFile(fileId = it)
-                    }
-                }
-            }
-        }
-    }
     //Private methods
     /*---------------------------------------------------------------------------------------------*/
     /*---------------------------------------------------------------------------------------------*/
@@ -396,57 +297,6 @@ class ChatViewModel @Inject constructor(
                         )
                     )
                 }
-            }
-        }
-    }
-    private fun ollamaPostEmbed(text: List<String>, embeddingModel: String, docId: Long, fileName: String){
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                ollamaRepository.insertLogToDb(
-                    LogModel(
-                        date = LocalDateTime.now().toString(),
-                        type = "ollama-embed",
-                        content = "post: ${chatState.value.ollamaBaseAddress}${OLLAMA_EMBED_ENDPOINT}",
-                    )
-                )
-                ollamaRepository.postOllamaEmbed(
-                    baseUrl = chatState.value.ollamaBaseAddress,
-                    embedEndpoint = OLLAMA_EMBED_ENDPOINT,
-                    embedInputModel = EmbedInputModel(
-                        model = embeddingModel,
-                        input = text
-                    )
-                )
-                    .onRight { response ->
-                        _chatState.update { it.copy(embedResponse = response) }
-                        response.embeddings.forEachIndexed { index, chunkedEmbedding ->
-                            chunkDatabase.addChunk(
-                                chunk = Chunk(
-                                    docId = docId,
-                                    docFileName = fileName,
-                                    chunkData = text[index],
-                                    chunkEmbedding = chunkedEmbedding,
-                                )
-                            )
-                        }
-                        ollamaRepository.insertLogToDb(
-                            LogModel(
-                                date = LocalDateTime.now().toString(),
-                                type = "ollama-embed",
-                                content = "Result: Success",
-                            )
-                        )
-                    }
-                    .onLeft { error ->
-                        _chatState.update { it.copy(embedError = error) }
-                        ollamaRepository.insertLogToDb(
-                            LogModel(
-                                date = LocalDateTime.now().toString(),
-                                type = "ollama-embed",
-                                content = "Result: Failed - ${error.error}",
-                            )
-                        )
-                    }
             }
         }
     }

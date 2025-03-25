@@ -37,7 +37,6 @@ import com.example.ollamaui.ui.theme.OllamaUITheme
 @Composable
 fun CustomDropDownList(
     modifier: Modifier = Modifier,
-    label: String = "Selected Model",
     defaultValue: String = "",
     width: Int = 200,
     listItems: List<String>,
@@ -74,7 +73,6 @@ fun CustomDropDownList(
                     focusedContainerColor = MaterialTheme.colorScheme.background,
                     unfocusedContainerColor = MaterialTheme.colorScheme.background
                 ),
-                label = { Text(label) },
                 enabled = isEnable
             )
             if (isEnable) {

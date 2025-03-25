@@ -2,8 +2,6 @@ package com.example.ollamaui.ui.screen.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.ollamaui.data.local.objectbox.ChunkDatabase
-import com.example.ollamaui.data.local.objectbox.FileDatabase
 import com.example.ollamaui.domain.model.MessageModel
 import com.example.ollamaui.domain.model.MessagesModel
 import com.example.ollamaui.domain.model.chat.ChatModel
@@ -21,8 +19,6 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val ollamaRepository: OllamaRepository,
-    private val fileDatabase: FileDatabase,
-    private val chunkDatabase: ChunkDatabase
 ):ViewModel(){
 
     private val _chatsList = ollamaRepository.getChats().flowOn(Dispatchers.IO)
@@ -64,24 +60,14 @@ class HomeViewModel @Inject constructor(
     fun deleteChat(chatModel: ChatModel){
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val fileIds = fileDatabase.getFileIds(chatModel.chatId)
                 ollamaRepository.deleteFromDb(chatModel)
-                fileIds.forEach {
-                    fileDatabase.removeFile(fileId = it)
-                    chunkDatabase.removeChunk(docId = it)
-                }
             }
         }
     }
     fun deleteChatById(chatId: Int){
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val fileIds = fileDatabase.getFileIds(chatId)
                 ollamaRepository.deleteFromDbById(chatId)
-                fileIds.forEach {
-                    fileDatabase.removeFile(fileId = it)
-                    chunkDatabase.removeChunk(docId = it)
-                }
             }
         }
     }

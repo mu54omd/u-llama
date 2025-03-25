@@ -39,7 +39,7 @@ class LocalUserManagerImpl (
 
     override suspend fun saveOllamaEmbeddingModel(modelName: String) {
         context.dataStore.edit { setting ->
-            setting[PreferencesKeys.IS_OLLAMA_EMBEDDING_MODEL_SET] = true
+            setting[PreferencesKeys.IS_OLLAMA_EMBEDDING_MODEL_SET] = modelName != "Select a Model"
             setting[PreferencesKeys.OLLAMA_EMBEDDING_MODEL] = modelName
         }
     }

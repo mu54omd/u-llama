@@ -46,9 +46,8 @@ import androidx.compose.ui.unit.dp
 import com.example.ollamaui.R
 import com.example.ollamaui.activity.EmbeddingModel
 import com.example.ollamaui.domain.model.MessageModel
-import com.example.ollamaui.domain.model.objectbox.File
+import com.example.ollamaui.domain.model.objectbox.StableFile
 import com.example.ollamaui.ui.common.messageModelToText
-import com.example.ollamaui.ui.screen.chat.components.AttachDocs
 import com.example.ollamaui.ui.screen.chat.components.AttachedFilesItem
 import com.example.ollamaui.ui.screen.chat.components.ChatBottomBar
 import com.example.ollamaui.ui.screen.chat.components.ChatTopBar
@@ -64,7 +63,8 @@ fun ChatScreen(
     attachedFilesList: State<AttachedFilesList>,
     embeddingModel: State<EmbeddingModel>,
     onBackClick: () -> Unit,
-    onFileClick: (File) -> Unit,
+    onFileClick: (StableFile) -> Unit,
+    onAttachClick: () -> Unit,
 ) {
     var textValue by rememberSaveable { mutableStateOf("") }
     val selectedDialogs = remember(chatState.value.chatModel.chatId) { mutableStateMapOf<Int, MessageModel>() }
@@ -79,10 +79,8 @@ fun ChatScreen(
             listState.canScrollForward
         }
     }
-    var isEnabled by remember { mutableStateOf(false) }
-    val selectedFiles = remember(chatState.value.chatModel.chatId) { mutableStateListOf<File>() }
-    val isAnyFileAttached by remember { derivedStateOf { attachedFilesList.value.item.any { it.chatId == chatState.value.chatModel.chatId } }}
-    val attachedFileItems by remember { derivedStateOf { attachedFilesList.value.item.filter { it.chatId == chatState.value.chatModel.chatId } }}
+    val selectedFiles = remember(chatState.value.chatModel.chatId) { mutableStateListOf<StableFile>() }
+    val isAnyFileAttached by remember { derivedStateOf { attachedFilesList.value.item.isNotEmpty() }}
 
     Scaffold(
         topBar = {
@@ -112,7 +110,7 @@ fun ChatScreen(
                     }
                 },
                 onClearClick = { textValue = "" },
-                onAttachClick = { isEnabled = true },
+                onAttachClick = { onAttachClick() },
                 isModelSelected = chatState.value.chatModel.modelName != "",
                 isSendingFailed = chatState.value.isSendingFailed,
                 isResponding = chatState.value.isRespondingList.contains(chatState.value.chatModel.chatId),
@@ -202,12 +200,11 @@ fun ChatScreen(
                 ) {
                     LazyRow(modifier = Modifier.height(32.dp)) {
                         itemsIndexed(
-                            items = attachedFileItems,
+                            items = attachedFilesList.value.item,
                             key = { _, item -> item.fileId}
                         ) { index, item ->
                             AttachedFilesItem(
                                 item = item,
-                                index = index,
                                 onFilesLongPress = {
                                     if (!selectedFiles.contains(it)) {
                                         selectedFiles.add(it)
@@ -226,10 +223,6 @@ fun ChatScreen(
                                 },
                                 onSelectedItemClick = {
                                     selectedFiles.remove(it)
-                                },
-                                onRemoveClick = { _, isImage ->
-                                    selectedFiles.remove(item)
-                                    chatViewModel.removeAttachedFile(index, isImage)
                                 },
                                 isSelected = selectedFiles.contains(item)
                             )
@@ -282,21 +275,6 @@ fun ChatScreen(
                 }
             }
             Spacer(modifier = Modifier.height(2.dp))
-            AttachDocs(
-                isEnabled = isEnabled,
-                onDispose = {isEnabled = false},
-                onSelectClick = { result, error, documentType, fileName, hash ->
-                    chatViewModel.attachFileToChat(
-                        attachResult = result,
-                        attachError = error,
-                        documentType = documentType,
-                        hash = hash,
-                        fileName = fileName,
-                        embeddingModel = embeddingModel.value.embeddingModelName,
-                        isEmbeddingModelSet = embeddingModel.value.isEmbeddingModelSet
-                        )
-                }
-            )
         }
 
     }

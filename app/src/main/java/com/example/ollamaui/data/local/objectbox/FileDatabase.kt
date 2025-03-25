@@ -2,11 +2,14 @@ package com.example.ollamaui.data.local.objectbox
 
 import com.example.ollamaui.domain.model.objectbox.File
 import com.example.ollamaui.domain.model.objectbox.File_
+import com.example.ollamaui.domain.model.objectbox.StableFile
+import com.example.ollamaui.domain.model.objectbox.toStableFile
 import io.objectbox.kotlin.flow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class FileDatabase @Inject constructor() {
@@ -21,15 +24,11 @@ class FileDatabase @Inject constructor() {
         fileBox.remove(fileId)
     }
 
-    fun getFileIds(chatId: Int):List<Long>{
-        return fileBox.query(File_.chatId.equal(chatId)).build().find().map { it.fileId }
-    }
-
-    fun getFilesCount(): Long {
-        return fileBox.count()
-    }
-
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun getAllFiles(): Flow<MutableList<File>> =
-        fileBox.query(File_.fileId.notNull()).build().flow().flowOn(Dispatchers.IO)
+    fun getAllFiles(): Flow<List<StableFile>> =
+        fileBox.query(File_.fileId.notNull())
+            .build()
+            .flow()
+            .map { filesList -> filesList.map { it.toStableFile() } }
+            .flowOn(Dispatchers.IO)
 }
