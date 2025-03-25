@@ -28,9 +28,9 @@ import androidx.compose.ui.unit.dp
 import com.example.ollamaui.domain.model.chat.ChatModel
 import com.example.ollamaui.helper.NetworkStatus
 import com.example.ollamaui.ui.common.printLastMessage
+import com.example.ollamaui.ui.screen.home.components.ChatListItem
 import com.example.ollamaui.ui.screen.home.components.CustomFabButton
 import com.example.ollamaui.ui.screen.home.components.HomeTopBar
-import com.example.ollamaui.ui.screen.home.components.ChatListItem
 import com.example.ollamaui.ui.screen.home.components.NewChatModal
 import com.example.ollamaui.ui.screen.home.components.SwipeActions
 
@@ -38,6 +38,7 @@ import com.example.ollamaui.ui.screen.home.components.SwipeActions
 fun HomeScreen(
     onChatClick: (ChatModel) -> Unit,
     onSettingClick: () -> Unit,
+    onFileManagerClick: () -> Unit,
     onLogClick: () -> Unit,
     onAddNewChatClick: (String, String, String) -> Unit,
     onDeleteChatByIdClick: (Int) -> Unit,
@@ -66,6 +67,7 @@ fun HomeScreen(
         topBar = {
                     HomeTopBar(
                         onSettingClick = { onSettingClick() },
+                        onFileManagerClick = { onFileManagerClick() },
                         onLogClick = { onLogClick() },
                         onDeleteClick = {
                             selectedChats.forEach{ selectedChat ->

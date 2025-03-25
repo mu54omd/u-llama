@@ -28,6 +28,7 @@ import com.example.ollamaui.utils.Constants.TOP_BAR_HEIGHT
 fun HomeTopBar(
     modifier: Modifier = Modifier,
     onSettingClick: () -> Unit,
+    onFileManagerClick: () -> Unit,
     onLogClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onDeselectClick: () -> Unit,
@@ -52,14 +53,26 @@ fun HomeTopBar(
                 .height(TOP_BAR_HEIGHT)
                 .padding(start = 5.dp, end = 5.dp),
             ) {
-            CustomButton(
-                description = "Setting Button",
-                onButtonClick = onSettingClick,
-                icon = R.drawable.baseline_settings_24,
-                buttonSize = 50,
-                modifier = Modifier.align(Alignment.CenterStart),
-                containerColor = MaterialTheme.colorScheme.background
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.align(Alignment.CenterStart)
+            ) {
+                CustomButton(
+                    description = "Setting Button",
+                    onButtonClick = onSettingClick,
+                    icon = R.drawable.baseline_settings_24,
+                    buttonSize = 50,
+                    containerColor = MaterialTheme.colorScheme.background
+                )
+                CustomButton(
+                    description = "File Manager Button",
+                    onButtonClick = onFileManagerClick,
+                    icon = R.drawable.baseline_folder_24,
+                    buttonSize = 50,
+                    containerColor = MaterialTheme.colorScheme.background
+                )
+            }
             LogoTitle(
                 lightLogo = R.drawable.icon_light,
                 darkLogo = R.drawable.icon_dark,
@@ -73,7 +86,7 @@ fun HomeTopBar(
                     .align(Alignment.CenterEnd)
             ) {
                 Crossfade(
-                    targetState = isSelectedChatsEmpty, label = "HomeTopBar Botton",
+                    targetState = isSelectedChatsEmpty, label = "HomeTopBar Button",
                 ) { isSelectedChatsEmpty ->
                     when(isSelectedChatsEmpty) {
                         false ->
@@ -132,6 +145,7 @@ private fun HomeTopBarPreview() {
         HomeTopBar(
             onLogClick = {},
             onSettingClick = {},
+            onFileManagerClick = {},
             onDeleteClick = {},
             onDeselectClick = {},
             onSelectClick = {},

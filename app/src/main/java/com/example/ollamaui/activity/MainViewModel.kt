@@ -185,7 +185,8 @@ class MainViewModel @Inject constructor(
                         .getElementsByClass("truncate text-xl font-medium underline-offset-2 group-hover:underline md:text-2xl")
                         .text()
                         .split(" ")
-                    _mainState.update { it.copy(embeddingModelList = result, fetchEmbeddingModelError = null) }
+                    val finalList = listOf<String>("Select a Model") + result
+                    _mainState.update { it.copy(embeddingModelList = finalList, fetchEmbeddingModelError = null) }
                     ollamaRepository.insertLogToDb(
                         LogModel(
                             date = LocalDateTime.now().toString(),

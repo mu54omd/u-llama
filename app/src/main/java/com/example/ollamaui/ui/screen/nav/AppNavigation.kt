@@ -49,13 +49,15 @@ import com.example.ollamaui.helper.NetworkStatus
 import com.example.ollamaui.ui.screen.chat.ChatScreen
 import com.example.ollamaui.ui.screen.chat.ChatViewModel
 import com.example.ollamaui.ui.screen.chat.components.EmptyChatScreen
-import com.example.ollamaui.ui.screen.files.FilesScreen
-import com.example.ollamaui.ui.screen.files.FilesViewModel
+import com.example.ollamaui.ui.screen.filemanager.FileManagerScreen
+import com.example.ollamaui.ui.screen.filemanager.FileManagerViewModel
 import com.example.ollamaui.ui.screen.home.HomeScreen
 import com.example.ollamaui.ui.screen.home.HomeViewModel
 import com.example.ollamaui.ui.screen.loading.LoadingScreen
 import com.example.ollamaui.ui.screen.log.LogScreen
 import com.example.ollamaui.ui.screen.log.LogViewModel
+import com.example.ollamaui.ui.screen.preview.FilePreviewScreen
+import com.example.ollamaui.ui.screen.preview.PreviewViewModel
 import com.example.ollamaui.ui.screen.setting.SettingScreen
 import kotlinx.coroutines.launch
 
@@ -74,11 +76,12 @@ fun AppNavigation(
     val chatsList = homeViewModel.chatsList.collectAsStateWithLifecycle()
     val chatViewModel: ChatViewModel = hiltViewModel()
     val chatState = chatViewModel.chatState.collectAsStateWithLifecycle()
-    val attachedFilesList = chatViewModel.attachedFiles.collectAsStateWithLifecycle()
     val logViewModel: LogViewModel = hiltViewModel()
-    val fileViewModel: FilesViewModel = hiltViewModel()
-    val fileContent = fileViewModel.output.collectAsState()
-    val selectedFile = fileViewModel.selectedFile.collectAsState()
+    val previewViewModel: PreviewViewModel = hiltViewModel()
+    val fileContent = previewViewModel.output.collectAsState()
+    val selectedFile = previewViewModel.selectedFile.collectAsState()
+    val fileManagerViewModel: FileManagerViewModel = hiltViewModel()
+    val attachedFiles = fileManagerViewModel.attachedFiles.collectAsStateWithLifecycle()
 
     val networkStatus = mainViewModel.networkStatus.collectAsState()
 
@@ -159,6 +162,12 @@ fun AppNavigation(
                                         route = Screens.SettingScreen.route
                                     )
                                 },
+                                onFileManagerClick = {
+                                    navigateToTab(
+                                        navController = navController,
+                                        route = Screens.FileManagerScreen.route
+                                    )
+                                },
                                 onLogClick = {
                                     navigateToTab(
                                         navController = navController,
@@ -189,7 +198,7 @@ fun AppNavigation(
                                 ChatScreen(
                                     chatViewModel = chatViewModel,
                                     chatState = chatState,
-                                    attachedFilesList = attachedFilesList,
+                                    attachedFilesList = attachedFiles,
                                     embeddingModel = embeddingModel,
                                     onBackClick = {
                                         if(navigator.scaffoldState.currentState.tertiary == PaneAdaptedValue.Hidden){
@@ -206,9 +215,15 @@ fun AppNavigation(
                                             }
                                         }
                                     },
+                                    onAttachClick = {
+                                        navigateToTab(
+                                            navController = navController,
+                                            route = Screens.FileManagerScreen.route
+                                        )
+                                    },
                                     onFileClick = { file ->
-                                        fileViewModel.selectFile(file)
-                                        fileViewModel.prepareFile(file = file)
+                                        previewViewModel.selectFile(file)
+                                        previewViewModel.prepareFile(file = file)
                                         scope.launch {
                                             navigator.navigateTo(
                                                 pane = ListDetailPaneScaffoldRole.Extra,
@@ -224,7 +239,7 @@ fun AppNavigation(
                     },
                     extraPane = {
                         AnimatedPane {
-                            FilesScreen(
+                            FilePreviewScreen(
                                 fileContent = fileContent,
                                 file = selectedFile
                             )
@@ -270,9 +285,7 @@ fun AppNavigation(
                     isEmbeddingModelPulled = { mainViewModel.checkIfEmbeddingModelPulled(it) },
                     onSaveClick = { url, embeddingModelName, modelParameters->
                         mainViewModel.saveOllamaAddress(url = url)
-                        if(embeddingModelName.isNotEmpty()) {
-                            mainViewModel.saveOllamaEmbeddingModel(modelName = embeddingModelName)
-                        }
+                        mainViewModel.saveOllamaEmbeddingModel(modelName = embeddingModelName)
                         mainViewModel.saveOllamaTuningParameters(modelParameters = modelParameters)
                     },
                     onCheckClick = {url ->
@@ -305,6 +318,33 @@ fun AppNavigation(
             ){
                 LogScreen(
                     logViewModel = logViewModel,
+                    onBackClick = {
+                        navigateToTab(
+                            navController = navController,
+                            route = Screens.HomeScreen.route
+                        )
+                    }
+                )
+            }
+            composable(
+                route = Screens.FileManagerScreen.route,
+                enterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Right
+                    )
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Start
+                    )
+                }
+            ){
+                FileManagerScreen(
+                    fileManagerViewModel = fileManagerViewModel,
+                    embeddingModel = embeddingModel,
+                    baseAddress = baseAddress,
+                    attachedFiles = attachedFiles,
+                    onFileClick = { },
                     onBackClick = {
                         navigateToTab(
                             navController = navController,
