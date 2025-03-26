@@ -15,8 +15,8 @@ android {
         applicationId = "com.example.ollamaui"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1024
-        versionName = "1.0.24"
+        versionCode = 1025
+        versionName = "1.0.25"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

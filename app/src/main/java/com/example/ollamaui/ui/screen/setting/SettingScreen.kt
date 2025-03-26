@@ -5,6 +5,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,7 +20,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -28,7 +28,9 @@ import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -39,13 +41,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.ollamaui.R
 import com.example.ollamaui.domain.model.chat.DefaultModelParameters
 import com.example.ollamaui.domain.model.chat.ModelParameters
-import com.example.ollamaui.ui.screen.common.CustomButton
 import com.example.ollamaui.ui.screen.common.CustomDropDownList
 import com.example.ollamaui.ui.screen.setting.components.CustomSettingBox
 import com.example.ollamaui.ui.screen.setting.components.TuningSlider
@@ -64,19 +63,25 @@ fun SettingScreen(
     onFetchEmbeddingModelClick: () -> Unit,
     onBackClick: () -> Unit,
 ) {
-    val ipRegex = remember { Regex("\\d{0,3}\\.?\\d{0,3}\\.?\\d{0,3}\\.?\\d{0,3}") }
-    val portRegex = remember { Regex("\\d{0,5}") }
+    val ipRegex = remember { Regex("^(\\d{0,3}\\.){0,3}\\d{0,3}$") }
+    val portRegex = Regex("\\d{0,5}")
     var ipAddress by rememberSaveable { mutableStateOf(savedParameters[0].split("//")[1].split(":")[0]) }
     var port by rememberSaveable { mutableStateOf(savedParameters[0].split("//")[1].split(":")[1]) }
-    var selectedEmbeddingModel by rememberSaveable { mutableStateOf(savedParameters[1]) }
-    var networkStatus by remember { mutableStateOf("") }
-    var isChecked by rememberSaveable { mutableStateOf(false) }
-    var isSelectedModelPulled by remember {
-        mutableStateOf(
-            isEmbeddingModelPulled(
-                selectedEmbeddingModel
-            )
-        )
+    var selectedEmbeddingModel by rememberSaveable { mutableStateOf(if(savedParameters[1].isEmpty()) embeddingModelList[0] else savedParameters[1]) }
+    var isSelectedModelPulled = remember { derivedStateOf { isEmbeddingModelPulled(selectedEmbeddingModel) } }
+    val ipOnValueChange = remember {
+        { input: String ->
+            if (ipRegex.matches(input)) {
+                ipAddress = input
+            }
+        }
+    }
+    val portOnValueChange = remember {
+        { input: String ->
+            if (portRegex.matches(input)) {
+                port = input
+            }
+        }
     }
     val sliderPositions = remember {
         mutableStateListOf(
@@ -123,11 +128,7 @@ fun SettingScreen(
             ) {
                 OutlinedTextField(
                     value = ipAddress,
-                    onValueChange = { input ->
-                        if (ipRegex.matches(input)) {
-                            ipAddress = input
-                        }
-                    },
+                    onValueChange = ipOnValueChange,
                     label = { Text(text = "Ip address") },
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedContainerColor = Color.Transparent,
@@ -135,9 +136,7 @@ fun SettingScreen(
                     ),
                     singleLine = true,
                     supportingText = {
-                        if (isChecked) {
-                            Text(text = ollamaStatus)
-                        }
+                        Text(text = ollamaStatus)
                     },
                     modifier = Modifier
                         .weight(0.3f)
@@ -146,7 +145,7 @@ fun SettingScreen(
                 Spacer(modifier = Modifier.width(20.dp))
                 OutlinedTextField(
                     value = port,
-                    onValueChange = { input -> if (portRegex.matches(input)) port = input },
+                    onValueChange = portOnValueChange,
                     label = { Text(text = "Port") },
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedContainerColor = Color.Transparent,
@@ -160,8 +159,6 @@ fun SettingScreen(
                 Button(
                     onClick = {
                         onCheckClick("http://$ipAddress:$port")
-                        networkStatus = ollamaStatus
-                        isChecked = true
                     },
                     modifier = Modifier.padding(top = 30.dp, end = 10.dp)
                 ) {
@@ -176,7 +173,6 @@ fun SettingScreen(
                     listItems = embeddingModelList,
                     onItemClick = {
                         selectedEmbeddingModel = it
-                        isSelectedModelPulled = isEmbeddingModelPulled(selectedEmbeddingModel)
                     },
                     defaultValue = selectedEmbeddingModel,
                     modifier = Modifier.padding(start = 10.dp, top = 20.dp, bottom = 5.dp)
@@ -187,37 +183,26 @@ fun SettingScreen(
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                     modifier = Modifier.padding(top = 40.dp, end = 10.dp)
                 ) {
-                    CustomButton(
-                        onButtonClick = {
-                            onFetchEmbeddingModelClick()
-                        },
-                        description = "re-fetch",
-                        icon = R.drawable.baseline_refresh_24,
-                        containerColor = Color.Transparent
-                    )
                     AnimatedVisibility(
                         visible = selectedEmbeddingModel != "Select a Model",
                         enter = scaleIn(),
                         exit = scaleOut()
                     ) {
-                        CustomButton(
-                            onButtonClick = {
-                                onPullEmbeddingModelClick(selectedEmbeddingModel)
-                            },
-                            description = "pull",
-                            icon = R.drawable.baseline_cloud_download_24,
-                            containerColor = Color.Transparent
-                        )
+                        TextButton(
+                            onClick = { onPullEmbeddingModelClick(selectedEmbeddingModel) },
+                            border = BorderStroke(
+                                color = if(isSelectedModelPulled.value) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.primaryContainer,
+                                width = 2.dp
+                            )
+                        ) {
+                            Text(text = if(isSelectedModelPulled.value) "Pulled" else "Pull")
+                        }
                     }
-                    AnimatedVisibility(
-                        visible = isSelectedModelPulled && selectedEmbeddingModel != "Select a Model",
-                        enter = scaleIn(),
-                        exit = scaleOut()
+                    TextButton(
+                        onClick = { onFetchEmbeddingModelClick },
+                        border = BorderStroke(color = MaterialTheme.colorScheme.primaryContainer, width = 2.dp)
                     ) {
-                        Icon(
-                            painter = painterResource(R.drawable.baseline_check_24),
-                            contentDescription = "isModelPulled",
-                        )
+                        Text("Re-fetch")
                     }
                 }
             }
