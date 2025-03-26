@@ -80,7 +80,7 @@ fun ChatScreen(
         }
     }
     val selectedFiles = remember(chatState.value.chatModel.chatId) { mutableStateListOf<StableFile>() }
-    val isAnyFileAttached by remember { derivedStateOf { attachedFilesList.value.item.isNotEmpty() }}
+    val isAnyFileAttached by remember { derivedStateOf { attachedFilesList.value.item.isNotEmpty() && embeddingModel.value.isEmbeddingModelSet }}
 
     Scaffold(
         topBar = {
