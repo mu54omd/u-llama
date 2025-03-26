@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,34 +39,39 @@ fun FileItem(
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center,
+                horizontalArrangement = Arrangement.spacedBy(5.dp),
                 modifier = Modifier.fillMaxSize().padding(start = 10.dp, end = 10.dp)
             ) {
                 Text(
                     text = fileName.substringBeforeLast("."),
                     maxLines = 1,
-                    modifier = Modifier.weight(0.1f),
-                    overflow = TextOverflow.Ellipsis
+                    modifier = Modifier.weight(0.2f),
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.Center
                 )
+                VerticalDivider(color = MaterialTheme.colorScheme.background, thickness = 4.dp)
                 Text(
                     text = fileName.substringAfterLast("."),
                     maxLines = 1,
                     modifier = Modifier.weight(0.1f),
                     overflow = TextOverflow.Ellipsis,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
                 )
+                VerticalDivider(color = MaterialTheme.colorScheme.background, thickness = 4.dp)
                 Text(
                     text = epochToDate(fileAddedTime),
                     maxLines = 1,
-                    modifier = Modifier.weight(0.1f),
+                    modifier = Modifier.weight(0.2f),
                     overflow = TextOverflow.Ellipsis,
                     textAlign = TextAlign.Center
                 )
+                VerticalDivider(color = MaterialTheme.colorScheme.background, thickness = 4.dp)
                 Text(
                     text = hash,
                     maxLines = 1,
-                    modifier = Modifier.weight(0.3f),
-                    overflow = TextOverflow.Ellipsis
+                    modifier = Modifier.weight(0.2f),
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.Center
                 )
             }
         }

@@ -39,7 +39,11 @@ class LocalUserManagerImpl (
 
     override suspend fun saveOllamaEmbeddingModel(modelName: String) {
         context.dataStore.edit { setting ->
-            setting[PreferencesKeys.IS_OLLAMA_EMBEDDING_MODEL_SET] = modelName != "Select a Model"
+            setting[PreferencesKeys.IS_OLLAMA_EMBEDDING_MODEL_SET] = when(modelName){
+                "Select a Model" -> false
+                "" -> false
+                else -> true
+            }
             setting[PreferencesKeys.OLLAMA_EMBEDDING_MODEL] = modelName
         }
     }
@@ -47,7 +51,7 @@ class LocalUserManagerImpl (
     override fun readOllamaEmbeddingModel(): Flow<EmbeddingModel> {
         return context.dataStore.data.map { preferences ->
             val modelName = preferences[PreferencesKeys.OLLAMA_EMBEDDING_MODEL]?:""
-            val isSet = preferences[PreferencesKeys.IS_OLLAMA_EMBEDDING_MODEL_SET]?:false
+            val isSet = preferences[PreferencesKeys.IS_OLLAMA_EMBEDDING_MODEL_SET] == true
             EmbeddingModel(isSet, modelName)
         }
     }

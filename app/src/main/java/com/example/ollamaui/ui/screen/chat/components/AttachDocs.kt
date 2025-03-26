@@ -40,7 +40,12 @@ import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AttachDocs(isEnabled: Boolean, onDispose: () -> Unit, onSelectClick: (String?, String?, String, String, String) -> Unit) {
+fun AttachDocs(
+    isEnabled: Boolean,
+    onDispose: () -> Unit,
+    onSelectClick: (String?, String?, String, String, String) -> Unit,
+    exceededAlert: (Int) -> Unit,
+) {
     val context = LocalContext.current
     var isImporting = remember { mutableStateOf(false) }
     var fileSize by remember { mutableIntStateOf(0) }
@@ -75,6 +80,8 @@ fun AttachDocs(isEnabled: Boolean, onDispose: () -> Unit, onSelectClick: (String
                         }
                     }
                 }
+            } else{
+                exceededAlert(fileSize)
             }
 
         }

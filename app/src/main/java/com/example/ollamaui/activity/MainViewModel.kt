@@ -196,7 +196,8 @@ class MainViewModel @Inject constructor(
                     )
                 }
             }catch (e: IOException){
-                _mainState.update { it.copy(fetchEmbeddingModelError = e.message) }
+                val finalList = listOf<String>("Select a Model")
+                _mainState.update { it.copy(embeddingModelList = finalList, fetchEmbeddingModelError = e.message) }
                 ollamaRepository.insertLogToDb(
                     LogModel(
                         date = LocalDateTime.now().toString(),
