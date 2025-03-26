@@ -63,7 +63,11 @@ fun CustomDropDownList(
                 modifier = Modifier
                     .menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
                     .width(width.dp)
-                    .border(width = 1.dp, color = MaterialTheme.colorScheme.onBackground, shape = MaterialTheme.shapes.medium),
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        shape = MaterialTheme.shapes.medium
+                    ),
                 textStyle = MaterialTheme.typography.bodySmall.copy(textAlign = TextAlign.Center),
                 shape = MaterialTheme.shapes.large,
                 colors = TextFieldDefaults.colors(
@@ -76,18 +80,21 @@ fun CustomDropDownList(
                 enabled = isEnable
             )
             if (isEnable) {
-            ExposedDropdownMenu(
-                expanded = isExpanded,
-                onDismissRequest = { isExpanded = false},
-                shape = MaterialTheme.shapes.medium,
-                modifier = Modifier.height(100.dp),
-                containerColor = MaterialTheme.colorScheme.background,
-                shadowElevation = 0.dp,
-                tonalElevation = 0.dp,
-                border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.onBackground)
-            ) {
+                ExposedDropdownMenu(
+                    expanded = isExpanded,
+                    onDismissRequest = { isExpanded = false },
+                    shape = MaterialTheme.shapes.medium,
+                    modifier = Modifier.height(100.dp),
+                    containerColor = MaterialTheme.colorScheme.background,
+                    shadowElevation = 0.dp,
+                    tonalElevation = 0.dp,
+                    border = BorderStroke(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                ) {
 
-                    listItems.forEachIndexed { index, item->
+                    listItems.forEachIndexed { index, item ->
                         DropdownMenuItem(
                             text = {
                                 Text(
@@ -103,8 +110,12 @@ fun CustomDropDownList(
                                 onItemClick(item)
                             },
                         )
-                        if(index != listItems.lastIndex)
-                        HorizontalDivider(modifier = Modifier.width((width-30).dp).align(Alignment.CenterHorizontally))
+                        if (index != listItems.lastIndex)
+                            HorizontalDivider(
+                                modifier = Modifier
+                                    .width((width - 30).dp)
+                                    .align(Alignment.CenterHorizontally)
+                            )
                     }
                 }
             }

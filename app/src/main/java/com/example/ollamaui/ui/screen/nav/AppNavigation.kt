@@ -290,7 +290,7 @@ fun AppNavigation(
                         mainViewModel.saveOllamaEmbeddingModel(modelName = embeddingModelName)
                         mainViewModel.saveOllamaTuningParameters(modelParameters = modelParameters)
                     },
-                    onCheckClick = {url ->
+                    onCheckClick = { url ->
                         mainViewModel.checkOllamaAddress(url)
                     },
                     onFetchEmbeddingModelClick = { mainViewModel.fetchEmbeddingModelList() },

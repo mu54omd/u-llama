@@ -5,10 +5,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
@@ -59,24 +60,29 @@ fun FileManagerScreen(
 
     Scaffold(
         topBar = {
-            Row {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.padding(start = 10.dp, end = 10.dp)
+            ) {
                 Box(
-                    modifier = Modifier.fillMaxWidth().height(64.dp).padding(5.dp)
+                    modifier = Modifier.weight(0.8f).height(64.dp).padding(5.dp)
                 ){
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center,
+                        horizontalArrangement = Arrangement.spacedBy(5.dp),
                         modifier = Modifier.fillMaxSize().padding(start = 10.dp, end = 10.dp)
                     ) {
-                        Text(text = "Name", maxLines = 1, modifier = Modifier.weight(0.1f).padding(5.dp), textAlign = TextAlign.Center)
-                        VerticalDivider()
-                        Text(text = "Type", maxLines = 1, modifier = Modifier.weight(0.1f).padding(5.dp), textAlign = TextAlign.Center)
-                        VerticalDivider()
-                        Text(text = "Added Time", maxLines = 1, modifier = Modifier.weight(0.2f).padding(5.dp), textAlign = TextAlign.Center)
-                        VerticalDivider()
-                        Text(text = "Hash", maxLines = 1, modifier = Modifier.weight(0.3f).padding(5.dp), textAlign = TextAlign.Center)
+                        Text(text = "Name", maxLines = 1, modifier = Modifier.weight(0.2f), textAlign = TextAlign.Center)
+                        VerticalDivider(thickness = 2.dp)
+                        Text(text = "Type", maxLines = 1, modifier = Modifier.weight(0.1f), textAlign = TextAlign.Center)
+                        VerticalDivider(thickness = 2.dp)
+                        Text(text = "Added Time", maxLines = 1, modifier = Modifier.weight(0.2f), textAlign = TextAlign.Center)
+                        VerticalDivider(thickness = 2.dp)
+                        Text(text = "Hash", maxLines = 1, modifier = Modifier.weight(0.2f), textAlign = TextAlign.Center)
                     }
                 }
+                Spacer(modifier = Modifier.width(25.dp))
             }
         },
         floatingActionButton = {
