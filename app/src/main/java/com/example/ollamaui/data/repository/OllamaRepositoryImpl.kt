@@ -5,18 +5,20 @@ import com.example.ollamaui.data.local.ChatDao
 import com.example.ollamaui.data.local.LogDao
 import com.example.ollamaui.data.remote.OllamaApi
 import com.example.ollamaui.domain.model.LogModel
+import com.example.ollamaui.domain.model.NetworkError
 import com.example.ollamaui.domain.model.chat.ChatInputModel
 import com.example.ollamaui.domain.model.chat.ChatModel
 import com.example.ollamaui.domain.model.chat.ChatResponse
 import com.example.ollamaui.domain.model.embed.EmbedInputModel
 import com.example.ollamaui.domain.model.embed.EmbedResponse
-import com.example.ollamaui.domain.model.NetworkError
 import com.example.ollamaui.domain.model.pull.PullInputModel
 import com.example.ollamaui.domain.model.pull.PullResponse
 import com.example.ollamaui.domain.model.tag.TagResponse
 import com.example.ollamaui.domain.repository.OllamaRepository
 import com.example.ollamaui.mapper.toNetworkError
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
 class OllamaRepositoryImpl @Inject constructor(
@@ -72,7 +74,7 @@ class OllamaRepositoryImpl @Inject constructor(
     }
 
     override fun getChats(): Flow<List<ChatModel>> {
-        return chatDao.getChats()
+        return chatDao.getChats().flowOn(Dispatchers.IO)
     }
 
     override suspend fun getChat(chatId: Int): ChatModel? {
@@ -92,6 +94,6 @@ class OllamaRepositoryImpl @Inject constructor(
     }
 
     override fun getLogsFromDb():Flow<List<LogModel>>{
-        return logDao.getLogs()
+        return logDao.getLogs().flowOn(Dispatchers.IO)
     }
 }

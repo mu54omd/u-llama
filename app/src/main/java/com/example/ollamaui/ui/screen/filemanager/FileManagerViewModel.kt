@@ -86,16 +86,16 @@ class FileManagerViewModel @Inject constructor(
                     attachResult != null -> ollamaRepository.insertLogToDb(
                         LogModel(
                             date = LocalDateTime.now().toString(),
-                            type = "attach-file",
-                            content = "Result: Success - $fileName",
+                            type = "SUCCESS",
+                            content = "attach-file: $fileName",
                         )
                     )
 
                     attachError != null -> ollamaRepository.insertLogToDb(
                         LogModel(
                             date = LocalDateTime.now().toString(),
-                            type = "attach-file",
-                            content = "Result: Failed - $fileName - $attachError",
+                            type = "ERROR",
+                            content = "attach-file: $fileName - $attachError",
                         )
                     )
                 }
@@ -122,8 +122,8 @@ class FileManagerViewModel @Inject constructor(
                 ollamaRepository.insertLogToDb(
                     LogModel(
                         date = LocalDateTime.now().toString(),
-                        type = "ollama-embed",
-                        content = "post: ${ollamaBaseAddress}${OLLAMA_EMBED_ENDPOINT}",
+                        type = "START",
+                        content = "ollama post embed: ${ollamaBaseAddress}${OLLAMA_EMBED_ENDPOINT}",
                     )
                 )
                 ollamaRepository.postOllamaEmbed(
@@ -148,8 +148,8 @@ class FileManagerViewModel @Inject constructor(
                         ollamaRepository.insertLogToDb(
                             LogModel(
                                 date = LocalDateTime.now().toString(),
-                                type = "ollama-embed",
-                                content = "Result: Success",
+                                type = "SUCCESS",
+                                content = "ollama post embed: ${ollamaBaseAddress}${OLLAMA_EMBED_ENDPOINT}",
                             )
                         )
                     }
@@ -157,8 +157,8 @@ class FileManagerViewModel @Inject constructor(
                         ollamaRepository.insertLogToDb(
                             LogModel(
                                 date = LocalDateTime.now().toString(),
-                                type = "ollama-embed",
-                                content = "Result: Failed - ${error.error}",
+                                type = "ERROR",
+                                content = "ollama post embed:  ${error.t.message}",
                             )
                         )
                     }

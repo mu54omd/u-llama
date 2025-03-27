@@ -217,8 +217,8 @@ class ChatViewModel @Inject constructor(
                 ollamaRepository.insertLogToDb(
                     LogModel(
                         date = LocalDateTime.now().toString(),
-                        type = "ollama-post",
-                        content = "post: ${chatState.value.ollamaBaseAddress}${OLLAMA_CHAT_ENDPOINT}",
+                        type = "START",
+                        content = "ollama post message: ${chatState.value.ollamaBaseAddress}${OLLAMA_CHAT_ENDPOINT}",
                     )
                 )
                 ollamaRepository.postOllamaChat(
@@ -266,8 +266,8 @@ class ChatViewModel @Inject constructor(
                     ollamaRepository.insertLogToDb(
                         LogModel(
                             date = LocalDateTime.now().toString(),
-                            type = "ollama-post",
-                            content = "Result: Success",
+                            type = "SUCCESS",
+                            content = "ollama post message: ${chatState.value.ollamaBaseAddress}${OLLAMA_CHAT_ENDPOINT}",
                         )
                     )
                 }.onLeft { error ->
@@ -292,8 +292,8 @@ class ChatViewModel @Inject constructor(
                     ollamaRepository.insertLogToDb(
                         LogModel(
                             date = LocalDateTime.now().toString(),
-                            type = "ollama-post",
-                            content = "Result: Failed - ${error.error}",
+                            type = "ERROR",
+                            content = "ollama post message: ${error.t.message}",
                         )
                     )
                 }
