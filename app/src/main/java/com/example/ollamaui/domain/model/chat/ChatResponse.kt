@@ -6,7 +6,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ChatResponse(
-    val context: List<Int>,
     @SerializedName("created_at")
     val createdAt: String,
     val done: Boolean,
@@ -20,7 +19,6 @@ data class ChatResponse(
 
 object EmptyChatResponse{
     val empty = ChatResponse(
-        context = emptyList(),
         createdAt = "",
         done = false,
         doneReason = "",

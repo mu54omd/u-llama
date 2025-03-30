@@ -70,9 +70,6 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
-    fun findChat(chatId: Int): ChatModel?{
-        return chatsList.value.find { item -> item.chatId == chatId }
-    }
 
 
     //Private methods

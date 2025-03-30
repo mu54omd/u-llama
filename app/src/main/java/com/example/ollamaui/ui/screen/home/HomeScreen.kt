@@ -1,6 +1,5 @@
 package com.example.ollamaui.ui.screen.home
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
@@ -144,7 +143,6 @@ fun HomeScreen(
                         items = chatListItems,
                         key = { chatItem -> chatItem.chatId }
                     ) { chatItem ->
-                        Log.d("cTAG", "${chatItem.chatId}:${chatItem.newMessageStatus}")
                         Column {
                             Box(modifier = Modifier.fillMaxWidth().animateItem()) {
                                 SwipeActions(

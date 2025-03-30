@@ -159,6 +159,11 @@ class ChatViewModel @Inject constructor(
                 chatError = null
             )
         }
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                uploadChatToDatabase(chatModel = chatState.value.chatModel)
+            }
+        }
     }
 
     fun loadStates(chatModel: ChatModel, url: String, modelParameters: ModelParameters) {
