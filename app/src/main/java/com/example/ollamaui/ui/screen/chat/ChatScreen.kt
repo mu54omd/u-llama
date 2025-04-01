@@ -61,6 +61,7 @@ fun ChatScreen(
     chatViewModel: ChatViewModel,
     chatState: State<ChatStates>,
     attachedFilesList: State<AttachedFilesList>,
+    embeddingInProgressList: State<List<Long>>,
     embeddingModel: State<EmbeddingModel>,
     onBackClick: () -> Unit,
     onFileClick: (StableFile) -> Unit,
@@ -80,7 +81,8 @@ fun ChatScreen(
         }
     }
     val selectedFiles = remember(chatState.value.chatModel.chatId) { mutableStateListOf<StableFile>() }
-    val isAnyFileAttached by remember { derivedStateOf { attachedFilesList.value.item.isNotEmpty() }}
+    val isAnyFileAttached by remember { derivedStateOf { attachedFilesList.value.item.isNotEmpty() && embeddingModel.value.isEmbeddingModelSet }}
+    val isEmbeddingInProgress: (Long) -> Boolean = remember { { id -> embeddingInProgressList.value.contains(id) } }
 
     Scaffold(
         topBar = {
@@ -224,7 +226,8 @@ fun ChatScreen(
                                 onSelectedItemClick = {
                                     selectedFiles.remove(it)
                                 },
-                                isSelected = selectedFiles.contains(item)
+                                isSelected = selectedFiles.contains(item),
+                                isFileReady = !isEmbeddingInProgress(item.fileId)
                             )
                         }
                     }

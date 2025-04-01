@@ -41,8 +41,8 @@ class NetworkObserver(
             ollamaRepository.insertLogToDb(
                 LogModel(
                     date = LocalDateTime.now().toString(),
-                    type = "Network-check",
-                    content = "Result: Failed - ${e.message}",
+                    type = "ERROR",
+                    content = "network status: ${e.message}",
                 )
             )
             false

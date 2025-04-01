@@ -46,6 +46,7 @@ import kotlinx.coroutines.launch
 fun FileManagerScreen(
     fileManagerViewModel: FileManagerViewModel,
     attachedFiles: State<AttachedFilesList>,
+    embeddingInProgressList: State<List<Long>>,
     embeddingModel: State<EmbeddingModel>,
     baseAddress: State<BaseAddress>,
     onFileClick: (StableFile) -> Unit,
@@ -56,6 +57,7 @@ fun FileManagerScreen(
     val isEmbeddingSettingsSet by remember { derivedStateOf { embeddingModel.value.isEmbeddingModelSet && isEmbeddingModelPulled } }
     val isAttachedFilesEmpty by remember { derivedStateOf { attachedFiles.value.item.isEmpty() } }
     val snackbarHostState = remember { SnackbarHostState() }
+    val isEmbeddingInProgress: (Long) -> Boolean = remember { { id -> embeddingInProgressList.value.contains(id) } }
     val scope = rememberCoroutineScope()
 
     Scaffold(
@@ -125,7 +127,8 @@ fun FileManagerScreen(
                         hash = it.hash,
                         fileAddedTime = it.fileAddedTime,
                         onFileClick = { onFileClick(it) },
-                        onDeleteFileClick = { fileManagerViewModel.removeAttachedFile(fileId = it.fileId, isImage = it.isImage) }
+                        onDeleteFileClick = { fileManagerViewModel.removeAttachedFile(fileId = it.fileId, isImage = it.isImage) },
+                        isFileReady = !isEmbeddingInProgress(it.fileId)
                     )
                 }
             }
