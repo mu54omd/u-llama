@@ -47,7 +47,10 @@ object OllamaModule {
             .create()
 
         val okHttpClient =  OkHttpClient.Builder().apply {
-            this.addInterceptor(HttpLoggingInterceptor().apply { this.level = HttpLoggingInterceptor.Level.BODY })
+            this.addInterceptor(
+                HttpLoggingInterceptor()
+                .apply { this.level = HttpLoggingInterceptor.Level.BODY }
+            )
                 .connectTimeout(3, TimeUnit.SECONDS)
                 .readTimeout(5,TimeUnit.MINUTES)
                 .writeTimeout(5, TimeUnit.MINUTES)

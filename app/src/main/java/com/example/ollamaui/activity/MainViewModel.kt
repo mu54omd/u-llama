@@ -176,8 +176,8 @@ class MainViewModel @Inject constructor(
                     ollamaRepository.insertLogToDb(
                         LogModel(
                             date = LocalDateTime.now().toString(),
-                            type = "ollama-fetch",
-                            content = "fetch: $url",
+                            type = "START",
+                            content = "fetch embedding model: $url",
                         )
                     )
                     val doc = Jsoup.connect(url).get()
@@ -190,8 +190,8 @@ class MainViewModel @Inject constructor(
                     ollamaRepository.insertLogToDb(
                         LogModel(
                             date = LocalDateTime.now().toString(),
-                            type = "ollama-fetch",
-                            content = "Result: Success",
+                            type = "SUCCESS",
+                            content = "fetch embedding model: $url",
                         )
                     )
                 }
@@ -201,8 +201,8 @@ class MainViewModel @Inject constructor(
                 ollamaRepository.insertLogToDb(
                     LogModel(
                         date = LocalDateTime.now().toString(),
-                        type = "ollama-fetch",
-                        content = "Result: Failed - ${e.message}",
+                        type = "ERROR",
+                        content = "fetch embedding model: ${e.message}",
                     )
                 )
             }
@@ -217,8 +217,8 @@ class MainViewModel @Inject constructor(
         ollamaRepository.insertLogToDb(
             LogModel(
                 date = LocalDateTime.now().toString(),
-                type = "ollama-get",
-                content = "get: ${url}${OLLAMA_BASE_ENDPOINT}",
+                type = "START",
+                content = "ollama get status: ${url}${OLLAMA_BASE_ENDPOINT}",
             )
         )
         ollamaRepository.getOllamaStatus(
@@ -235,8 +235,8 @@ class MainViewModel @Inject constructor(
                 ollamaRepository.insertLogToDb(
                     LogModel(
                         date = LocalDateTime.now().toString(),
-                        type = "ollama-get",
-                        content = "Result: Success",
+                        type = "SUCCESS",
+                        content = "ollama get status: ${url}${OLLAMA_BASE_ENDPOINT}",
                     )
                 )
             }
@@ -250,8 +250,8 @@ class MainViewModel @Inject constructor(
                 ollamaRepository.insertLogToDb(
                     LogModel(
                         date = LocalDateTime.now().toString(),
-                        type = "ollama-embed",
-                        content = "Result: Failed - ${statusError.error}",
+                        type = "ERROR",
+                        content = "ollama get status: ${statusError.t.message}",
                     )
                 )
             }
@@ -263,8 +263,8 @@ class MainViewModel @Inject constructor(
         ollamaRepository.insertLogToDb(
             LogModel(
                 date = LocalDateTime.now().toString(),
-                type = "ollama-tag",
-                content = "get: ${baseAddress.value.ollamaBaseAddress}${OLLAMA_LIST_ENDPOINT}",
+                type = "START",
+                content = "ollama get tag: ${baseAddress.value.ollamaBaseAddress}${OLLAMA_LIST_ENDPOINT}",
             )
         )
         ollamaRepository.getOllamaModelsList(baseUrl = baseAddress.value.ollamaBaseAddress, tagEndpoint = OLLAMA_LIST_ENDPOINT)
@@ -286,8 +286,8 @@ class MainViewModel @Inject constructor(
                 ollamaRepository.insertLogToDb(
                     LogModel(
                         date = LocalDateTime.now().toString(),
-                        type = "ollama-tag",
-                        content = "Result: Success",
+                        type = "SUCCESS",
+                        content = "ollama get tag: ${baseAddress.value.ollamaBaseAddress}${OLLAMA_LIST_ENDPOINT}",
                     )
                 )
             }
@@ -302,8 +302,8 @@ class MainViewModel @Inject constructor(
                 ollamaRepository.insertLogToDb(
                     LogModel(
                         date = LocalDateTime.now().toString(),
-                        type = "ollama-tag",
-                        content = "Result: Failed - ${tagError.error}",
+                        type = "ERROR",
+                        content = "ollama get tag: ${tagError.t.message}",
                     )
                 )
             }
@@ -314,8 +314,8 @@ class MainViewModel @Inject constructor(
         ollamaRepository.insertLogToDb(
             LogModel(
                 date = LocalDateTime.now().toString(),
-                type = "ollama-pull",
-                content = "post: ${baseAddress.value.ollamaBaseAddress}${OLLAMA_PULL_ENDPOINT}",
+                type = "START",
+                content = "ollama post pull: ${baseAddress.value.ollamaBaseAddress}${OLLAMA_PULL_ENDPOINT}",
             )
         )
         ollamaRepository.postOllamaPull(
@@ -334,8 +334,8 @@ class MainViewModel @Inject constructor(
                 ollamaRepository.insertLogToDb(
                     LogModel(
                         date = LocalDateTime.now().toString(),
-                        type = "ollama-pull",
-                        content = "Result: Success",
+                        type = "SUCCESS",
+                        content = "ollama post pull: ${baseAddress.value.ollamaBaseAddress}${OLLAMA_PULL_ENDPOINT}",
                     )
                 )
             }
@@ -348,8 +348,8 @@ class MainViewModel @Inject constructor(
                 ollamaRepository.insertLogToDb(
                     LogModel(
                         date = LocalDateTime.now().toString(),
-                        type = "ollama-pull",
-                        content = "Result: Failed - ${pullError.error}",
+                        type = "ERROR",
+                        content = "ollama post pull: ${pullError.t.message}",
                     )
                 )
             }

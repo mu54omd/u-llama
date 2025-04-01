@@ -34,7 +34,8 @@ fun AttachedFilesItem(
     onFilesClick: (StableFile) -> Unit,
     onFilesLongPress: (StableFile) -> Unit,
     onSelectedItemClick: (StableFile) -> Unit,
-    isSelected: Boolean
+    isSelected: Boolean,
+    isFileReady: Boolean
 ) {
     val animateColor by animateColorAsState(
         targetValue = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.8f),
@@ -52,7 +53,9 @@ fun AttachedFilesItem(
             }
             .pointerInput(Unit){ detectTapGestures(
                 onLongPress = {
-                    onFilesLongPress(item)
+                    if(isFileReady) {
+                        onFilesLongPress(item)
+                    }
                 },
                 onTap = {
                     when{

@@ -6,7 +6,6 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,6 +23,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,7 +38,6 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -46,6 +45,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.ollamaui.BuildConfig
 import com.example.ollamaui.R
 import com.example.ollamaui.ui.screen.common.CustomButton
+import com.example.ollamaui.ui.screen.log.components.LogItem
 import com.example.ollamaui.utils.Constants.TOP_BAR_HEIGHT
 import kotlinx.coroutines.launch
 
@@ -104,34 +104,19 @@ fun LogScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-        }
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.End,
-            modifier = Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp)
-        ) {
+            Spacer(modifier = Modifier.weight(1f))
             CustomButton(
                 description = "Clear Log",
-                iconSize = 15,
                 icon = R.drawable.baseline_delete_outline_24,
-                onButtonClick = logViewModel::deleteLogs
+                onButtonClick = logViewModel::deleteLogs,
             )
         }
+        HorizontalDivider()
         Box(
             modifier = Modifier
-                .padding(10.dp)
-                .background(
-                    color = if (isSystemInDarkTheme()) Color.DarkGray else Color.White,
-                    shape = MaterialTheme.shapes.small
-                )
-                .border(
-                    width = 1.dp,
-                    color = MaterialTheme.colorScheme.primary,
-                    shape = MaterialTheme.shapes.small
-                )
                 .fillMaxWidth()
                 .fillMaxHeight()
-                .padding(5.dp)
+                .padding(10.dp)
         ) {
             LaunchedEffect(Unit) {
                 snapshotFlow { logsState.value }
@@ -150,12 +135,8 @@ fun LogScreen(
                     items = logsState.value,
                     key = { log -> log.logId }
                 ) { log ->
-                    Text(
-                        text = ">> ${log.date} ${log.type} ${log.content}",
-                        style = MaterialTheme.typography.bodySmall.copy(
-                            color = MaterialTheme.colorScheme.onSurface,
-                        ),
-                    )
+                    LogItem(id = log.logId, date = log.date, type = log.type, content = log.content)
+
                 }
             }
             val showScrollButton by remember {

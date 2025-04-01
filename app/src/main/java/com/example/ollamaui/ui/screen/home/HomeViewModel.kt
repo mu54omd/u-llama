@@ -10,7 +10,6 @@ import com.example.ollamaui.utils.Constants.SYSTEM_ROLE
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -21,7 +20,7 @@ class HomeViewModel @Inject constructor(
     private val ollamaRepository: OllamaRepository,
 ):ViewModel(){
 
-    private val _chatsList = ollamaRepository.getChats().flowOn(Dispatchers.IO)
+    private val _chatsList = ollamaRepository.getChats()
     val chatsList = _chatsList
         .stateIn(
             viewModelScope,
@@ -70,9 +69,6 @@ class HomeViewModel @Inject constructor(
                 ollamaRepository.deleteFromDbById(chatId)
             }
         }
-    }
-    fun findChat(chatId: Int): ChatModel?{
-        return chatsList.value.find { item -> item.chatId == chatId }
     }
 
 
