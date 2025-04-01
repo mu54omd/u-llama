@@ -1,15 +1,16 @@
 package com.example.ollamaui.data.remote
 
 import com.example.ollamaui.domain.model.chat.ChatInputModel
-import com.example.ollamaui.domain.model.chat.ChatResponse
 import com.example.ollamaui.domain.model.embed.EmbedInputModel
 import com.example.ollamaui.domain.model.embed.EmbedResponse
 import com.example.ollamaui.domain.model.pull.PullInputModel
 import com.example.ollamaui.domain.model.pull.PullResponse
 import com.example.ollamaui.domain.model.tag.TagResponse
+import okhttp3.ResponseBody
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Streaming
 import retrofit2.http.Url
 
 
@@ -26,12 +27,13 @@ interface OllamaApi {
         @Url fullUrl: String
     ): TagResponse
 
-    //Post chat dialog
+    //Post chat dialog when streaming is enabled
     @POST
+    @Streaming
     suspend fun ollamaChat(
         @Url fullUrl: String,
         @Body chatInputModel: ChatInputModel?,
-    ): ChatResponse
+    ): ResponseBody
 
     //Post embedding request
     @POST

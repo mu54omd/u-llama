@@ -11,6 +11,7 @@ import com.example.ollamaui.domain.model.MessagesModel
 import com.example.ollamaui.domain.model.NetworkError
 import com.example.ollamaui.domain.model.chat.ChatInputModel
 import com.example.ollamaui.domain.model.chat.ChatModel
+import com.example.ollamaui.domain.model.chat.ChatResponse
 import com.example.ollamaui.domain.model.chat.EmptyChatModel
 import com.example.ollamaui.domain.model.chat.EmptyChatResponse
 import com.example.ollamaui.domain.model.chat.ModelParameters
@@ -28,6 +29,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 import java.time.LocalDateTime
 import javax.inject.Inject
 
@@ -66,10 +68,7 @@ class ChatViewModel @Inject constructor(
                         isDatabaseChanged = true
                     )
                 }
-                ollamaPostMessage(
-                    messages = MessagesModel(messageModels = messages),
-                    chatId = oldChatModel.chatId
-                )
+                ollamaPostMessage(messages = MessagesModel(messageModels = messages), chatId = oldChatModel.chatId)
             }
             imageList.isNotEmpty() -> {
                 messages.add(MessageModel(content = text.trim(), role = USER_ROLE, images = imageList))
@@ -84,10 +83,7 @@ class ChatViewModel @Inject constructor(
                         isDatabaseChanged = true
                     )
                 }
-                ollamaPostMessage(
-                    messages = MessagesModel(messageModels = messages),
-                    chatId = oldChatModel.chatId
-                )
+                ollamaPostMessage(messages = MessagesModel(messageModels = messages), chatId = oldChatModel.chatId)
             }
             else -> {
                 val job =
@@ -114,10 +110,7 @@ class ChatViewModel @Inject constructor(
                             isDatabaseChanged = true
                         )
                     }
-                    ollamaPostMessage(
-                        messages = MessagesModel(messageModels = messages),
-                        chatId = oldChatModel.chatId
-                    )
+                    ollamaPostMessage(messages = MessagesModel(messageModels = messages), chatId = oldChatModel.chatId)
                 }
             }
         }
@@ -233,14 +226,38 @@ class ChatViewModel @Inject constructor(
                         model = chatState.value.chatModel.modelName,
                         messages = messages.messageModels,
                         keepAlive = 3600,
-                        stream = false,
+                        stream = true,
                         options = chatState.value.chatOptions
                     )
                 ).onRight { response ->
+                    var chatResponse = EmptyChatResponse.empty
+                    response.byteStream().bufferedReader().use { reader ->
+                        var result = ""
+                        reader.lineSequence().forEach { line ->
+                            val customJson = Json { ignoreUnknownKeys = true}
+                            if(line.isNotBlank()) {
+                                val chunk = customJson.decodeFromString<ChatResponse>(line)
+                                result += chunk.message.content
+                                if(chunk.doneReason != null){
+                                    chatResponse = ChatResponse(
+                                        createdAt = chunk.createdAt,
+                                        done = chunk.done,
+                                        doneReason = chunk.doneReason,
+                                        model = chunk.model,
+                                        message = MessageModel(
+                                            content = result,
+                                            role = chunk.message.role,
+                                        ),
+                                        totalDuration = chunk.totalDuration
+                                    )
+                                }
+                            }
+                        }
+                    }
                     oldMessages.add(
                         MessageModel(
-                            content = response.message.content,
-                            role = response.message.role
+                            content = chatResponse.message.content,
+                            role = chatResponse.message.role
                         )
                     )
                     isRespondingList.remove(chatId)
@@ -254,7 +271,7 @@ class ChatViewModel @Inject constructor(
                                     chatMessages = MessagesModel(messageModels = oldMessages),
                                     modelName = oldChatModel.modelName,
                                 ),
-                                chatResponse = response,
+                                chatResponse = chatResponse,
                                 chatError = null
                             )
                         }
@@ -305,7 +322,6 @@ class ChatViewModel @Inject constructor(
             }
         }
     }
-
     private fun getSimilarChunk(fileIds: List<Long>, query: String, embeddingModel: String):Job{
         val job = viewModelScope.launch {
             withContext(Dispatchers.IO) {

@@ -8,7 +8,6 @@ import com.example.ollamaui.domain.model.LogModel
 import com.example.ollamaui.domain.model.NetworkError
 import com.example.ollamaui.domain.model.chat.ChatInputModel
 import com.example.ollamaui.domain.model.chat.ChatModel
-import com.example.ollamaui.domain.model.chat.ChatResponse
 import com.example.ollamaui.domain.model.embed.EmbedInputModel
 import com.example.ollamaui.domain.model.embed.EmbedResponse
 import com.example.ollamaui.domain.model.pull.PullInputModel
@@ -19,6 +18,7 @@ import com.example.ollamaui.mapper.toNetworkError
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
+import okhttp3.ResponseBody
 import javax.inject.Inject
 
 class OllamaRepositoryImpl @Inject constructor(
@@ -35,9 +35,10 @@ class OllamaRepositoryImpl @Inject constructor(
     }
 
     override suspend fun postOllamaChat(
-        baseUrl: String, chatEndpoint: String,
+        baseUrl: String,
+        chatEndpoint: String,
         chatInputModel: ChatInputModel?
-    ): Either<NetworkError, ChatResponse> {
+    ): Either<NetworkError, ResponseBody> {
         return Either.catch { ollamaApi.ollamaChat(fullUrl = baseUrl + chatEndpoint, chatInputModel = chatInputModel) }.mapLeft { it.toNetworkError() }
     }
 

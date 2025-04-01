@@ -14,9 +14,12 @@ import com.example.ollamaui.ui.screen.chat.AttachedFilesList
 import com.example.ollamaui.utils.Constants.OLLAMA_EMBED_ENDPOINT
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
@@ -35,6 +38,9 @@ class FileManagerViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5000L),
             initialValue = AttachedFilesList()
         )
+
+    private val _embeddingInProgressList = MutableStateFlow(emptyList<Long>())
+    val embeddingInProgressList = _embeddingInProgressList.asStateFlow()
 
     fun attachFileToChat(
         attachResult: String?,
@@ -118,6 +124,7 @@ class FileManagerViewModel @Inject constructor(
 
     private fun ollamaPostEmbed(text: List<String>, embeddingModel: String, docId: Long, fileName: String, ollamaBaseAddress: String){
         viewModelScope.launch {
+            _embeddingInProgressList.update { it + docId }
             withContext(Dispatchers.IO) {
                 ollamaRepository.insertLogToDb(
                     LogModel(
@@ -152,6 +159,7 @@ class FileManagerViewModel @Inject constructor(
                                 content = "ollama post embed: ${ollamaBaseAddress}${OLLAMA_EMBED_ENDPOINT}",
                             )
                         )
+                        _embeddingInProgressList.update { it - docId }
                     }
                     .onLeft { error ->
                         ollamaRepository.insertLogToDb(

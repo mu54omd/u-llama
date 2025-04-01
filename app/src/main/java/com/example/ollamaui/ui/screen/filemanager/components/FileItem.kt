@@ -1,11 +1,15 @@
 package com.example.ollamaui.ui.screen.filemanager.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Card
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
@@ -25,57 +29,69 @@ fun FileItem(
     fileName: String,
     hash: String,
     fileAddedTime: Long,
+    isFileReady: Boolean,
     onFileClick: () -> Unit,
     onDeleteFileClick: () -> Unit,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
-        modifier = modifier
+        modifier = modifier.wrapContentSize()
     ) {
-        Card(
-            onClick = onFileClick,
-            modifier = Modifier.weight(0.8f).height(64.dp).padding(5.dp)
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.weight(0.8f).padding(5.dp)
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(5.dp),
-                modifier = Modifier.fillMaxSize().padding(start = 10.dp, end = 10.dp)
+            Card(
+                onClick = onFileClick,
+                modifier = Modifier
+                    .height(64.dp),
+                enabled = isFileReady
             ) {
-                Text(
-                    text = fileName.substringBeforeLast("."),
-                    maxLines = 1,
-                    modifier = Modifier.weight(0.2f),
-                    overflow = TextOverflow.Ellipsis,
-                    textAlign = TextAlign.Center
-                )
-                VerticalDivider(color = MaterialTheme.colorScheme.background, thickness = 4.dp)
-                Text(
-                    text = fileName.substringAfterLast("."),
-                    maxLines = 1,
-                    modifier = Modifier.weight(0.1f),
-                    overflow = TextOverflow.Ellipsis,
-                    textAlign = TextAlign.Center,
-                )
-                VerticalDivider(color = MaterialTheme.colorScheme.background, thickness = 4.dp)
-                Text(
-                    text = epochToDate(fileAddedTime),
-                    maxLines = 1,
-                    modifier = Modifier.weight(0.2f),
-                    overflow = TextOverflow.Ellipsis,
-                    textAlign = TextAlign.Center
-                )
-                VerticalDivider(color = MaterialTheme.colorScheme.background, thickness = 4.dp)
-                Text(
-                    text = hash,
-                    maxLines = 1,
-                    modifier = Modifier.weight(0.2f),
-                    overflow = TextOverflow.Ellipsis,
-                    textAlign = TextAlign.Center
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(5.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(start = 10.dp, end = 10.dp)
+                ) {
+                    Text(
+                        text = fileName.substringBeforeLast("."),
+                        maxLines = 1,
+                        modifier = Modifier.weight(0.2f),
+                        overflow = TextOverflow.Ellipsis,
+                        textAlign = TextAlign.Center
+                    )
+                    VerticalDivider(color = MaterialTheme.colorScheme.background, thickness = 4.dp)
+                    Text(
+                        text = fileName.substringAfterLast("."),
+                        maxLines = 1,
+                        modifier = Modifier.weight(0.1f),
+                        overflow = TextOverflow.Ellipsis,
+                        textAlign = TextAlign.Center,
+                    )
+                    VerticalDivider(color = MaterialTheme.colorScheme.background, thickness = 4.dp)
+                    Text(
+                        text = epochToDate(fileAddedTime),
+                        maxLines = 1,
+                        modifier = Modifier.weight(0.2f),
+                        overflow = TextOverflow.Ellipsis,
+                        textAlign = TextAlign.Center
+                    )
+                    VerticalDivider(color = MaterialTheme.colorScheme.background, thickness = 4.dp)
+                    Text(
+                        text = hash,
+                        maxLines = 1,
+                        modifier = Modifier.weight(0.2f),
+                        overflow = TextOverflow.Ellipsis,
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
+            if (!isFileReady) LinearProgressIndicator(modifier = Modifier.fillMaxWidth(0.99f))
         }
         CustomButton(
+            isButtonEnabled = isFileReady,
             onButtonClick = onDeleteFileClick,
             description = "Delete File",
             icon = R.drawable.baseline_delete_outline_24

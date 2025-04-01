@@ -83,6 +83,8 @@ fun AppNavigation(
     val selectedFile = previewViewModel.selectedFile.collectAsState()
     val fileManagerViewModel: FileManagerViewModel = hiltViewModel()
     val attachedFiles = fileManagerViewModel.attachedFiles.collectAsStateWithLifecycle()
+    val embeddingInProgressList = fileManagerViewModel.embeddingInProgressList.collectAsState()
+
 
     val networkStatus = mainViewModel.networkStatus.collectAsState()
 
@@ -202,6 +204,7 @@ fun AppNavigation(
                                     chatViewModel = chatViewModel,
                                     chatState = chatState,
                                     attachedFilesList = attachedFiles,
+                                    embeddingInProgressList = embeddingInProgressList,
                                     embeddingModel = embeddingModel,
                                     onBackClick = {
                                         if(navigator.scaffoldState.currentState.tertiary == PaneAdaptedValue.Hidden){
@@ -347,6 +350,7 @@ fun AppNavigation(
                     embeddingModel = embeddingModel,
                     baseAddress = baseAddress,
                     attachedFiles = attachedFiles,
+                    embeddingInProgressList = embeddingInProgressList,
                     isEmbeddingModelPulled = isEmbeddingModelPulled,
                     onFileClick = { },
                     onBackClick = {
