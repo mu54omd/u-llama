@@ -1,4 +1,4 @@
-package com.example.ollamaui.domain.objectbox
+package com.example.ollamaui.domain.helper
 
 import kotlin.math.max
 import kotlin.math.min

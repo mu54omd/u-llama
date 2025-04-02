@@ -60,9 +60,9 @@ fun FilePreviewScreen(
                         .align(Alignment.Center)
                 ) {
                     items(
-                        items = fileContent.value
+                        items = fileContent.value.filter { it.isNotBlank() }
                     ) {
-                        Text(text = it)
+                        Text(text = it, modifier = Modifier.fillMaxWidth())
                     }
                 }
             }

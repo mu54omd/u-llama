@@ -1,5 +1,6 @@
 package com.example.ollamaui.domain.readers
 
+import com.example.ollamaui.domain.helper.removeEmptyLines
 import com.itextpdf.text.pdf.PdfReader
 import com.itextpdf.text.pdf.parser.PdfTextExtractor
 import java.io.IOException
@@ -13,7 +14,7 @@ class PDFReader:DocumentReader() {
         try {
             for (i in 1..pdfPages) {
                 process(((i.toFloat()/pdfPages.toFloat())*100).toInt())
-                result += "\n" + PdfTextExtractor.getTextFromPage(pdfReader, i)
+                result += "\n" + PdfTextExtractor.getTextFromPage(pdfReader, i).removeEmptyLines()
             }
             return Pair(result, null)
         }catch (e: IOException){
