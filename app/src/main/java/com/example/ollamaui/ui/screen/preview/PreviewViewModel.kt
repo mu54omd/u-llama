@@ -3,6 +3,7 @@ package com.example.ollamaui.ui.screen.preview
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ollamaui.domain.model.objectbox.StableFile
+import com.example.ollamaui.ui.common.splitAndKeepDot
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,7 +29,7 @@ class PreviewViewModel @Inject constructor(): ViewModel() {
     fun prepareFile (file: StableFile){
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val list = file.attachResult.split(".")
+                val list = file.attachResult.splitAndKeepDot()
                 _output.update { list }
             }
         }

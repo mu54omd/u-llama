@@ -1,6 +1,8 @@
 package com.example.ollamaui.ui.screen.chat
 
+import android.util.Log
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ollamaui.data.local.objectbox.ChunkDatabase
@@ -18,6 +20,7 @@ import com.example.ollamaui.domain.model.chat.ModelParameters
 import com.example.ollamaui.domain.model.embed.EmbedInputModel
 import com.example.ollamaui.domain.model.objectbox.StableFile
 import com.example.ollamaui.domain.repository.OllamaRepository
+import com.example.ollamaui.mapper.toNetworkError
 import com.example.ollamaui.utils.Constants.OLLAMA_CHAT_ENDPOINT
 import com.example.ollamaui.utils.Constants.OLLAMA_EMBED_ENDPOINT
 import com.example.ollamaui.utils.Constants.USER_ROLE
@@ -26,10 +29,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.Json
 import java.time.LocalDateTime
 import javax.inject.Inject
 
@@ -45,6 +51,9 @@ class ChatViewModel @Inject constructor(
 
     private val isRespondingList = mutableListOf<Int>()
     private val jobs = mutableMapOf<Int, Job>()
+
+    private val _temporaryReceivedMessage = mutableStateMapOf<Int, String?>()
+    val temporaryReceivedMessage = _temporaryReceivedMessage
 
     //Public methods
     /*---------------------------------------------------------------------------------------------*/
@@ -208,9 +217,7 @@ class ChatViewModel @Inject constructor(
         jobs[chatId] = job
         viewModelScope.launch(job) {
             withContext(Dispatchers.IO) {
-                if (!isRespondingList.contains(chatState.value.chatModel.chatId)) isRespondingList.add(
-                    chatId
-                )
+                if (!isRespondingList.contains(chatState.value.chatModel.chatId)) isRespondingList.add(chatId)
                 _chatState.update { it.copy(isRespondingList = isRespondingList) }
                 ollamaRepository.insertLogToDb(
                     LogModel(
@@ -219,6 +226,8 @@ class ChatViewModel @Inject constructor(
                         content = "ollama post message: ${chatState.value.ollamaBaseAddress}${OLLAMA_CHAT_ENDPOINT}",
                     )
                 )
+                var result = ""
+                var finalResponse = EmptyChatResponse.empty
                 ollamaRepository.postOllamaChat(
                     baseUrl = chatState.value.ollamaBaseAddress,
                     chatEndpoint = OLLAMA_CHAT_ENDPOINT,
@@ -229,96 +238,127 @@ class ChatViewModel @Inject constructor(
                         stream = true,
                         options = chatState.value.chatOptions
                     )
-                ).onRight { response ->
-                    var chatResponse = EmptyChatResponse.empty
-                    response.byteStream().bufferedReader().use { reader ->
-                        var result = ""
-                        reader.lineSequence().forEach { line ->
-                            val customJson = Json { ignoreUnknownKeys = true}
-                            if(line.isNotBlank()) {
-                                val chunk = customJson.decodeFromString<ChatResponse>(line)
-                                result += chunk.message.content
-                                if(chunk.doneReason != null){
-                                    chatResponse = ChatResponse(
-                                        createdAt = chunk.createdAt,
-                                        done = chunk.done,
-                                        doneReason = chunk.doneReason,
-                                        model = chunk.model,
+                )
+                    .onEach { response ->
+                        response.fold(
+                            { error -> Log.d("cTAG", error.error.message.toString()) },
+                            { chatResponse ->
+                                result += chatResponse.message.content
+                                _temporaryReceivedMessage[chatId] = result
+                                if (chatResponse.doneReason != null) {
+                                    finalResponse = ChatResponse(
+                                        createdAt = chatResponse.createdAt,
+                                        done = chatResponse.done,
+                                        doneReason = chatResponse.doneReason,
+                                        model = chatResponse.model,
                                         message = MessageModel(
                                             content = result,
-                                            role = chunk.message.role,
+                                            role = chatResponse.message.role,
                                         ),
-                                        totalDuration = chunk.totalDuration
+                                        totalDuration = chatResponse.totalDuration
                                     )
                                 }
                             }
-                        }
-                    }
-                    oldMessages.add(
-                        MessageModel(
-                            content = chatResponse.message.content,
-                            role = chatResponse.message.role
                         )
-                    )
-                    isRespondingList.remove(chatId)
-                    _chatState.update { it.copy(isRespondingList = isRespondingList) }
-                    if (chatState.value.chatModel.chatId == oldChatModel.chatId) {
-                        _chatState.update {
-                            it.copy(
+                    }
+                    .onCompletion { cause ->
+                        if (cause == null) {
+                            oldMessages.add(
+                                MessageModel(
+                                    content = finalResponse.message.content,
+                                    role = finalResponse.message.role
+                                )
+                            )
+                            isRespondingList.remove(chatId)
+                            _chatState.update { it.copy(isRespondingList = isRespondingList) }
+                            _temporaryReceivedMessage[chatId] = null
+                            if (chatState.value.chatModel.chatId == oldChatModel.chatId) {
+                                _chatState.update {
+                                    it.copy(
+                                        chatModel = ChatModel(
+                                            chatId = oldChatModel.chatId,
+                                            chatTitle = oldChatModel.chatTitle,
+                                            chatMessages = MessagesModel(messageModels = oldMessages),
+                                            modelName = oldChatModel.modelName,
+                                        ),
+                                        chatResponse = finalResponse,
+                                        chatError = null
+                                    )
+                                }
+                            }
+                            uploadChatToDatabase(
                                 chatModel = ChatModel(
                                     chatId = oldChatModel.chatId,
                                     chatTitle = oldChatModel.chatTitle,
                                     chatMessages = MessagesModel(messageModels = oldMessages),
                                     modelName = oldChatModel.modelName,
+                                    newMessageStatus = if (chatState.value.chatModel.chatId == oldChatModel.chatId) 0 else 1
                                 ),
-                                chatResponse = chatResponse,
-                                chatError = null
                             )
+                            ollamaRepository.insertLogToDb(
+                                LogModel(
+                                    date = LocalDateTime.now().toString(),
+                                    type = "SUCCESS",
+                                    content = "ollama post message: ${chatState.value.ollamaBaseAddress}${OLLAMA_CHAT_ENDPOINT}",
+                                )
+                            )
+                        } else {
+                            isRespondingList.remove(chatId)
+                            _chatState.update {
+                                it.copy(
+                                    isRespondingList = isRespondingList,
+                                    isSendingFailed = true,
+                                    isDatabaseChanged = true,
+                                )
+                            }
+                            if (chatState.value.chatModel.chatId == oldChatModel.chatId) {
+                                _chatState.update {
+                                    it.copy(
+                                        chatError = cause.toNetworkError(),
+                                        chatResponse = EmptyChatResponse.empty,
+                                        chatModel = chatState.value.chatModel.copy(newMessageStatus = 2)
+                                    )
+                                }
+                            }
+                            uploadChatToDatabase(oldChatModel.copy(newMessageStatus = 2))
+                            ollamaRepository.insertLogToDb(
+                                LogModel(
+                                    date = LocalDateTime.now().toString(),
+                                    type = "ERROR",
+                                    content = "ollama post message: ${cause.message}",
+                                )
+                            )
+                            Log.d("cTAG", "Stream closed by error. cause = ${cause.message}")
                         }
                     }
-                    uploadChatToDatabase(
-                        chatModel = ChatModel(
-                            chatId = oldChatModel.chatId,
-                            chatTitle = oldChatModel.chatTitle,
-                            chatMessages = MessagesModel(messageModels = oldMessages),
-                            modelName = oldChatModel.modelName,
-                            newMessageStatus = if (chatState.value.chatModel.chatId == oldChatModel.chatId) 0 else 1
-                        ),
-                    )
-                    ollamaRepository.insertLogToDb(
-                        LogModel(
-                            date = LocalDateTime.now().toString(),
-                            type = "SUCCESS",
-                            content = "ollama post message: ${chatState.value.ollamaBaseAddress}${OLLAMA_CHAT_ENDPOINT}",
-                        )
-                    )
-                }.onLeft { error ->
-                    isRespondingList.remove(chatId)
-                    _chatState.update {
-                        it.copy(
-                            isRespondingList = isRespondingList,
-                            isSendingFailed = true,
-                            isDatabaseChanged = true,
-                        )
-                    }
-                    if (chatState.value.chatModel.chatId == oldChatModel.chatId) {
+                    .catch { error ->
+                        isRespondingList.remove(chatId)
                         _chatState.update {
                             it.copy(
-                                chatError = error,
-                                chatResponse = EmptyChatResponse.empty,
-                                chatModel = chatState.value.chatModel.copy(newMessageStatus = 2)
+                                isRespondingList = isRespondingList,
+                                isSendingFailed = true,
+                                isDatabaseChanged = true,
                             )
                         }
-                    }
-                    uploadChatToDatabase(oldChatModel.copy(newMessageStatus = 2))
-                    ollamaRepository.insertLogToDb(
-                        LogModel(
-                            date = LocalDateTime.now().toString(),
-                            type = "ERROR",
-                            content = "ollama post message: ${error.t.message}",
+                        if (chatState.value.chatModel.chatId == oldChatModel.chatId) {
+                            _chatState.update {
+                                it.copy(
+                                    chatError = error.toNetworkError(),
+                                    chatResponse = EmptyChatResponse.empty,
+                                    chatModel = chatState.value.chatModel.copy(newMessageStatus = 2)
+                                )
+                            }
+                        }
+                        uploadChatToDatabase(oldChatModel.copy(newMessageStatus = 2))
+                        ollamaRepository.insertLogToDb(
+                            LogModel(
+                                date = LocalDateTime.now().toString(),
+                                type = "ERROR",
+                                content = "ollama post message: ${error.message}",
+                            )
                         )
-                    )
-                }
+                    }
+                    .collect()
             }
         }
     }

@@ -8,6 +8,7 @@ import com.example.ollamaui.domain.model.LogModel
 import com.example.ollamaui.domain.model.NetworkError
 import com.example.ollamaui.domain.model.chat.ChatInputModel
 import com.example.ollamaui.domain.model.chat.ChatModel
+import com.example.ollamaui.domain.model.chat.ChatResponse
 import com.example.ollamaui.domain.model.embed.EmbedInputModel
 import com.example.ollamaui.domain.model.embed.EmbedResponse
 import com.example.ollamaui.domain.model.pull.PullInputModel
@@ -17,8 +18,10 @@ import com.example.ollamaui.domain.repository.OllamaRepository
 import com.example.ollamaui.mapper.toNetworkError
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import okhttp3.ResponseBody
+import kotlinx.serialization.json.Json
+import okio.Buffer
 import javax.inject.Inject
 
 class OllamaRepositoryImpl @Inject constructor(
@@ -38,9 +41,26 @@ class OllamaRepositoryImpl @Inject constructor(
         baseUrl: String,
         chatEndpoint: String,
         chatInputModel: ChatInputModel?
-    ): Either<NetworkError, ResponseBody> {
-        return Either.catch { ollamaApi.ollamaChat(fullUrl = baseUrl + chatEndpoint, chatInputModel = chatInputModel) }.mapLeft { it.toNetworkError() }
-    }
+    ): Flow<Either<NetworkError, ChatResponse>> = flow {
+        try {
+            val responseBody = ollamaApi.ollamaChat(fullUrl = baseUrl + chatEndpoint, chatInputModel = chatInputModel)
+            responseBody.use { body ->
+                val source = body.source()
+                val buffer = Buffer()
+                while (!source.exhausted()) {
+                    val bytesRead = source.read(buffer, 8192)
+                    if (bytesRead != -1L) {
+                        val customJson = Json { ignoreUnknownKeys = true }
+                        val chatResponse =
+                            customJson.decodeFromString<ChatResponse>(buffer.readUtf8())
+                        emit(Either.Right(chatResponse))
+                    }
+                }
+            }
+        }catch (e: Exception){
+            emit(Either.Left(e.toNetworkError()))
+        }
+    }.flowOn(Dispatchers.IO)
 
     override suspend fun postOllamaEmbed(
         baseUrl: String,
