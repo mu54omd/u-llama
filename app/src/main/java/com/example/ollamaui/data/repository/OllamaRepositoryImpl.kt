@@ -17,6 +17,7 @@ import com.example.ollamaui.domain.model.tag.TagResponse
 import com.example.ollamaui.domain.repository.OllamaRepository
 import com.example.ollamaui.mapper.toNetworkError
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -47,13 +48,19 @@ class OllamaRepositoryImpl @Inject constructor(
             responseBody.use { body ->
                 val source = body.source()
                 val buffer = Buffer()
+                val accumulatedJson = StringBuilder()
                 while (!source.exhausted()) {
                     val bytesRead = source.read(buffer, 8192)
                     if (bytesRead != -1L) {
-                        val customJson = Json { ignoreUnknownKeys = true }
-                        val chatResponse =
-                            customJson.decodeFromString<ChatResponse>(buffer.readUtf8())
-                        emit(Either.Right(chatResponse))
+                        accumulatedJson.append(buffer.readUtf8())
+                        val jsonText = accumulatedJson.toString()
+                        if (jsonText.trim().endsWith("}")) {
+                            val customJson = Json { ignoreUnknownKeys = true }
+                            val chatResponse = customJson.decodeFromString<ChatResponse>(jsonText)
+                            emit(Either.Right(chatResponse))
+                            accumulatedJson.clear()
+                        }
+                        delay(50)
                     }
                 }
             }

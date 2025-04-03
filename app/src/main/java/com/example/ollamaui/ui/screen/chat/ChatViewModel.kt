@@ -241,7 +241,7 @@ class ChatViewModel @Inject constructor(
                 )
                     .onEach { response ->
                         response.fold(
-                            { error -> Log.d("cTAG", error.error.message.toString()) },
+                            { error -> Log.d("cTAG", "error received in the onEach block: ${error.t}") },
                             { chatResponse ->
                                 result += chatResponse.message.content
                                 _temporaryReceivedMessage[chatId] = result
