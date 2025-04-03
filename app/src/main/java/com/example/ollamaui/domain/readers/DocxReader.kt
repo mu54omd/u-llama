@@ -1,5 +1,6 @@
 package com.example.ollamaui.domain.readers
 
+import com.example.ollamaui.domain.helper.removeEmptyLines
 import org.apache.poi.xwpf.usermodel.XWPFDocument
 import java.io.IOException
 import java.io.InputStream
@@ -12,7 +13,7 @@ class DocxReader: DocumentReader() {
             val result = StringBuilder()
             for(i in 0..paragraphs.size -1){
                 process(((i.toFloat()/paragraphs.size.toFloat())*100).toInt())
-                result.append(" ").append(paragraphs[i].text)
+                result.append("\n").append(paragraphs[i].text.removeEmptyLines())
             }
             return Pair(result.toString(), null)
         }catch (e: IOException){

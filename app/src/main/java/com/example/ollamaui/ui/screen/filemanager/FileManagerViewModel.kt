@@ -8,7 +8,7 @@ import com.example.ollamaui.domain.model.LogModel
 import com.example.ollamaui.domain.model.embed.EmbedInputModel
 import com.example.ollamaui.domain.model.objectbox.Chunk
 import com.example.ollamaui.domain.model.objectbox.File
-import com.example.ollamaui.domain.objectbox.Splitter
+import com.example.ollamaui.domain.helper.Splitter
 import com.example.ollamaui.domain.repository.OllamaRepository
 import com.example.ollamaui.ui.screen.chat.AttachedFilesList
 import com.example.ollamaui.utils.Constants.OLLAMA_EMBED_ENDPOINT
