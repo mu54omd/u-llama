@@ -6,7 +6,6 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -78,18 +78,20 @@ fun ChatScreen(
     val selectedDialogs = remember(chatState.value.chatModel.chatId) { mutableStateMapOf<Int, MessageModel>() }
     val visibleDetails = remember(chatState.value.chatModel.chatId) { mutableStateMapOf<Int, MessageModel>() }
     val clipboard: ClipboardManager = LocalClipboardManager.current
-    val listState = rememberLazyListState(
-        initialFirstVisibleItemIndex = chatState.value.chatModel.chatMessages.messageModels.lastIndex
-    )
+
     val scope = rememberCoroutineScope()
     val selectedFiles = remember(chatState.value.chatModel.chatId) { mutableStateListOf<StableFile>() }
     val isAnyFileAttached by remember { derivedStateOf { attachedFilesList.value.item.isNotEmpty() && embeddingModel.value.isEmbeddingModelSet }}
     val isEmbeddingInProgress: (Long) -> Boolean = remember { { id -> embeddingInProgressList.value.contains(id) } }
     val tempText by remember(chatState.value.chatModel.chatId) { derivedStateOf { chatViewModel.temporaryReceivedMessage[chatState.value.chatModel.chatId] } }
     val isResponding by remember(chatState.value.chatModel.chatId) { derivedStateOf { chatState.value.isRespondingList.contains(chatState.value.chatModel.chatId) } }
-    val isFabVisible by remember { derivedStateOf { listState.canScrollForward && !isResponding } }
     var lastItemHeight by remember { mutableIntStateOf(0) }
     var extraItemHeight by remember { mutableIntStateOf(0) }
+    val listState = rememberLazyListState(
+        initialFirstVisibleItemIndex = chatState.value.chatModel.chatMessages.messageModels.lastIndex,
+        initialFirstVisibleItemScrollOffset = Int.MAX_VALUE
+    )
+    val isFabVisible by remember { derivedStateOf { listState.canScrollForward && !isResponding } }
 
     Scaffold(
         topBar = {
@@ -167,19 +169,24 @@ fun ChatScreen(
                 )
         ) {
             LaunchedEffect(
-                chatState.value.chatModel.chatMessages.messageModels.size,
                 isResponding,
-                extraItemHeight
+                extraItemHeight,
             ) {
-                val lastIndex = chatState.value.chatModel.chatMessages.messageModels.lastIndex + if (isResponding) 1 else 0
-                val scrollOffset = if (isResponding) extraItemHeight else lastItemHeight
-                listState.scrollToItem(lastIndex, scrollOffset)
+                if (!listState.isScrollInProgress) {
+                    val lastIndex =
+                        chatState.value.chatModel.chatMessages.messageModels.lastIndex + if (isResponding) 1 else 0
+                    val scrollOffset = if (isResponding) extraItemHeight else lastItemHeight
+                    snapshotFlow { chatState.value.chatModel.chatMessages.messageModels }
+                        .collect {
+                            listState.scrollToItem(lastIndex, scrollOffset)
+                        }
+                }
             }
             LazyColumn(
                 modifier = Modifier.padding(bottom = 25.dp),
                 verticalArrangement = Arrangement.Bottom,
                 state = listState,
-                contentPadding = PaddingValues(top = 32.dp, start = 10.dp, end = 10.dp)
+                contentPadding = PaddingValues(top = 128.dp, start = 10.dp, end = 10.dp, bottom = 128.dp)
             ) {
                 itemsIndexed(
                     items = chatState.value.chatModel.chatMessages.messageModels,
@@ -190,7 +197,9 @@ fun ChatScreen(
                             messageModel = message,
                             modifier = Modifier
                                 .onGloballyPositioned { coordinates ->
-                                    lastItemHeight = coordinates.size.height
+                                    if(index == chatState.value.chatModel.chatMessages.messageModels.lastIndex) {
+                                        lastItemHeight = coordinates.size.height
+                                    }
                             },
                             isSelected = selectedDialogs.contains(index) && selectedDialogs[index]?.messageId == message.messageId,
                             isVisible = visibleDetails.contains(index) && visibleDetails[index]?.messageId == message.messageId,
@@ -227,16 +236,6 @@ fun ChatScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(4.dp)
-                                    .border(
-                                        width = 1.dp,
-                                        color = MaterialTheme.colorScheme.onBackground,
-                                        shape = RoundedCornerShape(
-                                            topStart = 0f,
-                                            topEnd = 50f,
-                                            bottomStart = 0f,
-                                            bottomEnd = 50f
-                                        )
-                                    )
                                     .padding(16.dp)
                                     .onGloballyPositioned { coordinates ->
                                         extraItemHeight = coordinates.size.height

@@ -130,7 +130,6 @@ fun AppNavigation(
                             HomeScreen(
                                 chatsList = chatsList,
                                 onChatClick = {
-//                                    val chatModel = homeViewModel.findChat(chatId = it.chatId) ?: it
                                     val chatModel = it
                                     chatViewModel.loadStates(
                                         chatModel = chatModel,

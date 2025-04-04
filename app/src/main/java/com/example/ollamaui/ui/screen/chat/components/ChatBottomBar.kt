@@ -70,6 +70,7 @@ fun ChatBottomBar(
                             description = "Clear Button",
                             onButtonClick = onClearClick,
                             icon = R.drawable.baseline_clear_24,
+                            containerColor = MaterialTheme.colorScheme.surfaceContainer
                         )
                     }
                 },

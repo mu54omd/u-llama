@@ -17,7 +17,6 @@ import com.example.ollamaui.domain.model.tag.TagResponse
 import com.example.ollamaui.domain.repository.OllamaRepository
 import com.example.ollamaui.mapper.toNetworkError
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -60,7 +59,6 @@ class OllamaRepositoryImpl @Inject constructor(
                             emit(Either.Right(chatResponse))
                             accumulatedJson.clear()
                         }
-                        delay(50)
                     }
                 }
             }
