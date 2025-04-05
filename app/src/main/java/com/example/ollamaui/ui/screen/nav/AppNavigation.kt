@@ -255,8 +255,10 @@ fun AppNavigation(
             composable(route = Screens.LoadingScreen.route){
                 LoadingScreen(
                     isLocalSettingLoaded = baseAddress.value.isLocalSettingsLoaded,
-                    onDispose = {
+                    onClose = {
                         mainViewModel.refresh()
+                    },
+                    navigateTo = {
                         navigateToTab(navController = navController , route = Screens.HomeScreen.route)
                     }
                 )

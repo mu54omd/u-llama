@@ -7,6 +7,7 @@ import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -92,6 +94,7 @@ fun ChatScreen(
         initialFirstVisibleItemScrollOffset = Int.MAX_VALUE
     )
     val isFabVisible by remember { derivedStateOf { listState.canScrollForward && !isResponding } }
+    var isAutoScrollEnabled by remember { mutableStateOf(true) }
 
     Scaffold(
         topBar = {
@@ -111,6 +114,7 @@ fun ChatScreen(
                 textValue = textValue,
                 onValueChange = { textValue = it },
                 onSendClick = {
+                    isAutoScrollEnabled = true
                     when{
                      chatState.value.isSendingFailed -> { chatViewModel.retry() }
                      chatState.value.isRespondingList.contains(chatState.value.chatModel.chatId) -> { chatViewModel.stop(chatId = chatState.value.chatModel.chatId) }
@@ -172,7 +176,7 @@ fun ChatScreen(
                 isResponding,
                 extraItemHeight,
             ) {
-                if (!listState.isScrollInProgress) {
+                if (!listState.isScrollInProgress && isAutoScrollEnabled) {
                     val lastIndex =
                         chatState.value.chatModel.chatMessages.messageModels.lastIndex + if (isResponding) 1 else 0
                     val scrollOffset = if (isResponding) extraItemHeight else lastItemHeight
@@ -183,7 +187,15 @@ fun ChatScreen(
                 }
             }
             LazyColumn(
-                modifier = Modifier.padding(bottom = 25.dp),
+                modifier = Modifier
+                    .padding(bottom = 25.dp)
+                    .pointerInput(Unit){
+                        detectTapGestures(
+                            onPress = {
+                                isAutoScrollEnabled = false
+                            }
+                        )
+                    },
                 verticalArrangement = Arrangement.Bottom,
                 state = listState,
                 contentPadding = PaddingValues(top = 128.dp, start = 10.dp, end = 10.dp, bottom = 128.dp)
