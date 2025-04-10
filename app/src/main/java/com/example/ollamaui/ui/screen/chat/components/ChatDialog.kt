@@ -54,13 +54,22 @@ fun ChatDialog(
     onSelectedItemClick: () -> Unit,
     onLongPressItem: () -> Unit,
     isSelected: Boolean,
-    isVisible: Boolean,
+    isDetailsVisible: Boolean,
+    isSendingFailed: Boolean,
+    isLastMinusOneMessage: Boolean,
+    isLastMessage: Boolean,
+    onReproduceResponse: () -> Unit,
+    onDeleteLastMessage: () -> Unit,
+    onEditLastMessage: () -> Unit,
+    isResponding: Boolean
 ) {
     val isFromMe by remember { derivedStateOf { isFromMe(messageModel) } }
     val animatedColorMessage by animateColorAsState(
         when(isFromMe){
             true -> {
-                if(isSelected) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.primaryContainer
+                if(isSelected) MaterialTheme.colorScheme.tertiaryContainer
+                else if(isSendingFailed && isLastMessage) MaterialTheme.colorScheme.errorContainer
+                else MaterialTheme.colorScheme.primaryContainer
 
             }
             false -> {
@@ -94,10 +103,13 @@ fun ChatDialog(
             Box(
                 modifier = Modifier
                     .align(if (isFromMe) Alignment.End else Alignment.Start)
-                    .widthIn(min = 80.dp)
+                    .widthIn(min = 120.dp)
                     .border(
-                        width = 1.dp,
-                        color = if(isFromMe) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
+                        width = (1.5).dp,
+                        color = when{
+                            isFromMe -> MaterialTheme.colorScheme.surface
+                            else -> MaterialTheme.colorScheme.outlineVariant
+                        },
                         shape =
                             RoundedCornerShape(
                                 topStart = if (isFromMe) 50f else 0f,
@@ -114,13 +126,14 @@ fun ChatDialog(
                             bottomEnd = 50f
                         )
                     )
-                    .pointerInput(Unit){
+                    .pointerInput(Unit) {
                         detectTapGestures(
                             onTap = {
-                                when{
+                                when {
                                     !isSelected -> {
                                         onItemClick()
                                     }
+
                                     isSelected -> {
                                         onSelectedItemClick()
                                     }
@@ -131,7 +144,7 @@ fun ChatDialog(
                             }
                         )
                     }
-                    .drawBehind{
+                    .drawBehind {
                         drawRoundRect(
                             color = animatedColorMessage,
                         )
@@ -165,7 +178,7 @@ fun ChatDialog(
                                     textAlign = TextAlign.Start,
                                     modifier = Modifier
                                         .padding(bottom = 4.dp)
-                                        .drawBehind{
+                                        .drawBehind {
                                             val strokeWidth = 1.dp.toPx()
                                             drawLine(
                                                 color = Color.LightGray,
@@ -191,7 +204,18 @@ fun ChatDialog(
                 }
                 Spacer(modifier = Modifier.height(2.dp))
             }
-        ChatDialogDetails(isVisible = isVisible, isFromMe = isFromMe, date = messageModel.date, time = messageModel.time)
+        ChatDialogDetails(
+            isVisible = isDetailsVisible,
+            isFromMe = isFromMe,
+            date = messageModel.date,
+            time = messageModel.time,
+            isLastBotMessage = isLastMessage && !isFromMe,
+            isLastUserMessage = (isLastMessage || isLastMinusOneMessage ) && isFromMe,
+            onReproduceResponse = onReproduceResponse,
+            onEditLastMessage = onEditLastMessage,
+            onDeleteLastMessage = onDeleteLastMessage,
+            isResponding = isResponding
+        )
     }
 
 }
@@ -209,10 +233,17 @@ private fun ChatDialogPreview() {
                     date = "2025-05-17",
                 ),
                 isSelected = false,
-                isVisible = false,
+                isDetailsVisible = false,
+                isSendingFailed = false,
                 onItemClick = {},
                 onSelectedItemClick = {},
                 onLongPressItem = {},
+                isLastMessage = true,
+                isLastMinusOneMessage = false,
+                onReproduceResponse = {},
+                onEditLastMessage = {},
+                onDeleteLastMessage = {},
+                isResponding = false
             )
             ChatDialog(
                 messageModel = MessageModel(
@@ -222,10 +253,17 @@ private fun ChatDialogPreview() {
                     date = "2025-05-17",
                 ),
                 isSelected = false,
-                isVisible = false,
+                isDetailsVisible = false,
+                isSendingFailed = false,
                 onItemClick = {},
                 onSelectedItemClick = {},
                 onLongPressItem = {},
+                isLastMessage = true,
+                isLastMinusOneMessage = false,
+                onReproduceResponse = {},
+                onEditLastMessage = {},
+                onDeleteLastMessage = {},
+                isResponding = false
             )
             ChatDialog(
                 messageModel = MessageModel(
@@ -235,10 +273,17 @@ private fun ChatDialogPreview() {
                     date = "2025-05-17",
                 ),
                 isSelected = false,
-                isVisible = false,
+                isDetailsVisible = false,
+                isSendingFailed = false,
                 onItemClick = {},
                 onSelectedItemClick = {},
                 onLongPressItem = {},
+                isLastMinusOneMessage = true,
+                isLastMessage = false,
+                onReproduceResponse = {},
+                onEditLastMessage = {},
+                onDeleteLastMessage = {},
+                isResponding = false
             )
             ChatDialog(
                 messageModel = MessageModel(
@@ -248,10 +293,17 @@ private fun ChatDialogPreview() {
                     date = "2025-05-17",
                 ),
                 isSelected = false,
-                isVisible = false,
+                isDetailsVisible = false,
+                isSendingFailed = false,
                 onItemClick = {},
                 onSelectedItemClick = {},
                 onLongPressItem = {},
+                isLastMinusOneMessage = true,
+                isLastMessage = false,
+                onReproduceResponse = {},
+                onEditLastMessage = {},
+                onDeleteLastMessage = {},
+                isResponding = false
             )
         }
     }

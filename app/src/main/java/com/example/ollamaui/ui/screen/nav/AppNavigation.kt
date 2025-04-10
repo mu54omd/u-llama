@@ -202,6 +202,7 @@ fun AppNavigation(
                                 ChatScreen(
                                     chatViewModel = chatViewModel,
                                     chatState = chatState,
+                                    networkStatus = networkStatus,
                                     attachedFilesList = attachedFiles,
                                     embeddingInProgressList = embeddingInProgressList,
                                     embeddingModel = embeddingModel,

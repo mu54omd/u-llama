@@ -31,7 +31,7 @@ object Constants {
 
 
     //
-    val TOP_BAR_HEIGHT = 100.dp
+    val TOP_BAR_HEIGHT = 85.dp
     const val USER_ROLE = "user"
     const val SYSTEM_ROLE = "system"
     const val ASSISTANT_ROLE = "assistant"

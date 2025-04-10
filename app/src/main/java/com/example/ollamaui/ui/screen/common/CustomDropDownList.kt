@@ -38,6 +38,7 @@ import com.example.ollamaui.ui.theme.OllamaUITheme
 fun CustomDropDownList(
     modifier: Modifier = Modifier,
     defaultValue: String = "",
+    label: String = "",
     width: Int = 200,
     listItems: List<String>,
     onItemClick: (String) -> Unit,
@@ -60,6 +61,7 @@ fun CustomDropDownList(
                 onValueChange = {},
                 readOnly = true,
                 trailingIcon = { if(isEnable) ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded) },
+                placeholder = { Text(text = label)},
                 modifier = Modifier
                     .menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
                     .width(width.dp)

@@ -61,6 +61,7 @@ fun NewChatModal(
             ) {
             val focusManager = LocalFocusManager.current
             CustomDropDownList(
+                label = "Choose a model",
                 listItems = modelList,
                 onItemClick = {
                     onModelClick(it)

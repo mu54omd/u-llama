@@ -1,6 +1,5 @@
 package com.example.ollamaui.ui.screen.chat
 
-import android.util.Log
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.ViewModel
@@ -132,7 +131,7 @@ class ChatViewModel @Inject constructor(
         _chatState.update { it.copy(chatError = null, isRespondingList = isRespondingList, isSendingFailed = false) }
         ollamaPostMessage(messages = chatState.value.chatModel.chatMessages, chatId = chatState.value.chatModel.chatId)
     }
-    fun stop(chatId: Int){
+    fun stop(chatId: Int, chatError: NetworkError = NetworkError(error = ApiError.UnknownError, t = Throwable("The request has been cancelled by user"))){
         jobs[chatId]?.cancel()
         jobs.remove(chatId)
         isRespondingList.remove(chatId)
@@ -140,7 +139,7 @@ class ChatViewModel @Inject constructor(
             isSendingFailed = true,
             isRespondingList = isRespondingList,
             isDatabaseChanged = true,
-            chatError = NetworkError(error = ApiError.UnknownError, t = Throwable("The request has been cancelled by user")),
+            chatError = chatError,
             chatModel = chatState.value.chatModel.copy(newMessageStatus = 2)
         ) }
         viewModelScope.launch {
@@ -205,6 +204,35 @@ class ChatViewModel @Inject constructor(
             }
         }
     }
+
+    fun deleteLastMessage(index: Int) {
+        if(index == chatState.value.chatModel.chatMessages.messageModels.lastIndex){
+            removeLastDialogFromDatabase()
+        }else{
+            removeLastDialogFromDatabase()
+            removeLastDialogFromDatabase()
+        }
+    }
+
+    fun reproduceResponse() {
+        val chatId = chatState.value.chatModel.chatId
+        removeLastDialogFromDatabase()
+        ollamaPostMessage(chatState.value.chatModel.chatMessages, chatId)
+    }
+
+    fun editLastMessage(index: Int):String {
+        if(index == chatState.value.chatModel.chatMessages.messageModels.lastIndex) {
+            val lastMessage = chatState.value.chatModel.chatMessages.messageModels[index].content
+            removeLastDialogFromDatabase()
+            return lastMessage
+        }else{
+            val lastMessage = chatState.value.chatModel.chatMessages.messageModels[index].content
+            removeLastDialogFromDatabase()
+            removeLastDialogFromDatabase()
+            return lastMessage
+        }
+    }
+
     //Private methods
     /*---------------------------------------------------------------------------------------------*/
     /*---------------------------------------------------------------------------------------------*/
@@ -241,7 +269,17 @@ class ChatViewModel @Inject constructor(
                 )
                     .onEach { response ->
                         response.fold(
-                            { error -> Log.d("cTAG", "error received in the onEach block: ${error.t}") },
+                            { error ->
+                                stop(chatId = chatId, chatError = error)
+                                uploadChatToDatabase(oldChatModel.copy(newMessageStatus = 2))
+                                ollamaRepository.insertLogToDb(
+                                    LogModel(
+                                        date = LocalDateTime.now().toString(),
+                                        type = "ERROR",
+                                        content = "ollama post message: ${error.t.message}",
+                                    )
+                                )
+                            },
                             { chatResponse ->
                                 result += chatResponse.message.content
                                 _temporaryReceivedMessage[chatId] = result
@@ -328,7 +366,6 @@ class ChatViewModel @Inject constructor(
                                     content = "ollama post message: ${cause.message}",
                                 )
                             )
-                            Log.d("cTAG", "Stream closed by error. cause = ${cause.message}")
                         }
                     }
                     .catch { error ->
