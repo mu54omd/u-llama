@@ -27,7 +27,7 @@ fun CustomButton(
     buttonSize: Int = 25,
     iconSize: Int = 25,
     description: String,
-    containerColor: Color = MaterialTheme.colorScheme.surfaceContainer,
+    containerColor: Color = MaterialTheme.colorScheme.background,
     elevation: Int = 0,
     @DrawableRes icon: Int,
 ) {

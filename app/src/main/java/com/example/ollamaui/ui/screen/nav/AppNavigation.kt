@@ -130,7 +130,6 @@ fun AppNavigation(
                             HomeScreen(
                                 chatsList = chatsList,
                                 onChatClick = {
-//                                    val chatModel = homeViewModel.findChat(chatId = it.chatId) ?: it
                                     val chatModel = it
                                     chatViewModel.loadStates(
                                         chatModel = chatModel,
@@ -203,6 +202,7 @@ fun AppNavigation(
                                 ChatScreen(
                                     chatViewModel = chatViewModel,
                                     chatState = chatState,
+                                    networkStatus = networkStatus,
                                     attachedFilesList = attachedFiles,
                                     embeddingInProgressList = embeddingInProgressList,
                                     embeddingModel = embeddingModel,
@@ -256,8 +256,10 @@ fun AppNavigation(
             composable(route = Screens.LoadingScreen.route){
                 LoadingScreen(
                     isLocalSettingLoaded = baseAddress.value.isLocalSettingsLoaded,
-                    onDispose = {
+                    onClose = {
                         mainViewModel.refresh()
+                    },
+                    navigateTo = {
                         navigateToTab(navController = navController , route = Screens.HomeScreen.route)
                     }
                 )

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -58,6 +59,7 @@ fun ChatBottomBar(
                 value = textValue,
                 onValueChange = onValueChange,
                 shape = MaterialTheme.shapes.extraLarge,
+                placeholder = { Text(text = "Type your message...") },
                 colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
@@ -70,6 +72,7 @@ fun ChatBottomBar(
                             description = "Clear Button",
                             onButtonClick = onClearClick,
                             icon = R.drawable.baseline_clear_24,
+                            containerColor = MaterialTheme.colorScheme.surfaceContainer
                         )
                     }
                 },
