@@ -5,15 +5,11 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.slideInVertically
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,7 +18,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -39,11 +34,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -53,12 +49,12 @@ import com.example.ollamaui.R
 import com.example.ollamaui.activity.EmbeddingModel
 import com.example.ollamaui.domain.model.MessageModel
 import com.example.ollamaui.domain.model.objectbox.StableFile
+import com.example.ollamaui.helper.NetworkStatus
 import com.example.ollamaui.ui.common.messageModelToText
 import com.example.ollamaui.ui.screen.chat.components.AttachedFilesItem
 import com.example.ollamaui.ui.screen.chat.components.ChatBottomBar
 import com.example.ollamaui.ui.screen.chat.components.ChatDialog
 import com.example.ollamaui.ui.screen.chat.components.ChatTopBar
-import com.example.ollamaui.ui.screen.chat.components.PulsingDots
 import com.example.ollamaui.ui.screen.common.CustomButton
 import com.example.ollamaui.utils.Constants.SYSTEM_ROLE
 import kotlinx.coroutines.launch
@@ -67,6 +63,7 @@ import kotlinx.coroutines.launch
 fun ChatScreen(
     chatViewModel: ChatViewModel,
     chatState: State<ChatStates>,
+    networkStatus: State<NetworkStatus>,
     attachedFilesList: State<AttachedFilesList>,
     embeddingInProgressList: State<List<Long>>,
     embeddingModel: State<EmbeddingModel>,
@@ -74,22 +71,25 @@ fun ChatScreen(
     onFileClick: (StableFile) -> Unit,
     onAttachClick: () -> Unit,
 ) {
-    var textValue by rememberSaveable { mutableStateOf("") }
+    var textValue by rememberSaveable(chatState.value.chatModel.chatId) { mutableStateOf("") }
     val selectedDialogs = remember(chatState.value.chatModel.chatId) { mutableStateMapOf<Int, MessageModel>() }
     val visibleDetails = remember(chatState.value.chatModel.chatId) { mutableStateMapOf<Int, MessageModel>() }
     val clipboard: ClipboardManager = LocalClipboardManager.current
-    val listState = rememberLazyListState(
-        initialFirstVisibleItemIndex = chatState.value.chatModel.chatMessages.messageModels.lastIndex
-    )
+
     val scope = rememberCoroutineScope()
     val selectedFiles = remember(chatState.value.chatModel.chatId) { mutableStateListOf<StableFile>() }
     val isAnyFileAttached by remember { derivedStateOf { attachedFilesList.value.item.isNotEmpty() && embeddingModel.value.isEmbeddingModelSet }}
     val isEmbeddingInProgress: (Long) -> Boolean = remember { { id -> embeddingInProgressList.value.contains(id) } }
     val tempText by remember(chatState.value.chatModel.chatId) { derivedStateOf { chatViewModel.temporaryReceivedMessage[chatState.value.chatModel.chatId] } }
     val isResponding by remember(chatState.value.chatModel.chatId) { derivedStateOf { chatState.value.isRespondingList.contains(chatState.value.chatModel.chatId) } }
-    val isFabVisible by remember { derivedStateOf { listState.canScrollForward && !isResponding } }
     var lastItemHeight by remember { mutableIntStateOf(0) }
     var extraItemHeight by remember { mutableIntStateOf(0) }
+    val listState = rememberLazyListState(
+        initialFirstVisibleItemIndex = chatState.value.chatModel.chatMessages.messageModels.lastIndex,
+        initialFirstVisibleItemScrollOffset = Int.MAX_VALUE
+    )
+    val isFabVisible by remember { derivedStateOf { listState.canScrollForward && !isResponding } }
+    var isAutoScrollEnabled by remember { mutableStateOf(true) }
 
     Scaffold(
         topBar = {
@@ -101,7 +101,8 @@ fun ChatScreen(
                     clipboard.setText(AnnotatedString(text = messageModelToText(selectedDialogs)))
                     selectedDialogs.clear()
                               },
-                isCopyButtonEnabled = selectedDialogs.isNotEmpty()
+                isCopyButtonEnabled = selectedDialogs.isNotEmpty(),
+                isResponding = chatState.value.isRespondingList.contains(chatState.value.chatModel.chatId) && !chatState.value.isSendingFailed
             )
                  },
         bottomBar = {
@@ -109,6 +110,7 @@ fun ChatScreen(
                 textValue = textValue,
                 onValueChange = { textValue = it },
                 onSendClick = {
+                    isAutoScrollEnabled = true
                     when{
                      chatState.value.isSendingFailed -> { chatViewModel.retry() }
                      chatState.value.isRespondingList.contains(chatState.value.chatModel.chatId) -> { chatViewModel.stop(chatId = chatState.value.chatModel.chatId) }
@@ -120,7 +122,7 @@ fun ChatScreen(
                 },
                 onClearClick = { textValue = "" },
                 onAttachClick = { onAttachClick() },
-                isModelSelected = chatState.value.chatModel.modelName != "",
+                isModelSelected = chatState.value.chatModel.modelName != "" && networkStatus.value == NetworkStatus.CONNECTED,
                 isSendingFailed = chatState.value.isSendingFailed,
                 isResponding = chatState.value.isRespondingList.contains(chatState.value.chatModel.chatId),
             )
@@ -167,33 +169,51 @@ fun ChatScreen(
                 )
         ) {
             LaunchedEffect(
-                chatState.value.chatModel.chatMessages.messageModels.size,
                 isResponding,
-                extraItemHeight
+                extraItemHeight,
             ) {
-                val lastIndex = chatState.value.chatModel.chatMessages.messageModels.lastIndex + if (isResponding) 1 else 0
-                val scrollOffset = if (isResponding) extraItemHeight else lastItemHeight
-                listState.scrollToItem(lastIndex, scrollOffset)
+                if (!listState.isScrollInProgress && isAutoScrollEnabled) {
+                    val lastIndex =
+                        chatState.value.chatModel.chatMessages.messageModels.lastIndex + if (isResponding) 1 else 0
+                    val scrollOffset = if (isResponding) extraItemHeight else lastItemHeight
+                    snapshotFlow { chatState.value.chatModel.chatMessages.messageModels }
+                        .collect {
+                            listState.scrollToItem(lastIndex, scrollOffset)
+                        }
+                }
             }
             LazyColumn(
-                modifier = Modifier.padding(bottom = 25.dp),
+                modifier = Modifier
+                    .pointerInput(Unit){
+                        detectTapGestures(
+                            onPress = {
+                                isAutoScrollEnabled = false
+                            }
+                        )
+                    },
                 verticalArrangement = Arrangement.Bottom,
                 state = listState,
-                contentPadding = PaddingValues(top = 32.dp, start = 10.dp, end = 10.dp)
+                contentPadding = PaddingValues(top = 64.dp, start = 10.dp, end = 10.dp, bottom = 64.dp)
             ) {
                 itemsIndexed(
                     items = chatState.value.chatModel.chatMessages.messageModels,
                     key = { _, item ->  item.messageId }
                 ){ index, message ->
                     if (message.role != SYSTEM_ROLE) {
+                        val lastIndex = chatState.value.chatModel.chatMessages.messageModels.lastIndex
+                        if(index == lastIndex || index == lastIndex - 1 ){
+                            visibleDetails[index] = message
+                        }
                         ChatDialog(
                             messageModel = message,
                             modifier = Modifier
                                 .onGloballyPositioned { coordinates ->
-                                    lastItemHeight = coordinates.size.height
+                                    if(index == chatState.value.chatModel.chatMessages.messageModels.lastIndex) {
+                                        lastItemHeight = coordinates.size.height
+                                    }
                             },
                             isSelected = selectedDialogs.contains(index) && selectedDialogs[index]?.messageId == message.messageId,
-                            isVisible = visibleDetails.contains(index) && visibleDetails[index]?.messageId == message.messageId,
+                            isDetailsVisible = visibleDetails.contains(index) && visibleDetails[index]?.messageId == message.messageId,
                             onLongPressItem = {
                                 if (selectedDialogs.contains(index)) {
                                     selectedDialogs.remove(index)
@@ -217,6 +237,13 @@ fun ChatScreen(
                                 }
                             },
                             onSelectedItemClick = { selectedDialogs.remove(index) },
+                            isLastMinusOneMessage = index == chatState.value.chatModel.chatMessages.messageModels.lastIndex - 1,
+                            isLastMessage = index == chatState.value.chatModel.chatMessages.messageModels.lastIndex,
+                            onReproduceResponse = chatViewModel::reproduceResponse,
+                            isSendingFailed = chatState.value.isSendingFailed,
+                            onDeleteLastMessage = { chatViewModel.deleteLastMessage(index) },
+                            onEditLastMessage = { textValue = chatViewModel.editLastMessage(index) },
+                            isResponding = isResponding
                         )
                     }
                 }
@@ -227,16 +254,6 @@ fun ChatScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(4.dp)
-                                    .border(
-                                        width = 1.dp,
-                                        color = MaterialTheme.colorScheme.onBackground,
-                                        shape = RoundedCornerShape(
-                                            topStart = 0f,
-                                            topEnd = 50f,
-                                            bottomStart = 0f,
-                                            bottomEnd = 50f
-                                        )
-                                    )
                                     .padding(16.dp)
                                     .onGloballyPositioned { coordinates ->
                                         extraItemHeight = coordinates.size.height
@@ -298,52 +315,6 @@ fun ChatScreen(
                     }
                 }
             }
-
-            Column (
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier
-                    .height(30.dp)
-                    .align(Alignment.BottomCenter)
-            ) {
-                AnimatedVisibility(visible = chatState.value.isRespondingList.contains(chatState.value.chatModel.chatId) && !chatState.value.isSendingFailed) {
-                    PulsingDots()
-                }
-                AnimatedVisibility(visible = chatState.value.isSendingFailed) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(text = "Try again!")
-                        Text(text = " OR ")
-                        Box(
-                            modifier = Modifier
-                                .clip(shape = RoundedCornerShape(100))
-                                .background(color = MaterialTheme.colorScheme.tertiaryContainer)
-                                .padding(2.dp)
-                                .clickable {
-                                    textValue =
-                                        chatState.value.chatModel.chatMessages.messageModels.last().content
-                                    chatViewModel.removeLastDialogFromDatabase()
-                                }
-                        ) {
-                            Text(text = "Edit", style = MaterialTheme.typography.bodySmall)
-                        }
-                        Text(text = " OR ")
-                        Box(
-                            modifier = Modifier
-                                .clip(shape = RoundedCornerShape(100))
-                                .background(color = MaterialTheme.colorScheme.errorContainer)
-                                .padding(2.dp)
-                                .clickable { chatViewModel.removeLastDialogFromDatabase() }
-                        ) {
-                            Text(text = "Delete", style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onErrorContainer))
-                        }
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.height(2.dp))
         }
 
     }

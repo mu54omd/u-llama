@@ -29,7 +29,8 @@ import kotlinx.coroutines.delay
 @Composable
 fun LoadingScreen(
     isLocalSettingLoaded: Boolean = false,
-    onDispose: () -> Unit
+    onClose: () -> Unit,
+    navigateTo: () -> Unit,
 ) {
     val imageAlpha by animateFloatAsState(
         targetValue = if (isLocalSettingLoaded)  1f else 0f,
@@ -73,8 +74,9 @@ fun LoadingScreen(
         }
         LaunchedEffect(isLocalSettingLoaded) {
             if(isLocalSettingLoaded){
+                onClose()
                 delay(1500)
-                onDispose()
+                navigateTo()
             }
         }
     }
@@ -86,7 +88,8 @@ private fun LoadingScreenPreview() {
     OllamaUITheme {
         LoadingScreen(
             isLocalSettingLoaded = true,
-            onDispose = {}
+            onClose = {},
+            navigateTo = {}
         )
     }
 }

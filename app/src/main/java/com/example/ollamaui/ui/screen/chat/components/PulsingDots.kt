@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -24,7 +25,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun PulsingDots() {
     val scales = remember { List(3) { Animatable(0f) } }
-    val color = MaterialTheme.colorScheme.primaryContainer
+    val color = MaterialTheme.colorScheme.onBackground
 
     LaunchedEffect(Unit) {
         while (true) {
@@ -47,7 +48,7 @@ fun PulsingDots() {
         verticalAlignment = Alignment.CenterVertically
     ) {
         for (scale in scales) {
-            Canvas(modifier = Modifier.size(10.dp)) {
+            Canvas(modifier = Modifier.size(6.dp)) {
                 drawPulsingDot(scale = scale.value, color = color)
             }
         }
@@ -55,7 +56,7 @@ fun PulsingDots() {
 }
 
 private fun DrawScope.drawPulsingDot(scale: Float, color: Color) {
-    val radius = 4.dp.toPx() * scale
+    val radius = 2.dp.toPx() * scale
     drawCircle(
         color = color,
         radius = radius,
@@ -65,8 +66,10 @@ private fun DrawScope.drawPulsingDot(scale: Float, color: Color) {
 
 @Preview
 @Composable
-private fun ChatLoadingPreview() {
+private fun PulsingDotsPreview() {
     OllamaUITheme {
-        PulsingDots()
+        Surface {
+            PulsingDots()
+        }
     }
 }

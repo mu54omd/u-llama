@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -23,10 +24,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -51,16 +54,29 @@ fun ChatDialog(
     onSelectedItemClick: () -> Unit,
     onLongPressItem: () -> Unit,
     isSelected: Boolean,
-    isVisible: Boolean,
+    isDetailsVisible: Boolean,
+    isSendingFailed: Boolean,
+    isLastMinusOneMessage: Boolean,
+    isLastMessage: Boolean,
+    onReproduceResponse: () -> Unit,
+    onDeleteLastMessage: () -> Unit,
+    onEditLastMessage: () -> Unit,
+    isResponding: Boolean
 ) {
     val isFromMe by remember { derivedStateOf { isFromMe(messageModel) } }
-    val animatedColorMyMessage by animateColorAsState(
-        if(isSelected) MaterialTheme.colorScheme.tertiaryContainer.copy(red = MaterialTheme.colorScheme.tertiaryContainer.red + 30f) else MaterialTheme.colorScheme.primaryContainer,
-        label = "Animated Color My Message",
-    )
-    val animatedColorBotMessage by animateColorAsState(
-        if(isSelected) MaterialTheme.colorScheme.tertiaryContainer.copy(red = MaterialTheme.colorScheme.tertiaryContainer.red + 30f) else MaterialTheme.colorScheme.tertiaryContainer,
-        label = "Animated Color Bot Message",
+    val animatedColorMessage by animateColorAsState(
+        when(isFromMe){
+            true -> {
+                if(isSelected) MaterialTheme.colorScheme.tertiaryContainer
+                else if(isSendingFailed && isLastMessage) MaterialTheme.colorScheme.errorContainer
+                else MaterialTheme.colorScheme.primaryContainer
+
+            }
+            false -> {
+                if(isSelected) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.background
+            }
+        },
+        label = "Animated Color Message",
     )
     val textBgColor = if(!isSystemInDarkTheme()) Color.LightGray else Color.DarkGray
     val richTextStyle = RichTextStyle(
@@ -82,26 +98,42 @@ fun ChatDialog(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(4.dp)
+            .padding(start = 4.dp, end = 4.dp, bottom = 10.dp)
     ) {
             Box(
                 modifier = Modifier
                     .align(if (isFromMe) Alignment.End else Alignment.Start)
+                    .widthIn(min = 120.dp)
+                    .border(
+                        width = (1.5).dp,
+                        color = when{
+                            isFromMe -> MaterialTheme.colorScheme.surface
+                            else -> MaterialTheme.colorScheme.outlineVariant
+                        },
+                        shape =
+                            RoundedCornerShape(
+                                topStart = if (isFromMe) 50f else 0f,
+                                topEnd = if (isFromMe) 0f else 50f,
+                                bottomStart = 50f,
+                                bottomEnd = 50f
+                            )
+                    )
                     .clip(
                         RoundedCornerShape(
                             topStart = if (isFromMe) 50f else 0f,
                             topEnd = if (isFromMe) 0f else 50f,
-                            bottomStart = if (isFromMe) 50f else 0f,
-                            bottomEnd = if (isFromMe) 0f else 50f
+                            bottomStart = 50f,
+                            bottomEnd = 50f
                         )
                     )
-                    .pointerInput(Unit){
+                    .pointerInput(Unit) {
                         detectTapGestures(
                             onTap = {
-                                when{
+                                when {
                                     !isSelected -> {
                                         onItemClick()
                                     }
+
                                     isSelected -> {
                                         onSelectedItemClick()
                                     }
@@ -112,9 +144,9 @@ fun ChatDialog(
                             }
                         )
                     }
-                    .drawBehind{
+                    .drawBehind {
                         drawRoundRect(
-                            color = if (isFromMe) animatedColorMyMessage else animatedColorBotMessage
+                            color = animatedColorMessage,
                         )
                     }
                     .padding(16.dp)
@@ -142,18 +174,20 @@ fun ChatDialog(
                                 Text(
                                     text = thinkingText.second!!,
                                     style = MaterialTheme.typography.bodySmall,
+                                    fontStyle = FontStyle.Italic,
+                                    textAlign = TextAlign.Start,
                                     modifier = Modifier
                                         .padding(bottom = 4.dp)
-                                        .background(
-                                            color = MaterialTheme.colorScheme.background,
-                                            shape = MaterialTheme.shapes.small
-                                        )
-                                        .border(
-                                            width = 1.dp,
-                                            color = Color.Gray,
-                                            shape = MaterialTheme.shapes.small
-                                        )
-                                        .padding(10.dp)
+                                        .drawBehind {
+                                            val strokeWidth = 1.dp.toPx()
+                                            drawLine(
+                                                color = Color.LightGray,
+                                                start = Offset(0f, size.height),
+                                                end = Offset(size.width, size.height),
+                                                strokeWidth = strokeWidth
+                                            )
+                                        }
+                                        .padding(top = 5.dp, bottom = 5.dp)
                                 )
                             }
                             RichText(
@@ -170,7 +204,18 @@ fun ChatDialog(
                 }
                 Spacer(modifier = Modifier.height(2.dp))
             }
-        ChatDialogDetails(isVisible = isVisible, isFromMe = isFromMe, date = messageModel.date, time = messageModel.time)
+        ChatDialogDetails(
+            isVisible = isDetailsVisible,
+            isFromMe = isFromMe,
+            date = messageModel.date,
+            time = messageModel.time,
+            isLastBotMessage = isLastMessage && !isFromMe,
+            isLastUserMessage = (isLastMessage || isLastMinusOneMessage ) && isFromMe,
+            onReproduceResponse = onReproduceResponse,
+            onEditLastMessage = onEditLastMessage,
+            onDeleteLastMessage = onDeleteLastMessage,
+            isResponding = isResponding
+        )
     }
 
 }
@@ -182,16 +227,23 @@ private fun ChatDialogPreview() {
         Column {
             ChatDialog(
                 messageModel = MessageModel(
-                    content = "<think> User ask some question </think> Hi. How are you???",
+                    content = "<think> User ask some question and we should answer that</think> Hi. How are you???",
                     role = "system",
                     time = "17:43",
                     date = "2025-05-17",
                 ),
                 isSelected = false,
-                isVisible = false,
+                isDetailsVisible = false,
+                isSendingFailed = false,
                 onItemClick = {},
                 onSelectedItemClick = {},
                 onLongPressItem = {},
+                isLastMessage = true,
+                isLastMinusOneMessage = false,
+                onReproduceResponse = {},
+                onEditLastMessage = {},
+                onDeleteLastMessage = {},
+                isResponding = false
             )
             ChatDialog(
                 messageModel = MessageModel(
@@ -201,10 +253,17 @@ private fun ChatDialogPreview() {
                     date = "2025-05-17",
                 ),
                 isSelected = false,
-                isVisible = false,
+                isDetailsVisible = false,
+                isSendingFailed = false,
                 onItemClick = {},
                 onSelectedItemClick = {},
                 onLongPressItem = {},
+                isLastMessage = true,
+                isLastMinusOneMessage = false,
+                onReproduceResponse = {},
+                onEditLastMessage = {},
+                onDeleteLastMessage = {},
+                isResponding = false
             )
             ChatDialog(
                 messageModel = MessageModel(
@@ -214,10 +273,17 @@ private fun ChatDialogPreview() {
                     date = "2025-05-17",
                 ),
                 isSelected = false,
-                isVisible = false,
+                isDetailsVisible = false,
+                isSendingFailed = false,
                 onItemClick = {},
                 onSelectedItemClick = {},
                 onLongPressItem = {},
+                isLastMinusOneMessage = true,
+                isLastMessage = false,
+                onReproduceResponse = {},
+                onEditLastMessage = {},
+                onDeleteLastMessage = {},
+                isResponding = false
             )
             ChatDialog(
                 messageModel = MessageModel(
@@ -227,10 +293,17 @@ private fun ChatDialogPreview() {
                     date = "2025-05-17",
                 ),
                 isSelected = false,
-                isVisible = false,
+                isDetailsVisible = false,
+                isSendingFailed = false,
                 onItemClick = {},
                 onSelectedItemClick = {},
                 onLongPressItem = {},
+                isLastMinusOneMessage = true,
+                isLastMessage = false,
+                onReproduceResponse = {},
+                onEditLastMessage = {},
+                onDeleteLastMessage = {},
+                isResponding = false
             )
         }
     }

@@ -12,10 +12,14 @@ class ChunkDatabase @Inject constructor() {
         chunksBox.put(chunk)
     }
 
-    fun removeChunk(docId: Long){
+    fun removeChunk(docId: Long, onProgress: (deleted: Int,total: Int) -> Unit){
         val chunksToDelete = chunksBox.query().equal(Chunk_.docId, docId).build().find()
-        chunksToDelete.chunked(1000).forEach { batch ->
+        val total = chunksToDelete.size
+        var deleted = 0
+        chunksToDelete.chunked(500).forEach { batch ->
             chunksBox.remove(batch)
+            deleted += batch.size
+            onProgress(deleted, total)
         }
     }
 
@@ -31,9 +35,8 @@ class ChunkDatabase @Inject constructor() {
         docIds.forEach { docId ->
             result += chunksBox.query(Chunk_.docId.equal(docId) and  Chunk_.chunkEmbedding.nearestNeighbors(queryEmbedding, 100))
                 .build()
-                .findWithScores()
+                .findWithScores(0,n.toLong())
                 .map { Pair(it.score.toFloat(), it.get()) }
-                .subList(0, n)
         }
         return result
     }

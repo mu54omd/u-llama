@@ -1,10 +1,15 @@
 package com.example.ollamaui.ui.screen.chat.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.MarqueeSpacing
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,6 +31,7 @@ fun ChatTitle(
     modifier: Modifier = Modifier,
     title: String,
     modelName: String,
+    isResponding: Boolean
     ) {
     var isEnable1 by remember { mutableStateOf(false)}
     var isEnable2 by remember { mutableStateOf(false)}
@@ -55,6 +61,20 @@ fun ChatTitle(
                 .pointerInput(Unit){detectTapGestures(onTap = {isEnable2 = !isEnable2})}
 
         )
+        AnimatedVisibility(
+            visible = isResponding,
+            enter = slideInVertically(),
+            exit = slideOutVertically(),
+            modifier = Modifier.padding(top = 2.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(text = "Typing", style = MaterialTheme.typography.bodySmall)
+                PulsingDots()
+            }
+        }
     }
 
 }
@@ -65,7 +85,8 @@ private fun ChatTitlePreview() {
     OllamaUITheme {
         ChatTitle(
             modelName = "Boooooooooooooooooooooooooooooooooot",
-            title = "Chaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaat"
+            title = "Chaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaat",
+            isResponding = true
         )
     }
 }

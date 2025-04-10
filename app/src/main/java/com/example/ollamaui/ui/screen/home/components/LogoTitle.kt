@@ -7,7 +7,8 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,7 +43,8 @@ fun LogoTitle(
                 painter = painterResource(if(isSystemInDarkTheme()) darkLogo else lightLogo),
                 contentDescription = "Logo Image",
                 modifier = Modifier
-                    .size(width = 96.dp, height = 64.dp)
+                    .height(64.dp)
+                    .aspectRatio(2f)
                     .pointerInput(isVisible){detectTapGestures { isVisible = !isVisible }},
             )
         AnimatedVisibility(visible = isVisible) {
