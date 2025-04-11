@@ -15,9 +15,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -84,11 +84,22 @@ fun ChatScreen(
     val isResponding by remember(chatState.value.chatModel.chatId) { derivedStateOf { chatState.value.isRespondingList.contains(chatState.value.chatModel.chatId) } }
     var lastItemHeight by remember { mutableIntStateOf(0) }
     var extraItemHeight by remember { mutableIntStateOf(0) }
-    val listState = rememberLazyListState(
-        initialFirstVisibleItemIndex = chatState.value.chatModel.chatMessages.messageModels.lastIndex,
-        initialFirstVisibleItemScrollOffset = Int.MAX_VALUE
-    )
-    val isFabVisible by remember { derivedStateOf { listState.canScrollForward && !isResponding } }
+    val listState = remember(chatState.value.chatModel.chatId) {
+        LazyListState(
+            firstVisibleItemIndex = chatState.value.chatModel.chatMessages.messageModels.lastIndex,
+            firstVisibleItemScrollOffset = Int.MAX_VALUE
+        )
+    }
+    val isAtBottom by remember(chatState.value.chatModel.chatId) {
+        derivedStateOf {
+            val layoutInfo = listState.layoutInfo
+            val visibleItems = layoutInfo.visibleItemsInfo
+            val totalItems = layoutInfo.totalItemsCount
+            if (visibleItems.isEmpty()) return@derivedStateOf true
+            val lastVisible = visibleItems.last().index
+            lastVisible >= totalItems - 1
+        }
+    }
     var isAutoScrollEnabled by remember { mutableStateOf(true) }
 
     Scaffold(
@@ -129,7 +140,7 @@ fun ChatScreen(
         },
         floatingActionButton = {
             AnimatedVisibility(
-                visible = isFabVisible,
+                visible = !isAtBottom,
                 enter = scaleIn(),
                 exit = scaleOut()
             ) {
