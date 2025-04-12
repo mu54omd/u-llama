@@ -17,6 +17,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -53,7 +54,7 @@ fun CustomDropDownList(
         ExposedDropdownMenuBox(
             expanded = isExpanded,
             onExpandedChange = { isExpanded = !isExpanded},
-            modifier = Modifier.clip(RoundedCornerShape(10.dp))
+            modifier = Modifier.clip(RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp))
         ) {
             OutlinedTextField(
                 value = selectedItem,
@@ -66,7 +67,7 @@ fun CustomDropDownList(
                     .width(width.dp),
                 textStyle = MaterialTheme.typography.bodySmall.copy(textAlign = TextAlign.Center),
                 enabled = isEnable,
-                shape = RoundedCornerShape(10.dp)
+                shape = RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp)
             )
             if (isEnable) {
                 ExposedDropdownMenu(
@@ -74,6 +75,7 @@ fun CustomDropDownList(
                     onDismissRequest = { isExpanded = false },
                     shape = RoundedCornerShape(bottomStart = 10.dp, bottomEnd = 10.dp),
                     modifier = Modifier.height(100.dp),
+
                 ) {
 
                     listItems.forEachIndexed { index, item ->
@@ -110,16 +112,19 @@ fun CustomDropDownList(
 @Composable
 private fun DropDownListPreview() {
     OllamaUITheme {
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize()) {
-            CustomDropDownList(
-                defaultValue = "a",
-                listItems = listOf("a", "b", "c", "d", "b", "c", "d", "b", "c", "d"),
-                onItemClick = {},
-                isEnable = true
-            )
+        Surface {
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                CustomDropDownList(
+                    defaultValue = "a",
+                    listItems = listOf("a", "b", "c", "d", "b", "c", "d", "b", "c", "d"),
+                    onItemClick = {},
+                    isEnable = true
+                )
+            }
         }
     }
 }

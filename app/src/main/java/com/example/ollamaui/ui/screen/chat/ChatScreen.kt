@@ -1,10 +1,12 @@
 package com.example.ollamaui.ui.screen.chat
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,11 +15,13 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -37,7 +41,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -57,6 +63,7 @@ import com.example.ollamaui.ui.screen.chat.components.ChatDialog
 import com.example.ollamaui.ui.screen.chat.components.ChatTopBar
 import com.example.ollamaui.ui.screen.common.CustomButton
 import com.example.ollamaui.utils.Constants.SYSTEM_ROLE
+import com.example.ollamaui.utils.Constants.TOP_BAR_HEIGHT
 import kotlinx.coroutines.launch
 
 @Composable
@@ -71,26 +78,27 @@ fun ChatScreen(
     onFileClick: (StableFile) -> Unit,
     onAttachClick: () -> Unit,
 ) {
-    var textValue by rememberSaveable(chatState.value.chatModel.chatId) { mutableStateOf("") }
-    val selectedDialogs = remember(chatState.value.chatModel.chatId) { mutableStateMapOf<Int, MessageModel>() }
-    val visibleDetails = remember(chatState.value.chatModel.chatId) { mutableStateMapOf<Int, MessageModel>() }
+    val chatId = chatState.value.chatModel.chatId
+    var textValue by rememberSaveable(chatId) { mutableStateOf("") }
+    val selectedDialogs = remember(chatId) { mutableStateMapOf<Int, MessageModel>() }
+    val visibleDetails = remember(chatId) { mutableStateMapOf<Int, MessageModel>() }
     val clipboard: ClipboardManager = LocalClipboardManager.current
 
     val scope = rememberCoroutineScope()
-    val selectedFiles = remember(chatState.value.chatModel.chatId) { mutableStateListOf<StableFile>() }
+    val selectedFiles = remember(chatId) { mutableStateListOf<StableFile>() }
     val isAnyFileAttached by remember { derivedStateOf { attachedFilesList.value.item.isNotEmpty() && embeddingModel.value.isEmbeddingModelSet }}
     val isEmbeddingInProgress: (Long) -> Boolean = remember { { id -> embeddingInProgressList.value.contains(id) } }
-    val tempText by remember(chatState.value.chatModel.chatId) { derivedStateOf { chatViewModel.temporaryReceivedMessage[chatState.value.chatModel.chatId] } }
-    val isResponding by remember(chatState.value.chatModel.chatId) { derivedStateOf { chatState.value.isRespondingList.contains(chatState.value.chatModel.chatId) } }
+    val tempText by remember(chatId) { derivedStateOf { chatViewModel.temporaryReceivedMessage[chatId] } }
+    val isResponding by remember(chatId) { derivedStateOf { chatState.value.isRespondingList.contains(chatId) } }
     var lastItemHeight by remember { mutableIntStateOf(0) }
     var extraItemHeight by remember { mutableIntStateOf(0) }
-    val listState = remember(chatState.value.chatModel.chatId) {
+    val listState = remember(chatId) {
         LazyListState(
             firstVisibleItemIndex = chatState.value.chatModel.chatMessages.messageModels.lastIndex,
             firstVisibleItemScrollOffset = Int.MAX_VALUE
         )
     }
-    val isAtBottom by remember(chatState.value.chatModel.chatId) {
+    val isAtBottom by remember(chatId) {
         derivedStateOf {
             val layoutInfo = listState.layoutInfo
             val visibleItems = layoutInfo.visibleItemsInfo
@@ -101,76 +109,17 @@ fun ChatScreen(
         }
     }
     var isAutoScrollEnabled by remember { mutableStateOf(true) }
-
-    Scaffold(
-        topBar = {
-            ChatTopBar(
-                modelName = chatState.value.chatModel.modelName,
-                chatTitle = chatState.value.chatModel.chatTitle,
-                onBackClick = onBackClick,
-                onCopyClick = {
-                    clipboard.setText(AnnotatedString(text = messageModelToText(selectedDialogs)))
-                    selectedDialogs.clear()
-                              },
-                isCopyButtonEnabled = selectedDialogs.isNotEmpty(),
-                isResponding = chatState.value.isRespondingList.contains(chatState.value.chatModel.chatId) && !chatState.value.isSendingFailed
-            )
-                 },
-        bottomBar = {
-            ChatBottomBar(
-                textValue = textValue,
-                onValueChange = { textValue = it },
-                onSendClick = {
-                    isAutoScrollEnabled = true
-                    when{
-                     chatState.value.isSendingFailed -> { chatViewModel.retry() }
-                     chatState.value.isRespondingList.contains(chatState.value.chatModel.chatId) -> { chatViewModel.stop(chatId = chatState.value.chatModel.chatId) }
-                     else -> {
-                         chatViewModel.sendButton(text = textValue, selectedFiles = selectedFiles, embeddingModel = embeddingModel.value.embeddingModelName)
-                         textValue = ""
-                     }
-                    }
-                },
-                onClearClick = { textValue = "" },
-                onAttachClick = { onAttachClick() },
-                isModelSelected = chatState.value.chatModel.modelName != "" && networkStatus.value == NetworkStatus.CONNECTED,
-                isSendingFailed = chatState.value.isSendingFailed,
-                isResponding = chatState.value.isRespondingList.contains(chatState.value.chatModel.chatId),
-            )
-        },
-        floatingActionButton = {
-            AnimatedVisibility(
-                visible = !isAtBottom,
-                enter = scaleIn(),
-                exit = scaleOut()
-            ) {
-                CustomButton(
-                    onButtonClick = {
-                        scope.launch {
-                            listState.animateScrollToItem(
-                                index = chatState.value.chatModel.chatMessages.messageModels.lastIndex,
-                                scrollOffset = lastItemHeight
-                            )
-                        }
-                    },
-                    icon = R.drawable.baseline_expand_more_24,
-                    description = "Scroll Down",
-                    buttonSize = 50,
-                    iconSize = 40,
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                    elevation = 10
-                )
-            }
-        }
-    ) { contentPadding ->
-        val brush = Brush.horizontalGradient(
-            colors = listOf(
-                MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-                MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
-                MaterialTheme.colorScheme.tertiary.copy(alpha = 0.5f),
-                MaterialTheme.colorScheme.error.copy(alpha = 0.5f),
-            )
+    val attachedFilesBgColor = Brush.linearGradient(
+        colors = listOf(
+            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.8f),
+            MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.8f),
         )
+    )
+    Scaffold(
+    ) { contentPadding ->
+        BackHandler {
+            onBackClick()
+        }
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -195,6 +144,7 @@ fun ChatScreen(
             }
             LazyColumn(
                 modifier = Modifier
+                    .padding(top = TOP_BAR_HEIGHT)
                     .pointerInput(Unit){
                         detectTapGestures(
                             onPress = {
@@ -204,7 +154,7 @@ fun ChatScreen(
                     },
                 verticalArrangement = Arrangement.Bottom,
                 state = listState,
-                contentPadding = PaddingValues(top = 64.dp, start = 10.dp, end = 10.dp, bottom = 64.dp)
+                contentPadding = PaddingValues(top = 64.dp, start = 10.dp, end = 10.dp, bottom = 128.dp)
             ) {
                 itemsIndexed(
                     items = chatState.value.chatModel.chatMessages.messageModels,
@@ -212,7 +162,7 @@ fun ChatScreen(
                 ){ index, message ->
                     if (message.role != SYSTEM_ROLE) {
                         val lastIndex = chatState.value.chatModel.chatMessages.messageModels.lastIndex
-                        if(index == lastIndex || index == lastIndex - 1 ){
+                        if(index == lastIndex || index == lastIndex - 1){
                             visibleDetails[index] = message
                         }
                         ChatDialog(
@@ -277,23 +227,32 @@ fun ChatScreen(
                 }
             }
             Column(
-                verticalArrangement = Arrangement.Top,
+                verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .drawBehind {
-                        drawRoundRect(
-                            brush = brush,
-                        )
-                    }
-                    .align(Alignment.TopCenter)
+                    .padding(start = 10.dp, end = 10.dp)
+                    .align(Alignment.TopCenter).offset(y = TOP_BAR_HEIGHT + 10.dp)
             ) {
                 AnimatedVisibility(
                     visible = isAnyFileAttached,
                     enter = slideInVertically(),
                     exit = shrinkHorizontally()
                 ) {
-                    LazyRow(modifier = Modifier.height(32.dp)) {
+                    LazyRow(
+                        contentPadding = PaddingValues(start = 1.dp, end = 1.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier
+                            .height(36.dp)
+                            .fillMaxWidth()
+                            .drawBehind {
+                                drawRoundRect(
+                                    brush = attachedFilesBgColor,
+                                    cornerRadius = CornerRadius(x = 20f, y = 20f)
+                                )
+                            }
+                            .clip(RoundedCornerShape(50))
+                            .padding(start = 2.dp, end = 2.dp)
+                    ) {
                         itemsIndexed(
                             items = attachedFilesList.value.item,
                             key = { _, item -> item.fileId}
@@ -326,7 +285,69 @@ fun ChatScreen(
                     }
                 }
             }
+            ChatTopBar(
+                modelName = chatState.value.chatModel.modelName,
+                chatTitle = chatState.value.chatModel.chatTitle,
+                onBackClick = onBackClick,
+                onCopyClick = {
+                    clipboard.setText(AnnotatedString(text = messageModelToText(selectedDialogs)))
+                    selectedDialogs.clear()
+                },
+                onDeselectClick = { selectedDialogs.clear() },
+                isCopyButtonEnabled = selectedDialogs.isNotEmpty(),
+                isResponding = chatState.value.isRespondingList.contains(chatId) && !chatState.value.isSendingFailed,
+                modifier = Modifier.align(Alignment.TopCenter)
+            )
+            ChatBottomBar(
+                textValue = textValue,
+                onValueChange = { textValue = it },
+                onSendClick = {
+                    isAutoScrollEnabled = true
+                    when{
+                        chatState.value.isSendingFailed -> { chatViewModel.retry() }
+                        chatState.value.isRespondingList.contains(chatId) -> { chatViewModel.stop(chatId = chatId) }
+                        else -> {
+                            chatViewModel.sendButton(text = textValue, selectedFiles = selectedFiles, embeddingModel = embeddingModel.value.embeddingModelName)
+                            textValue = ""
+                        }
+                    }
+                },
+                onClearClick = { textValue = "" },
+                onAttachClick = { onAttachClick() },
+                isModelSelected = chatState.value.chatModel.modelName != "" && networkStatus.value == NetworkStatus.CONNECTED,
+                isSendingFailed = chatState.value.isSendingFailed,
+                isResponding = chatState.value.isRespondingList.contains(chatId),
+                modifier = Modifier.align(Alignment.BottomCenter)
+            )
+            AnimatedVisibility(
+                visible = !isAtBottom,
+                enter = slideInHorizontally(
+                    initialOffsetX = {fullWidth -> fullWidth + 100},
+                    animationSpec = tween(durationMillis = 200)
+                ),
+                exit = slideOutHorizontally(
+                    targetOffsetX = {fullWidth -> fullWidth + 100},
+                    animationSpec = tween(durationMillis = 200)
+                ),
+                modifier = Modifier.align(Alignment.BottomEnd).offset(x = (-20).dp, y = (-80).dp)
+            ) {
+                CustomButton(
+                    onButtonClick = {
+                        scope.launch {
+                            listState.animateScrollToItem(
+                                index = chatState.value.chatModel.chatMessages.messageModels.lastIndex,
+                                scrollOffset = lastItemHeight
+                            )
+                        }
+                    },
+                    icon = R.drawable.baseline_expand_more_24,
+                    description = "Scroll Down",
+                    buttonSize = 40,
+                    iconSize = 30,
+                    containerColor = MaterialTheme.colorScheme.inversePrimary,
+                    elevation = 0
+                )
+            }
         }
-
     }
 }

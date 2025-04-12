@@ -4,6 +4,7 @@ import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -34,6 +35,7 @@ fun CustomButton(
     Button(
         onClick = onButtonClick,
         enabled = isButtonEnabled,
+        shape = RoundedCornerShape(100),
         modifier = modifier.size(buttonSize.dp),
         contentPadding = PaddingValues(0.dp),
         colors = ButtonDefaults.buttonColors(
@@ -42,7 +44,8 @@ fun CustomButton(
             disabledContainerColor = containerColor,
             disabledContentColor = MaterialTheme.colorScheme.onBackground.copy(red = 0.5f, blue = 0.5f, green = 0.5f)
         ),
-        elevation = ButtonDefaults.elevatedButtonElevation(defaultElevation = elevation.dp)
+        elevation = if(containerColor == Color.Transparent) null
+        else ButtonDefaults.elevatedButtonElevation(defaultElevation = elevation.dp)
     ){
         Icon(
             painter = painterResource(icon),
@@ -57,7 +60,7 @@ fun CustomButton(
 @Composable
 private fun SendButtonPreview() {
     OllamaUITheme {
-        Surface(color = MaterialTheme.colorScheme.background) {
+        Surface(color = MaterialTheme.colorScheme.secondary) {
             CustomButton(
                 onButtonClick = {},
                 description = "CustomButton",
@@ -65,7 +68,8 @@ private fun SendButtonPreview() {
                 iconSize = 25,
                 buttonSize = 50,
                 isButtonEnabled = true,
-                elevation = 9
+                elevation = 0,
+                containerColor = Color.Transparent
             )
         }
     }

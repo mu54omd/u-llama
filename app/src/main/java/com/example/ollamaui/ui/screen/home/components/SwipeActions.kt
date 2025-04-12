@@ -60,7 +60,7 @@ fun SwipeActions(
             iconSize = 30,
             onButtonClick = onDeleteClick,
             modifier = Modifier.padding(10.dp),
-            containerColor = Color(0xFFFF3259)
+            containerColor = Color.Transparent
         )
     }
 }
