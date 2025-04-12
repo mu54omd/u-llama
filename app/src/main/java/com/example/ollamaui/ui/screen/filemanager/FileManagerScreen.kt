@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -94,7 +95,8 @@ fun FileManagerScreen(
                 icon = R.drawable.baseline_add_24,
                 buttonSize = 40,
                 iconSize = 30,
-                onButtonClick = { isFileExplorerEnable = true }
+                onButtonClick = { isFileExplorerEnable = true },
+                containerColor = MaterialTheme.colorScheme.outlineVariant
             )
         },
         snackbarHost = {

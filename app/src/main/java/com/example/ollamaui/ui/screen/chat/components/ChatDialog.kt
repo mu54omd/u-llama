@@ -67,13 +67,13 @@ fun ChatDialog(
     val animatedColorMessage by animateColorAsState(
         when(isFromMe){
             true -> {
-                if(isSelected) MaterialTheme.colorScheme.tertiaryContainer
+                if(isSelected) MaterialTheme.colorScheme.inversePrimary.copy(alpha = 0.5f)
                 else if(isSendingFailed && isLastMessage) MaterialTheme.colorScheme.errorContainer
-                else MaterialTheme.colorScheme.primaryContainer
+                else MaterialTheme.colorScheme.surfaceVariant
 
             }
             false -> {
-                if(isSelected) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.background
+                if(isSelected) MaterialTheme.colorScheme.inversePrimary.copy(alpha = 0.5f) else MaterialTheme.colorScheme.background
             }
         },
         label = "Animated Color Message",

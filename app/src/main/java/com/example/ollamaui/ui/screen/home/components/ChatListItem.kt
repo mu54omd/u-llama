@@ -38,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
@@ -216,7 +217,7 @@ fun ChatListItem(
                         description = "Clear Select",
                         onButtonClick = { onSelectedItemClick() },
                         icon = R.drawable.baseline_clear_24,
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        containerColor = Color.Transparent,
                         buttonSize = 30
                     )
                 }

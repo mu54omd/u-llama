@@ -3,6 +3,7 @@ package com.example.ollamaui.ui.screen.setting
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.BorderStroke
@@ -40,6 +41,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -49,6 +51,7 @@ import com.example.ollamaui.ui.screen.common.CustomDropDownList
 import com.example.ollamaui.ui.screen.setting.components.CustomSettingBox
 import com.example.ollamaui.ui.screen.setting.components.TuningSlider
 import com.example.ollamaui.ui.theme.OllamaUITheme
+import com.example.ollamaui.utils.Constants.OLLAMA_IS_RUNNING
 import kotlinx.coroutines.launch
 
 @Composable
@@ -96,7 +99,13 @@ fun SettingScreen(
     }
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-
+    val statusColor by animateColorAsState(
+        when(ollamaStatus) {
+            OLLAMA_IS_RUNNING -> MaterialTheme.colorScheme.tertiaryContainer
+            "" -> MaterialTheme.colorScheme.background
+            else -> MaterialTheme.colorScheme.errorContainer
+        }
+    )
     Scaffold(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState){ snackbarData ->
@@ -136,7 +145,7 @@ fun SettingScreen(
                     ),
                     singleLine = true,
                     supportingText = {
-                        Text(text = ollamaStatus)
+                        Text(text = ollamaStatus, modifier = Modifier.drawBehind{drawRoundRect(color = statusColor)}.padding(2.dp))
                     },
                     modifier = Modifier
                         .weight(0.3f)

@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -15,6 +14,9 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
@@ -35,25 +37,38 @@ fun ChatBottomBar(
     onAttachClick: () -> Unit,
     isModelSelected: Boolean,
 ) {
+    val brush = Brush.linearGradient(
+        colors = listOf(
+            MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.98f,),
+            MaterialTheme.colorScheme.inversePrimary.copy(alpha = 0.98f),
+            ),
+    )
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(color = MaterialTheme.colorScheme.background)
-            .padding(start = 5.dp, end = 5.dp, top = 0.dp, bottom = 10.dp)
+            .background(color = Color.Transparent)
+            .padding(10.dp)
             .navigationBarsPadding()
     ) {
-        HorizontalDivider(thickness = 1.dp)
         Row(
             horizontalArrangement = Arrangement.spacedBy(2.dp),
             verticalAlignment = Alignment.Bottom,
-            modifier = modifier.fillMaxWidth().padding(top = 10.dp)
+            modifier = modifier
+                .fillMaxWidth()
+                .drawBehind {
+                    drawRoundRect(
+                        brush = brush,
+                        cornerRadius = CornerRadius(50f, 50f)
+                    )
+                }
         ) {
             CustomButton(
                 description = "Attach Button",
                 icon = R.drawable.baseline_attach_file_24,
                 buttonSize = 50,
                 iconSize = 25,
-                onButtonClick = onAttachClick
+                onButtonClick = onAttachClick,
+                containerColor = Color.Transparent
             )
             TextField(
                 value = textValue,
@@ -63,8 +78,8 @@ fun ChatBottomBar(
                 colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
-                    focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
                     ),
                 trailingIcon = {
                     if(textValue != ""){
@@ -72,14 +87,14 @@ fun ChatBottomBar(
                             description = "Clear Button",
                             onButtonClick = onClearClick,
                             icon = R.drawable.baseline_clear_24,
-                            containerColor = MaterialTheme.colorScheme.surfaceContainer
+                            containerColor = Color.Transparent
                         )
                     }
                 },
                 modifier = Modifier
                     .weight(1f)
                 ,
-                maxLines = 5,
+                maxLines = 3,
                 )
             CustomButton(
                 description = "Send Button",
@@ -91,6 +106,7 @@ fun ChatBottomBar(
                 buttonSize = 50,
                 iconSize = 25,
                 onButtonClick = onSendClick,
+                containerColor = Color.Transparent,
                 isButtonEnabled = ((textValue != "")|| isSendingFailed || isResponding) && isModelSelected
             )
         }

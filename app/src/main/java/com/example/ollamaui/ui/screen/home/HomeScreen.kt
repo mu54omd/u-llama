@@ -21,6 +21,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,6 +34,8 @@ import com.example.ollamaui.ui.screen.home.components.CustomFabButton
 import com.example.ollamaui.ui.screen.home.components.HomeTopBar
 import com.example.ollamaui.ui.screen.home.components.NewChatModal
 import com.example.ollamaui.ui.screen.home.components.SwipeActions
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
@@ -48,7 +51,7 @@ fun HomeScreen(
     networkStatus: NetworkStatus,
     isChatReady: Boolean,
     modelList: List<String>,
-    onBackClick: (Int) -> Unit,
+    onBackClick: (Int) -> Int,
 ) {
     var isNewChatDialogVisible by remember { mutableStateOf(false) }
     var userName by remember { mutableStateOf("") }
@@ -62,6 +65,7 @@ fun HomeScreen(
     var isRevealed by remember { mutableIntStateOf(-1) }
     var backHandlerCounter by remember { mutableIntStateOf(0) }
     val chatListItems by remember { derivedStateOf { chatsList.value }}
+    val scope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
@@ -212,7 +216,19 @@ fun HomeScreen(
             }
         }
     BackHandler {
-        backHandlerCounter++
-        onBackClick(backHandlerCounter)
+        if(selectedChats.isEmpty()) {
+            backHandlerCounter++
+            val result = onBackClick(backHandlerCounter)
+            if(result == 1) {
+                scope.launch {
+                    delay(3000L)
+                    backHandlerCounter = 0
+                }
+            }else{
+                backHandlerCounter = 0
+            }
+        }else{
+            selectedChats.clear()
+        }
     }
 }

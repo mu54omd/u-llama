@@ -51,7 +51,7 @@ fun HomeTopBar(
                 .fillMaxWidth()
                 .background(color = MaterialTheme.colorScheme.background)
                 .height(TOP_BAR_HEIGHT)
-                .padding(start = 5.dp, end = 5.dp),
+                .padding(start = 10.dp, end = 10.dp),
             ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -62,14 +62,14 @@ fun HomeTopBar(
                     description = "Setting Button",
                     onButtonClick = onSettingClick,
                     icon = R.drawable.baseline_settings_24,
-                    buttonSize = 50,
+                    buttonSize = 40,
                     containerColor = MaterialTheme.colorScheme.background
                 )
                 CustomButton(
                     description = "File Manager Button",
                     onButtonClick = onFileManagerClick,
                     icon = R.drawable.baseline_folder_24,
-                    buttonSize = 50,
+                    buttonSize = 40,
                     containerColor = MaterialTheme.colorScheme.background
                 )
             }
@@ -98,14 +98,14 @@ fun HomeTopBar(
                                         description = "DeselectAll Button",
                                         onButtonClick = onDeselectClick,
                                         icon = R.drawable.baseline_deselect_24,
-                                        buttonSize = 50,
+                                        buttonSize = 40,
                                         containerColor = MaterialTheme.colorScheme.background
                                     )
                                     CustomButton(
                                         description = "Delete Button",
                                         onButtonClick = onDeleteClick,
                                         icon = R.drawable.baseline_delete_outline_24,
-                                        buttonSize = 50,
+                                        buttonSize = 40,
                                         containerColor = MaterialTheme.colorScheme.background
                                     )
                                 }
@@ -118,7 +118,7 @@ fun HomeTopBar(
                                     description = "SelectAll Button",
                                     onButtonClick = onSelectClick,
                                     icon = R.drawable.baseline_select_all_24,
-                                    buttonSize = 50,
+                                    buttonSize = 40,
                                     containerColor = MaterialTheme.colorScheme.background,
                                     isButtonEnabled = chatsListSize > 0
                                 )
@@ -126,7 +126,7 @@ fun HomeTopBar(
                                     description = "About Button",
                                     onButtonClick = onLogClick,
                                     icon = R.drawable.baseline_info_outline_24,
-                                    buttonSize = 50,
+                                    buttonSize = 40,
                                     containerColor = MaterialTheme.colorScheme.background,
                                 )
                             }

@@ -182,14 +182,23 @@ fun AppNavigation(
                                 isChatReady = mainState.value.isModelListLoaded and (networkStatus.value == NetworkStatus.CONNECTED),
                                 modelList = mainState.value.filteredModelList,
                                 onBackClick = { backHandlerCounter ->
-                                    if(backHandlerCounter >= 2) {
-                                        activity?.finish()
-                                    }else {
-                                        scope.launch {
-                                            snackbarHostState.showSnackbar(
-                                                message = "Perform back function again to exit the app!",
-                                                duration = SnackbarDuration.Short
-                                            )
+                                    when(selectedChatId){
+                                        -1,-2 -> {
+                                            if (backHandlerCounter >= 2) {
+                                                activity?.finish()
+                                            } else {
+                                                scope.launch {
+                                                    snackbarHostState.showSnackbar(
+                                                        message = "Perform back function again to exit the app!",
+                                                        duration = SnackbarDuration.Short
+                                                    )
+                                                }
+                                            }
+                                            return@HomeScreen 1
+                                        }
+                                        else -> {
+                                            selectedChatId = if(windowSizeClass.windowWidthSizeClass != WindowWidthSizeClass.EXPANDED) -2 else -1
+                                            return@HomeScreen -1
                                         }
                                     }
                                 }
