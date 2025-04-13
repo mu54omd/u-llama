@@ -96,7 +96,7 @@ fun AppNavigation(
     val activity = LocalActivity.current
     val snackbarHostState  = remember { SnackbarHostState() }
     val isEmbeddingModelPulled by remember(embeddingModel.value.embeddingModelName) { derivedStateOf { mainViewModel.checkIfEmbeddingModelPulled(embeddingModel.value.embeddingModelName) } }
-
+    val isChatReady by remember(networkStatus) { derivedStateOf { mainState.value.isModelListLoaded and (networkStatus.value == NetworkStatus.CONNECTED) }}
     Scaffold(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState){ snackbarData ->
@@ -179,7 +179,7 @@ fun AppNavigation(
                                     )
                                 },
                                 networkStatus = networkStatus.value,
-                                isChatReady = mainState.value.isModelListLoaded and (networkStatus.value == NetworkStatus.CONNECTED),
+                                isChatReady = isChatReady,
                                 modelList = mainState.value.filteredModelList,
                                 onBackClick = { backHandlerCounter ->
                                     when(selectedChatId){

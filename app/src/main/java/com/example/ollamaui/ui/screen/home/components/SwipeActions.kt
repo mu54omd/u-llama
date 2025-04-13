@@ -29,7 +29,7 @@ fun SwipeActions(
     isSelected: Boolean
 ) {
     val scale by animateFloatAsState(
-        targetValue = if (isSelected) 0.97f else 0.99f, // Adds a pop effect
+        targetValue = if (isSelected) 0.97f else 0.99f,
         animationSpec = tween(300, easing = FastOutSlowInEasing),
         label = "Scale Animation"
     )
@@ -37,7 +37,7 @@ fun SwipeActions(
         modifier = Modifier
             .padding(5.dp)
             .fillMaxWidth()
-            .height(85.dp)
+            .height(60.dp)
             .graphicsLayer {
                 clip = true
                 shape = RoundedCornerShape(16.dp)
@@ -49,7 +49,6 @@ fun SwipeActions(
                     color = Color(0xFFFF3259)
                 )
             },
-//            .background(, shape = MaterialTheme.shapes.extraLarge),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
