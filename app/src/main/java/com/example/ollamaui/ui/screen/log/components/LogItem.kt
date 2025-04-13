@@ -33,9 +33,9 @@ fun LogItem(
     content: String,
 ) {
     val bgColor = when (type) {
-        "ERROR" -> MaterialTheme.colorScheme.errorContainer
-        "SUCCESS" -> MaterialTheme.colorScheme.tertiaryContainer
-        else -> MaterialTheme.colorScheme.secondaryContainer
+        "ERROR" -> MaterialTheme.colorScheme.error
+        "SUCCESS" -> MaterialTheme.colorScheme.tertiary
+        else -> MaterialTheme.colorScheme.secondary
     }
     Row(
         modifier = Modifier
@@ -56,7 +56,7 @@ fun LogItem(
             Text(
                 text = type.substring(0,2),
                 modifier = Modifier.padding(5.dp),
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.background),
                 fontWeight = FontWeight.Bold
             )
         }
