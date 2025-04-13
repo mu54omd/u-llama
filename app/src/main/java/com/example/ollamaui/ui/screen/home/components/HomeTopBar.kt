@@ -1,7 +1,6 @@
 package com.example.ollamaui.ui.screen.home.components
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,14 +35,6 @@ fun HomeTopBar(
     chatsListSize: Int,
     networkStatus: NetworkStatus
 ) {
-    val animatedDividerColor by animateColorAsState(
-        targetValue = when(networkStatus){
-            NetworkStatus.CONNECTED -> MaterialTheme.colorScheme.tertiary
-            NetworkStatus.DISCONNECTED -> MaterialTheme.colorScheme.error
-            NetworkStatus.UNKNOWN -> MaterialTheme.colorScheme.primary
-        },
-        label = "Animated Divider Color"
-    )
     Column {
         Box(
             modifier = modifier
@@ -76,7 +66,7 @@ fun HomeTopBar(
             LogoTitle(
                 lightLogo = R.drawable.icon_light,
                 darkLogo = R.drawable.icon_dark,
-                text = "Ollama UI",
+                networkStatus = networkStatus,
                 modifier = Modifier.align(Alignment.Center),
             )
             Row(
@@ -134,7 +124,7 @@ fun HomeTopBar(
                 }
             }
         }
-        HorizontalDivider(thickness = 2.dp, color = animatedDividerColor)
+        HorizontalDivider(thickness = 2.dp)
     }
 }
 
