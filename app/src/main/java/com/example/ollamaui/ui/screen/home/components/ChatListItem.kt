@@ -5,6 +5,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.scaleIn
@@ -13,7 +14,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.MarqueeSpacing
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
-import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -39,6 +40,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
@@ -75,22 +77,25 @@ fun ChatListItem(
     onCollapse: () -> Unit,
 ) {
     val animatedColor by animateColorAsState(
-        targetValue = if(isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.background,
+        targetValue = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.background,
         label = "Animated Color",
     )
 
     val scale by animateFloatAsState(
-        targetValue = if (isSelected) 0.98f else 1f, // Adds a pop effect
+        targetValue = if (isSelected) 0.98f else 1f,
         animationSpec = tween(300, easing = FastOutSlowInEasing),
         label = "Scale Animation"
     )
 
     val indicatorAnimation by animateColorAsState(
-        targetValue = if(isNewMessageReceived) {
-            if(newMessageStatus == 1) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.errorContainer
-        } else MaterialTheme.colorScheme.surfaceContainer,
+        targetValue = if (isNewMessageReceived) {
+            if (newMessageStatus == 1) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.errorContainer
+        } else MaterialTheme.colorScheme.outlineVariant,
         animationSpec = tween(delayMillis = 100),
         label = "Indicator",
+    )
+    val animatedWidth by animateDpAsState(
+        targetValue = if (isSelected) 6.dp else 0.dp
     )
 
     /////////////////////////////////////////
@@ -123,9 +128,9 @@ fun ChatListItem(
                 drawRoundRect(
                     color = animatedColor,
                     cornerRadius = CornerRadius(16.dp.toPx()),
-                    )
+                )
             }
-            .pointerInput(Unit){
+            .pointerInput(Unit) {
                 detectHorizontalDragGestures { _, dragAmount ->
                     when {
                         dragAmount >= MIN_DRAG_AMOUNT -> onCollapse()
@@ -141,13 +146,12 @@ fun ChatListItem(
                     onItemLongPress()
                 }
             )
-    ){
+    ) {
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(end = 5.dp)
         ) {
-
             Box(
                 modifier = Modifier
                     .padding(5.dp)
@@ -156,14 +160,21 @@ fun ChatListItem(
                         drawRoundRect(
                             color = indicatorAnimation
                         )
+                        drawRoundRect(
+                            color = if(isSelected) Color.White else Color.Transparent,
+                            style = Stroke(animatedWidth.toPx()),
+                            cornerRadius = CornerRadius(x = 100f, y = 100f)
+                        )
                     }
-                    .border(width = 5.dp, color = MaterialTheme.colorScheme.background, shape = RoundedCornerShape(100))
-                    .size(75.dp),
+                    .size(50.dp),
                 contentAlignment = Alignment.Center
-            ){
+            ) {
                 Text(
                     text = modelName,
-                    modifier = Modifier,
+                    modifier = Modifier.graphicsLayer{
+                        scaleX = 0.8f
+                        scaleY = 0.8f
+                    },
                     maxLines = 1,
                     style = MaterialTheme.typography.displayMedium.copy(textAlign = TextAlign.Center)
                 )
@@ -175,14 +186,24 @@ fun ChatListItem(
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier.background(color = MaterialTheme.colorScheme.surfaceVariant).padding(2.dp)
+                    modifier = Modifier
+                        .background(
+                            color = MaterialTheme.colorScheme.outlineVariant,
+                            shape = RoundedCornerShape(20)
+                        )
+                        .padding(2.dp)
                 ) {
                     Text(
                         text = chatTitle,
                         style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
                         overflow = TextOverflow.Ellipsis,
                         maxLines = 1,
-                        modifier = Modifier.basicMarquee().background(color = MaterialTheme.colorScheme.primaryContainer)
+                        modifier = Modifier
+                            .basicMarquee()
+                            .background(
+                                color = MaterialTheme.colorScheme.primaryContainer,
+                                shape = RoundedCornerShape(20)
+                            )
                     )
                     Spacer(modifier = Modifier.width(5.dp))
                     Text(
@@ -231,20 +252,39 @@ fun ChatListItem(
 @Composable
 private fun ChatListItemPreview() {
     OllamaUITheme {
-        ChatListItem(
-            modelName = "llama3.1:1b",
-            chatTitle = "Title",
-            lastMessage = "Last Message will place here despite of its length! The sentences maybe become so large that it can't show completely!",
-            onItemClick = {},
-            onItemLongPress = {},
-            onSelectedItemClick = {},
-            isSelected = true,
-            isNewMessageReceived = true,
-            newMessageStatus = 1,
-            isRevealed = false,
-            cardOffset = 80f,
-            onExpand = {},
-            onCollapse = {},
-        )
+        Surface {
+            Column {
+                ChatListItem(
+                    modelName = "llama3.1:1b",
+                    chatTitle = "Title",
+                    lastMessage = "Last Message will place here despite of its length! The sentences maybe become so large that it can't show completely!",
+                    onItemClick = {},
+                    onItemLongPress = {},
+                    onSelectedItemClick = {},
+                    isSelected = false,
+                    isNewMessageReceived = false,
+                    newMessageStatus = 1,
+                    isRevealed = false,
+                    cardOffset = 80f,
+                    onExpand = {},
+                    onCollapse = {},
+                )
+                ChatListItem(
+                    modelName = "llama3.1:1b",
+                    chatTitle = "Title",
+                    lastMessage = "Last Message will place here despite of its length! The sentences maybe become so large that it can't show completely!",
+                    onItemClick = {},
+                    onItemLongPress = {},
+                    onSelectedItemClick = {},
+                    isSelected = true,
+                    isNewMessageReceived = true,
+                    newMessageStatus = 1,
+                    isRevealed = false,
+                    cardOffset = 80f,
+                    onExpand = {},
+                    onCollapse = {},
+                )
+            }
+        }
     }
 }
