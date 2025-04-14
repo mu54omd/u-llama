@@ -3,10 +3,10 @@ package com.example.ollamaui.ui.screen.chat
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -87,6 +87,7 @@ fun ChatScreen(
     val scope = rememberCoroutineScope()
     val selectedFiles = remember(chatId) { mutableStateListOf<StableFile>() }
     val isAnyFileAttached by remember { derivedStateOf { attachedFilesList.value.item.isNotEmpty() && embeddingModel.value.isEmbeddingModelSet }}
+    var isAttachedFilesListEnabled by remember { mutableStateOf(false) }
     val isEmbeddingInProgress: (Long) -> Boolean = remember { { id -> embeddingInProgressList.value.contains(id) } }
     val tempText by remember(chatId) { derivedStateOf { chatViewModel.temporaryReceivedMessage[chatId] } }
     val isResponding by remember(chatId) { derivedStateOf { chatState.value.isRespondingList.contains(chatId) } }
@@ -234,9 +235,11 @@ fun ChatScreen(
                     .align(Alignment.TopCenter).offset(y = TOP_BAR_HEIGHT + 10.dp)
             ) {
                 AnimatedVisibility(
-                    visible = isAnyFileAttached,
+                    visible = isAttachedFilesListEnabled,
                     enter = slideInVertically(),
-                    exit = shrinkHorizontally()
+                    exit = slideOutVertically(
+                        targetOffsetY = {fullHeight -> -fullHeight * 2}
+                    )
                 ) {
                     LazyRow(
                         contentPadding = PaddingValues(start = 1.dp, end = 1.dp),
@@ -294,9 +297,12 @@ fun ChatScreen(
                     selectedDialogs.clear()
                 },
                 onDeselectClick = { selectedDialogs.clear() },
+                onShowAttachedFileClick = { isAttachedFilesListEnabled = true },
+                onHideAttachedFileClick = { isAttachedFilesListEnabled = false},
                 isCopyButtonEnabled = selectedDialogs.isNotEmpty(),
                 isResponding = chatState.value.isRespondingList.contains(chatId) && !chatState.value.isSendingFailed,
-                modifier = Modifier.align(Alignment.TopCenter)
+                modifier = Modifier.align(Alignment.TopCenter),
+                isAnyFileAttached = isAnyFileAttached
             )
             ChatBottomBar(
                 textValue = textValue,
