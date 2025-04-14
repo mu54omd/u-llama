@@ -30,9 +30,10 @@ object Constants {
     const val NUM_CTX = "num_ctx"
 
 
-    //
     val TOP_BAR_HEIGHT = 85.dp
     const val USER_ROLE = "user"
     const val SYSTEM_ROLE = "system"
     const val ASSISTANT_ROLE = "assistant"
+
+    val EMBEDDING_MODEL_LIST = listOf<String>("Select a Model", "nomic-embed-text", "mxbai-embed-large", "bge-m3", "snowflake-arctic-embed", "all-minilm", "bge-large", "paraphrase-multilingual", "snowflake-arctic-embed2", "granite-embedding")
 }
