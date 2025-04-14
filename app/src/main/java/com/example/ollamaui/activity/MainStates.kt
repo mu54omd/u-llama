@@ -5,6 +5,7 @@ import com.example.ollamaui.domain.model.pull.EmptyPullResponse
 import com.example.ollamaui.domain.model.pull.PullResponse
 import com.example.ollamaui.domain.model.tag.EmptyTagResponse
 import com.example.ollamaui.domain.model.tag.TagResponse
+import com.example.ollamaui.utils.Constants.EMBEDDING_MODEL_LIST
 
 data class MainStates(
 
@@ -12,7 +13,7 @@ data class MainStates(
 
     val fullModelList: List<String> = emptyList(),
     val filteredModelList: List<String> = emptyList(),
-    val embeddingModelList: List<String> = emptyList(),
+    val embeddingModelList: List<String> = EMBEDDING_MODEL_LIST,
 
     val ollamaStatus: String = "",
     val statusError: NetworkError? = null,

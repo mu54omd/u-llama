@@ -5,11 +5,11 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -29,7 +29,7 @@ fun SwipeActions(
     isSelected: Boolean
 ) {
     val scale by animateFloatAsState(
-        targetValue = if (isSelected) 0.97f else 0.99f,
+        targetValue = if (isSelected) 0.96f else 0.97f,
         animationSpec = tween(300, easing = FastOutSlowInEasing),
         label = "Scale Animation"
     )
@@ -50,9 +50,8 @@ fun SwipeActions(
                 )
             },
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.End
     ) {
-        Spacer(modifier = Modifier)
         CustomButton(
             icon = R.drawable.baseline_delete_outline_24,
             description = "Delete chat",
@@ -68,9 +67,11 @@ fun SwipeActions(
 @Composable
 private fun SwipeActionsPreview() {
     OllamaUITheme {
-        SwipeActions(
-            onDeleteClick = {},
-            isSelected = true
-        )
+        Surface {
+            SwipeActions(
+                onDeleteClick = {},
+                isSelected = false
+            )
+        }
     }
 }
