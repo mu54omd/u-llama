@@ -1,5 +1,7 @@
 package com.example.ollamaui.ui.screen.chat.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,6 +17,10 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,9 +39,13 @@ fun ChatTopBar(
     onBackClick: () -> Unit,
     onCopyClick: () -> Unit,
     onDeselectClick: () -> Unit,
+    onShowAttachedFileClick: () -> Unit,
+    onHideAttachedFileClick: () -> Unit,
     isCopyButtonEnabled: Boolean,
     isResponding: Boolean,
+    isAnyFileAttached: Boolean
 ) {
+    var isAttachedFilesListEnabled by remember { mutableStateOf(false) }
     Column(
         modifier = modifier
             .background(color = Color.Transparent)
@@ -71,8 +81,44 @@ fun ChatTopBar(
             Row(
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.requiredSize(width = 80.dp, height = 40.dp)
+                modifier = Modifier.requiredSize(width = 120.dp, height = 40.dp)
             ) {
+                AnimatedVisibility(isAnyFileAttached) {
+                    Crossfade(
+                        targetState = isAttachedFilesListEnabled,
+                        label = "Show/Hide imported file"
+                    ) { isEnabled ->
+                        when (isEnabled) {
+                            false -> {
+                                CustomButton(
+                                    description = "show attached files Icon",
+                                    onButtonClick = {
+                                        isAttachedFilesListEnabled = true
+                                        onShowAttachedFileClick()
+                                    },
+                                    icon = R.drawable.baseline_source_24,
+                                    buttonSize = 40,
+                                    containerColor = Color.Transparent,
+                                    isButtonEnabled = true
+                                )
+                            }
+
+                            true -> {
+                                CustomButton(
+                                    description = "hide attached files Icon",
+                                    onButtonClick = {
+                                        isAttachedFilesListEnabled = false
+                                        onHideAttachedFileClick()
+                                    },
+                                    icon = R.drawable.baseline_hide_source_24,
+                                    buttonSize = 40,
+                                    containerColor = Color.Transparent,
+                                    isButtonEnabled = true
+                                )
+                            }
+                        }
+                    }
+                }
                 CustomButton(
                     description = "Deselect Icon",
                     onButtonClick = onDeselectClick,
@@ -108,8 +154,11 @@ private fun ChatTopBarPreview() {
                 onBackClick = {},
                 onCopyClick = {},
                 onDeselectClick = {},
+                onShowAttachedFileClick = {},
+                onHideAttachedFileClick = {},
                 isCopyButtonEnabled = false,
-                isResponding = true
+                isResponding = true,
+                isAnyFileAttached = true
             )
         }
     }
