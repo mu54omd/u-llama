@@ -187,6 +187,7 @@ class MainViewModel @Inject constructor(
                         .split(" ")
                     val finalList = listOf<String>("Select a Model") + result
                     _mainState.update { it.copy(embeddingModelList = finalList, fetchEmbeddingModelError = null) }
+                    getOllamaModelsList()
                     ollamaRepository.insertLogToDb(
                         LogModel(
                             date = LocalDateTime.now().toString(),
