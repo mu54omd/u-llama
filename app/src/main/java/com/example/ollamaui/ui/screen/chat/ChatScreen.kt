@@ -28,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -55,7 +56,7 @@ import com.example.ollamaui.R
 import com.example.ollamaui.activity.EmbeddingModel
 import com.example.ollamaui.domain.model.MessageModel
 import com.example.ollamaui.domain.model.objectbox.StableFile
-import com.example.ollamaui.helper.NetworkStatus
+import com.example.ollamaui.helper.network.NetworkStatus
 import com.example.ollamaui.ui.common.messageModelToText
 import com.example.ollamaui.ui.screen.chat.components.AttachedFilesItem
 import com.example.ollamaui.ui.screen.chat.components.ChatBottomBar
@@ -116,6 +117,8 @@ fun ChatScreen(
             MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.8f),
         )
     )
+    val isReading by chatViewModel.isReading.collectAsState()
+
     Scaffold(
     ) { contentPadding ->
         BackHandler {
@@ -205,7 +208,10 @@ fun ChatScreen(
                             isSendingFailed = chatState.value.isSendingFailed,
                             onDeleteLastMessage = { chatViewModel.deleteLastMessage(index) },
                             onEditLastMessage = { textValue = chatViewModel.editLastMessage(index) },
-                            isResponding = isResponding
+                            isResponding = isResponding,
+                            onReadClick = { botMessage -> chatViewModel.read(chatId, botMessage) },
+                            onStopClick = { chatViewModel.stopTTS(chatId) },
+                            isReading = isReading[chatId] == true
                         )
                     }
                 }

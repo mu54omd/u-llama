@@ -28,7 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ollamaui.R
-import com.example.ollamaui.helper.NetworkStatus
+import com.example.ollamaui.helper.network.NetworkStatus
 import com.example.ollamaui.ui.theme.OllamaUITheme
 import kotlinx.coroutines.delay
 

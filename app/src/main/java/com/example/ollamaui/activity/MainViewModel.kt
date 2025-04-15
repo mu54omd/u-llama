@@ -9,8 +9,8 @@ import com.example.ollamaui.domain.model.pull.PullInputModel
 import com.example.ollamaui.domain.model.tag.EmptyTagResponse
 import com.example.ollamaui.domain.preferences.LocalUserManager
 import com.example.ollamaui.domain.repository.OllamaRepository
-import com.example.ollamaui.helper.NetworkObserver
-import com.example.ollamaui.helper.NetworkStatus
+import com.example.ollamaui.helper.network.NetworkObserver
+import com.example.ollamaui.helper.network.NetworkStatus
 import com.example.ollamaui.utils.Constants.OLLAMA_BASE_ENDPOINT
 import com.example.ollamaui.utils.Constants.OLLAMA_FETCH_EMBEDDING_URL
 import com.example.ollamaui.utils.Constants.OLLAMA_LIST_ENDPOINT

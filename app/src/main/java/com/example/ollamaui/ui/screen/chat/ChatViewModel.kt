@@ -1,5 +1,6 @@
 package com.example.ollamaui.ui.screen.chat
 
+import android.app.Application
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.ViewModel
@@ -19,6 +20,7 @@ import com.example.ollamaui.domain.model.chat.ModelParameters
 import com.example.ollamaui.domain.model.embed.EmbedInputModel
 import com.example.ollamaui.domain.model.objectbox.StableFile
 import com.example.ollamaui.domain.repository.OllamaRepository
+import com.example.ollamaui.helper.tts.TTSHelper
 import com.example.ollamaui.mapper.toNetworkError
 import com.example.ollamaui.utils.Constants.OLLAMA_CHAT_ENDPOINT
 import com.example.ollamaui.utils.Constants.OLLAMA_EMBED_ENDPOINT
@@ -27,6 +29,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
@@ -43,7 +46,12 @@ import javax.inject.Inject
 class ChatViewModel @Inject constructor(
     private val ollamaRepository: OllamaRepository,
     private val chunkDatabase: ChunkDatabase,
+    application: Application
 ):ViewModel() {
+
+    val ttsHelper = TTSHelper(application)
+    private val _isReading = MutableStateFlow<Map<Int, Boolean>>(emptyMap())
+    val isReading: StateFlow<Map<Int, Boolean>> = _isReading.asStateFlow()
 
     private val _chatState = MutableStateFlow(ChatStates())
     val chatState = _chatState.asStateFlow()
@@ -233,10 +241,34 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+    fun read(chatId: Int, text: String){
+        clearReading()
+        setReading(chatId, true)
+        ttsHelper.speak(text){
+            setReading(chatId, false)
+        }
+    }
+
+    fun stopTTS(chatId: Int){
+        ttsHelper.stop()
+        setReading(chatId, false)
+    }
+
     //Private methods
     /*---------------------------------------------------------------------------------------------*/
     /*---------------------------------------------------------------------------------------------*/
     /*---------------------------------------------------------------------------------------------*/
+
+    private fun setReading(chatId: Int, isReading: Boolean){
+        _isReading.update { currentMap ->
+            currentMap.toMutableMap().apply {
+                this[chatId] = isReading
+            }
+        }
+    }
+    private fun clearReading(){
+        _isReading.update { emptyMap() }
+    }
 
     private fun ollamaPostMessage(messages: MessagesModel, chatId: Int){
         val oldMessages = chatState.value.chatModel.chatMessages.messageModels.toMutableList()
@@ -462,4 +494,8 @@ class ChatViewModel @Inject constructor(
         )
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        ttsHelper.shutdown()
+    }
 }
