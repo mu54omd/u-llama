@@ -3,10 +3,11 @@ package com.example.ollamaui.ui.screen.chat
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -46,6 +47,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.ClipboardManager
@@ -118,7 +120,12 @@ fun ChatScreen(
         )
     )
     val isReading by chatViewModel.isReading.collectAsState()
-
+    val topBgColor = Brush.verticalGradient(
+        colors = listOf(MaterialTheme.colorScheme.background, Color.Transparent)
+    )
+    val bottomBgColor = Brush.verticalGradient(
+        colors = listOf(Color.Transparent, MaterialTheme.colorScheme.background)
+    )
     Scaffold(
     ) { contentPadding ->
         BackHandler {
@@ -149,7 +156,7 @@ fun ChatScreen(
             LazyColumn(
                 modifier = Modifier
                     .padding(top = TOP_BAR_HEIGHT)
-                    .pointerInput(Unit){
+                    .pointerInput(Unit) {
                         detectTapGestures(
                             onPress = {
                                 isAutoScrollEnabled = false
@@ -233,12 +240,28 @@ fun ChatScreen(
                     }
                 }
             }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp)
+                    .offset(y = TOP_BAR_HEIGHT)
+                    .align(Alignment.TopCenter)
+                    .background(brush = topBgColor)
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp)
+                    .align(Alignment.BottomCenter)
+                    .background(brush = bottomBgColor)
+            )
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .padding(start = 10.dp, end = 10.dp)
-                    .align(Alignment.TopCenter).offset(y = TOP_BAR_HEIGHT + 10.dp)
+                    .align(Alignment.TopCenter)
+                    .offset(y = TOP_BAR_HEIGHT + 10.dp)
             ) {
                 AnimatedVisibility(
                     visible = isAttachedFilesListEnabled,
@@ -310,6 +333,37 @@ fun ChatScreen(
                 modifier = Modifier.align(Alignment.TopCenter),
                 isAnyFileAttached = isAnyFileAttached
             )
+            AnimatedVisibility(
+                visible = !isAtBottom,
+                enter = slideInVertically(
+                    initialOffsetY = {fullHeight -> fullHeight + 50},
+                    animationSpec = tween(durationMillis = 200)
+                ) + scaleIn(),
+                exit = slideOutVertically(
+                    targetOffsetY = {fullHeight -> fullHeight + 50},
+                    animationSpec = tween(durationMillis = 200)
+                ) + scaleOut(),
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .offset(y = (-80).dp)
+            ) {
+                CustomButton(
+                    onButtonClick = {
+                        scope.launch {
+                            listState.animateScrollToItem(
+                                index = chatState.value.chatModel.chatMessages.messageModels.lastIndex,
+                                scrollOffset = lastItemHeight
+                            )
+                        }
+                    },
+                    icon = R.drawable.baseline_expand_more_24,
+                    description = "Scroll Down",
+                    buttonSize = 30,
+                    iconSize = 25,
+                    containerColor = MaterialTheme.colorScheme.inversePrimary,
+                    elevation = 0
+                )
+            }
             ChatBottomBar(
                 textValue = textValue,
                 onValueChange = { textValue = it },
@@ -331,35 +385,6 @@ fun ChatScreen(
                 isResponding = chatState.value.isRespondingList.contains(chatId),
                 modifier = Modifier.align(Alignment.BottomCenter)
             )
-            AnimatedVisibility(
-                visible = !isAtBottom,
-                enter = slideInHorizontally(
-                    initialOffsetX = {fullWidth -> fullWidth + 100},
-                    animationSpec = tween(durationMillis = 200)
-                ),
-                exit = slideOutHorizontally(
-                    targetOffsetX = {fullWidth -> fullWidth + 100},
-                    animationSpec = tween(durationMillis = 200)
-                ),
-                modifier = Modifier.align(Alignment.BottomEnd).offset(x = (-20).dp, y = (-80).dp)
-            ) {
-                CustomButton(
-                    onButtonClick = {
-                        scope.launch {
-                            listState.animateScrollToItem(
-                                index = chatState.value.chatModel.chatMessages.messageModels.lastIndex,
-                                scrollOffset = lastItemHeight
-                            )
-                        }
-                    },
-                    icon = R.drawable.baseline_expand_more_24,
-                    description = "Scroll Down",
-                    buttonSize = 40,
-                    iconSize = 30,
-                    containerColor = MaterialTheme.colorScheme.inversePrimary,
-                    elevation = 0
-                )
-            }
         }
     }
 }
