@@ -61,7 +61,10 @@ fun ChatDialog(
     onReproduceResponse: () -> Unit,
     onDeleteLastMessage: () -> Unit,
     onEditLastMessage: () -> Unit,
-    isResponding: Boolean
+    isResponding: Boolean,
+    onReadClick: (String) -> Unit,
+    onStopClick: () -> Unit,
+    isReading: Boolean
 ) {
     val isFromMe by remember { derivedStateOf { isFromMe(messageModel) } }
     val animatedColorMessage by animateColorAsState(
@@ -94,7 +97,7 @@ fun ChatDialog(
             )
         )
     )
-
+    var botMessage = ""
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -160,6 +163,7 @@ fun ChatDialog(
                     }else{
                         val thinkingText = filterAssistantMessage(assistantMessage = messageModel.content)
                         if(thinkingText.first != null){
+                            botMessage = messageModel.content
                             RichText(
                                 style = richTextStyle
                             ) {
@@ -170,6 +174,7 @@ fun ChatDialog(
                                 BasicMarkdown(astNode)
                             }
                         }else{
+                            botMessage = thinkingText.third!!
                             if(thinkingText.second?.isNotEmpty() == true) {
                                 Text(
                                     text = thinkingText.second!!,
@@ -214,7 +219,10 @@ fun ChatDialog(
             onReproduceResponse = onReproduceResponse,
             onEditLastMessage = onEditLastMessage,
             onDeleteLastMessage = onDeleteLastMessage,
-            isResponding = isResponding
+            onReadClick = { onReadClick(botMessage) },
+            onStopClick = { onStopClick() },
+            isResponding = isResponding,
+            isReading = isReading
         )
     }
 
@@ -243,7 +251,10 @@ private fun ChatDialogPreview() {
                 onReproduceResponse = {},
                 onEditLastMessage = {},
                 onDeleteLastMessage = {},
-                isResponding = false
+                isResponding = false,
+                onStopClick = {},
+                onReadClick = {},
+                isReading = true
             )
             ChatDialog(
                 messageModel = MessageModel(
@@ -263,7 +274,10 @@ private fun ChatDialogPreview() {
                 onReproduceResponse = {},
                 onEditLastMessage = {},
                 onDeleteLastMessage = {},
-                isResponding = false
+                isResponding = false,
+                onStopClick = {},
+                onReadClick = {},
+                isReading = true
             )
             ChatDialog(
                 messageModel = MessageModel(
@@ -283,7 +297,10 @@ private fun ChatDialogPreview() {
                 onReproduceResponse = {},
                 onEditLastMessage = {},
                 onDeleteLastMessage = {},
-                isResponding = false
+                isResponding = false,
+                onStopClick = {},
+                onReadClick = {},
+                isReading = true
             )
             ChatDialog(
                 messageModel = MessageModel(
@@ -303,7 +320,10 @@ private fun ChatDialogPreview() {
                 onReproduceResponse = {},
                 onEditLastMessage = {},
                 onDeleteLastMessage = {},
-                isResponding = false
+                isResponding = false,
+                onStopClick = {},
+                onReadClick = {},
+                isReading = true
             )
         }
     }

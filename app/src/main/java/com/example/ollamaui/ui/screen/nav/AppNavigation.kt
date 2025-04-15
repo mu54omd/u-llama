@@ -46,7 +46,7 @@ import com.example.ollamaui.activity.EmbeddingModel
 import com.example.ollamaui.activity.MainStates
 import com.example.ollamaui.activity.MainViewModel
 import com.example.ollamaui.domain.model.chat.ModelParameters
-import com.example.ollamaui.helper.NetworkStatus
+import com.example.ollamaui.helper.network.NetworkStatus
 import com.example.ollamaui.ui.screen.chat.ChatScreen
 import com.example.ollamaui.ui.screen.chat.ChatViewModel
 import com.example.ollamaui.ui.screen.chat.components.EmptyChatScreen
