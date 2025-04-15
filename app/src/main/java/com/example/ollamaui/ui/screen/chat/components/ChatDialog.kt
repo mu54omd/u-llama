@@ -2,6 +2,7 @@ package com.example.ollamaui.ui.screen.chat.components
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -31,6 +33,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ollamaui.domain.model.MessageModel
@@ -73,13 +76,16 @@ fun ChatDialog(
                 if(isSelected) MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.5f)
                 else if(isSendingFailed && isLastMessage) MaterialTheme.colorScheme.errorContainer
                 else MaterialTheme.colorScheme.surfaceVariant
-
             }
             false -> {
                 if(isSelected) MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.5f) else MaterialTheme.colorScheme.background
             }
         },
         label = "Animated Color Message",
+    )
+    val animatedOffset by animateIntAsState(
+        targetValue = if(isSelected) {if(isFromMe) -30 else 30 } else 0,
+        label = "Animated Offset chat dialog"
     )
     val textBgColor = if(!isSystemInDarkTheme()) Color.LightGray else Color.DarkGray
     val richTextStyle = RichTextStyle(
@@ -106,6 +112,7 @@ fun ChatDialog(
             Box(
                 modifier = Modifier
                     .align(if (isFromMe) Alignment.End else Alignment.Start)
+                    .offset { IntOffset(animatedOffset, 0) }
                     .widthIn(min = 120.dp)
                     .border(
                         width = (1.5).dp,

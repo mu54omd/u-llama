@@ -2,7 +2,8 @@ package com.example.ollamaui.ui.screen.chat
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInVertically
@@ -337,11 +338,11 @@ fun ChatScreen(
                 visible = !isAtBottom,
                 enter = slideInVertically(
                     initialOffsetY = {fullHeight -> fullHeight + 50},
-                    animationSpec = tween(durationMillis = 200)
+                    animationSpec = spring(dampingRatio = Spring.DampingRatioHighBouncy)
                 ) + scaleIn(),
                 exit = slideOutVertically(
                     targetOffsetY = {fullHeight -> fullHeight + 50},
-                    animationSpec = tween(durationMillis = 200)
+                    animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
                 ) + scaleOut(),
                 modifier = Modifier
                     .align(Alignment.BottomCenter)

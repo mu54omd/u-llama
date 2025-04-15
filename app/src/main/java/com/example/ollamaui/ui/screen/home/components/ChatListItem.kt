@@ -54,7 +54,7 @@ import com.example.ollamaui.ui.screen.common.CustomButton
 import com.example.ollamaui.ui.theme.OllamaUITheme
 import kotlin.math.roundToInt
 
-const val ANIMATION_DURATION = 350
+const val ANIMATION_DURATION = 200
 const val MIN_DRAG_AMOUNT = 30
 
 
@@ -87,10 +87,16 @@ fun ChatListItem(
         label = "Scale Animation"
     )
 
+    val rotateAnimation by animateFloatAsState(
+        targetValue = if (isSelected) 0f else 360f,
+        animationSpec = tween(300, easing = FastOutSlowInEasing),
+        label = "Rotate Animation"
+    )
+
     val indicatorAnimation by animateColorAsState(
         targetValue = if (isNewMessageReceived) {
             if (newMessageStatus == 1) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.errorContainer
-        } else MaterialTheme.colorScheme.outlineVariant,
+        } else if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.outlineVariant,
         animationSpec = tween(delayMillis = 100),
         label = "Indicator",
     )
@@ -165,6 +171,9 @@ fun ChatListItem(
                             style = Stroke(animatedWidth.toPx()),
                             cornerRadius = CornerRadius(x = 100f, y = 100f)
                         )
+                    }
+                    .graphicsLayer{
+                        rotationY = rotateAnimation
                     }
                     .size(50.dp),
                 contentAlignment = Alignment.Center
@@ -261,7 +270,7 @@ private fun ChatListItemPreview() {
                     onItemClick = {},
                     onItemLongPress = {},
                     onSelectedItemClick = {},
-                    isSelected = false,
+                    isSelected = true,
                     isNewMessageReceived = false,
                     newMessageStatus = 1,
                     isRevealed = false,
