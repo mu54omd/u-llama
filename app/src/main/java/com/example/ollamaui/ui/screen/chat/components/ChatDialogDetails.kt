@@ -32,7 +32,10 @@ fun ChatDialogDetails(
     onReproduceResponse: () -> Unit,
     onDeleteLastMessage: () -> Unit,
     onEditLastMessage: () -> Unit,
-    isResponding: Boolean
+    isResponding: Boolean,
+    onReadClick: () -> Unit,
+    onStopClick: () -> Unit,
+    isReading: Boolean,
 ) {
     val finalDate = when (date) {
         LocalDate.now().toString() -> { "" }
@@ -88,6 +91,19 @@ fun ChatDialogDetails(
                             iconSize = 18,
                             isButtonEnabled = !isResponding
                         )
+                        CustomButton(
+                            onButtonClick = {
+                                if(!isReading){
+                                    onReadClick()
+                                }else{
+                                    onStopClick()
+                                }
+                            },
+                            description = "Read bot message",
+                            icon = if(isReading) R.drawable.baseline_stop_24 else R.drawable.baseline_volume_up_24,
+                            iconSize = 18,
+                            isButtonEnabled = !isResponding
+                        )
                     }
                     else -> {
                         Text(
@@ -117,7 +133,10 @@ fun ChatDialogDetailsPreview() {
                 onReproduceResponse = {},
                 onEditLastMessage = {},
                 onDeleteLastMessage = {},
-                isResponding = false
+                isResponding = false,
+                onStopClick = {},
+                onReadClick = {},
+                isReading = false
             )
             ChatDialogDetails(
                 isVisible = true,
@@ -129,7 +148,10 @@ fun ChatDialogDetailsPreview() {
                 onReproduceResponse = {},
                 onEditLastMessage = {},
                 onDeleteLastMessage = {},
-                isResponding = false
+                isResponding = false,
+                onStopClick = {},
+                onReadClick = {},
+                isReading = true
             )
             ChatDialogDetails(
                 isVisible = true,
@@ -141,7 +163,10 @@ fun ChatDialogDetailsPreview() {
                 onReproduceResponse = {},
                 onEditLastMessage = {},
                 onDeleteLastMessage = {},
-                isResponding = false
+                isResponding = false,
+                onStopClick = {},
+                onReadClick = {},
+                isReading = false
             )
             ChatDialogDetails(
                 isVisible = true,
@@ -153,7 +178,10 @@ fun ChatDialogDetailsPreview() {
                 onReproduceResponse = {},
                 onEditLastMessage = {},
                 onDeleteLastMessage = {},
-                isResponding = false
+                isResponding = false,
+                onStopClick = {},
+                onReadClick = {},
+                isReading = true
             )
         }
     }

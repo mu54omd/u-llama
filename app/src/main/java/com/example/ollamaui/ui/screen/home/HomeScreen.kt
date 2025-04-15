@@ -27,7 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.ollamaui.domain.model.chat.ChatModel
-import com.example.ollamaui.helper.NetworkStatus
+import com.example.ollamaui.helper.network.NetworkStatus
 import com.example.ollamaui.ui.common.printLastMessage
 import com.example.ollamaui.ui.screen.home.components.ChatListItem
 import com.example.ollamaui.ui.screen.home.components.CustomFabButton

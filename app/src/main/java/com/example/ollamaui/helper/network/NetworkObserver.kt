@@ -1,4 +1,4 @@
-package com.example.ollamaui.helper
+package com.example.ollamaui.helper.network
 
 import com.example.ollamaui.domain.model.LogModel
 import com.example.ollamaui.domain.repository.OllamaRepository

@@ -3,10 +3,11 @@ package com.example.ollamaui.ui.screen.chat
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -45,6 +47,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.ClipboardManager
@@ -55,7 +58,7 @@ import com.example.ollamaui.R
 import com.example.ollamaui.activity.EmbeddingModel
 import com.example.ollamaui.domain.model.MessageModel
 import com.example.ollamaui.domain.model.objectbox.StableFile
-import com.example.ollamaui.helper.NetworkStatus
+import com.example.ollamaui.helper.network.NetworkStatus
 import com.example.ollamaui.ui.common.messageModelToText
 import com.example.ollamaui.ui.screen.chat.components.AttachedFilesItem
 import com.example.ollamaui.ui.screen.chat.components.ChatBottomBar
@@ -116,6 +119,13 @@ fun ChatScreen(
             MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.8f),
         )
     )
+    val isReading by chatViewModel.isReading.collectAsState()
+    val topBgColor = Brush.verticalGradient(
+        colors = listOf(MaterialTheme.colorScheme.background, Color.Transparent)
+    )
+    val bottomBgColor = Brush.verticalGradient(
+        colors = listOf(Color.Transparent, MaterialTheme.colorScheme.background)
+    )
     Scaffold(
     ) { contentPadding ->
         BackHandler {
@@ -146,7 +156,7 @@ fun ChatScreen(
             LazyColumn(
                 modifier = Modifier
                     .padding(top = TOP_BAR_HEIGHT)
-                    .pointerInput(Unit){
+                    .pointerInput(Unit) {
                         detectTapGestures(
                             onPress = {
                                 isAutoScrollEnabled = false
@@ -205,7 +215,10 @@ fun ChatScreen(
                             isSendingFailed = chatState.value.isSendingFailed,
                             onDeleteLastMessage = { chatViewModel.deleteLastMessage(index) },
                             onEditLastMessage = { textValue = chatViewModel.editLastMessage(index) },
-                            isResponding = isResponding
+                            isResponding = isResponding,
+                            onReadClick = { botMessage -> chatViewModel.read(chatId, botMessage) },
+                            onStopClick = { chatViewModel.stopTTS(chatId) },
+                            isReading = isReading[chatId] == true
                         )
                     }
                 }
@@ -227,12 +240,28 @@ fun ChatScreen(
                     }
                 }
             }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp)
+                    .offset(y = TOP_BAR_HEIGHT)
+                    .align(Alignment.TopCenter)
+                    .background(brush = topBgColor)
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp)
+                    .align(Alignment.BottomCenter)
+                    .background(brush = bottomBgColor)
+            )
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .padding(start = 10.dp, end = 10.dp)
-                    .align(Alignment.TopCenter).offset(y = TOP_BAR_HEIGHT + 10.dp)
+                    .align(Alignment.TopCenter)
+                    .offset(y = TOP_BAR_HEIGHT + 10.dp)
             ) {
                 AnimatedVisibility(
                     visible = isAttachedFilesListEnabled,
@@ -304,6 +333,37 @@ fun ChatScreen(
                 modifier = Modifier.align(Alignment.TopCenter),
                 isAnyFileAttached = isAnyFileAttached
             )
+            AnimatedVisibility(
+                visible = !isAtBottom,
+                enter = slideInVertically(
+                    initialOffsetY = {fullHeight -> fullHeight + 50},
+                    animationSpec = tween(durationMillis = 200)
+                ) + scaleIn(),
+                exit = slideOutVertically(
+                    targetOffsetY = {fullHeight -> fullHeight + 50},
+                    animationSpec = tween(durationMillis = 200)
+                ) + scaleOut(),
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .offset(y = (-80).dp)
+            ) {
+                CustomButton(
+                    onButtonClick = {
+                        scope.launch {
+                            listState.animateScrollToItem(
+                                index = chatState.value.chatModel.chatMessages.messageModels.lastIndex,
+                                scrollOffset = lastItemHeight
+                            )
+                        }
+                    },
+                    icon = R.drawable.baseline_expand_more_24,
+                    description = "Scroll Down",
+                    buttonSize = 30,
+                    iconSize = 25,
+                    containerColor = MaterialTheme.colorScheme.inversePrimary,
+                    elevation = 0
+                )
+            }
             ChatBottomBar(
                 textValue = textValue,
                 onValueChange = { textValue = it },
@@ -325,35 +385,6 @@ fun ChatScreen(
                 isResponding = chatState.value.isRespondingList.contains(chatId),
                 modifier = Modifier.align(Alignment.BottomCenter)
             )
-            AnimatedVisibility(
-                visible = !isAtBottom,
-                enter = slideInHorizontally(
-                    initialOffsetX = {fullWidth -> fullWidth + 100},
-                    animationSpec = tween(durationMillis = 200)
-                ),
-                exit = slideOutHorizontally(
-                    targetOffsetX = {fullWidth -> fullWidth + 100},
-                    animationSpec = tween(durationMillis = 200)
-                ),
-                modifier = Modifier.align(Alignment.BottomEnd).offset(x = (-20).dp, y = (-80).dp)
-            ) {
-                CustomButton(
-                    onButtonClick = {
-                        scope.launch {
-                            listState.animateScrollToItem(
-                                index = chatState.value.chatModel.chatMessages.messageModels.lastIndex,
-                                scrollOffset = lastItemHeight
-                            )
-                        }
-                    },
-                    icon = R.drawable.baseline_expand_more_24,
-                    description = "Scroll Down",
-                    buttonSize = 40,
-                    iconSize = 30,
-                    containerColor = MaterialTheme.colorScheme.inversePrimary,
-                    elevation = 0
-                )
-            }
         }
     }
 }
