@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -43,6 +44,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -88,8 +90,8 @@ fun ChatListItem(
     )
 
     val rotateAnimation by animateFloatAsState(
-        targetValue = if (isSelected) 0f else 360f,
-        animationSpec = tween(300, easing = FastOutSlowInEasing),
+        targetValue = if (isSelected) 180f else 0f,
+        animationSpec = tween(400, easing = FastOutSlowInEasing),
         label = "Rotate Animation"
     )
 
@@ -99,6 +101,16 @@ fun ChatListItem(
         } else if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.outlineVariant,
         animationSpec = tween(delayMillis = 100),
         label = "Indicator",
+    )
+    val titleBgColor by animateColorAsState(
+        targetValue = if(isSelected) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.outlineVariant,
+        animationSpec = tween(delayMillis = 25),
+        label = "title background Color animation",
+    )
+    val modelNameColor by animateColorAsState(
+        targetValue = if(isSelected) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.onBackground,
+        animationSpec = tween(delayMillis = 25),
+        label = "title background Color animation",
     )
     val animatedWidth by animateDpAsState(
         targetValue = if (isSelected) 6.dp else 0.dp
@@ -178,15 +190,25 @@ fun ChatListItem(
                     .size(50.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = modelName,
-                    modifier = Modifier.graphicsLayer{
-                        scaleX = 0.8f
-                        scaleY = 0.8f
-                    },
-                    maxLines = 1,
-                    style = MaterialTheme.typography.displayMedium.copy(textAlign = TextAlign.Center)
-                )
+                if(rotateAnimation > 90f) {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_check_24),
+                        contentDescription = "Selected Chat Item",
+                        modifier = Modifier.graphicsLayer{
+                            rotationY = 180f
+                        }
+                    )
+                }else {
+                    Text(
+                        text = modelName,
+                        modifier = Modifier.graphicsLayer {
+                            scaleX = 0.8f
+                            scaleY = 0.8f
+                        },
+                        maxLines = 1,
+                        style = MaterialTheme.typography.displayMedium.copy(textAlign = TextAlign.Center)
+                    )
+                }
             }
             Spacer(modifier = Modifier.width(10.dp))
             Column(
@@ -196,10 +218,12 @@ fun ChatListItem(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center,
                     modifier = Modifier
-                        .background(
-                            color = MaterialTheme.colorScheme.outlineVariant,
-                            shape = RoundedCornerShape(20)
-                        )
+                        .drawBehind{
+                            drawRoundRect(
+                                color = titleBgColor,
+                                cornerRadius = CornerRadius(x = 10f, y =  10f)
+                            )
+                        }
                         .padding(2.dp)
                 ) {
                     Text(
@@ -218,6 +242,7 @@ fun ChatListItem(
                     Text(
                         text = modelName,
                         style = MaterialTheme.typography.labelSmall,
+                        color = modelNameColor,
                         overflow = TextOverflow.Ellipsis,
                         maxLines = 1,
                         modifier = Modifier.basicMarquee(spacing = marqueeSpacing)
