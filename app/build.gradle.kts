@@ -8,15 +8,15 @@ plugins {
 }
 
 android {
-    namespace = "com.example.ollamaui"
+    namespace = "com.mu54omd.ullama"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.ollamaui"
+        applicationId = "com.mu54omd.ullama"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1032
-        versionName = "1.0.32"
+        versionCode = 1034
+        versionName = "1.0.34"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Ollama UI"
+rootProject.name = "u-llama"
 include(":app")
