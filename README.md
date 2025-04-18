@@ -1,3 +1,4 @@
-# Ollama-UI
-## A User interface for Ollama (status: UNFINISHED)
+# u-llama
+## A simple but powerfull user interface for ollama 
+
 
