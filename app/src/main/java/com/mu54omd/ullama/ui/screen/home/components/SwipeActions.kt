@@ -21,7 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mu54omd.ullama.R
 import com.mu54omd.ullama.ui.screen.common.CustomButton
-import com.mu54omd.ullama.ui.theme.OllamaUITheme
+import com.mu54omd.ullama.ui.theme.ULlamaTheme
 
 @Composable
 fun SwipeActions(
@@ -66,7 +66,7 @@ fun SwipeActions(
 @Preview
 @Composable
 private fun SwipeActionsPreview() {
-    OllamaUITheme {
+    ULlamaTheme {
         Surface {
             SwipeActions(
                 onDeleteClick = {},

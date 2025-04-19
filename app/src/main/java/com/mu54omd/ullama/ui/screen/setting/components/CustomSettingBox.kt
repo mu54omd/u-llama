@@ -19,7 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.mu54omd.ullama.ui.theme.OllamaUITheme
+import com.mu54omd.ullama.ui.theme.ULlamaTheme
 
 @Composable
 fun CustomSettingBox(
@@ -58,7 +58,7 @@ fun CustomSettingBox(
 @Preview(showSystemUi = false)
 @Composable
 private fun CustomSettingBoxPreview() {
-    OllamaUITheme {
+    ULlamaTheme {
         CustomSettingBox(
             title = "Title"
         ) {

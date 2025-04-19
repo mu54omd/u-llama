@@ -30,7 +30,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.mu54omd.ullama.ui.theme.OllamaUITheme
+import com.mu54omd.ullama.ui.theme.ULlamaTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -111,7 +111,7 @@ fun CustomDropDownList(
 @Preview
 @Composable
 private fun DropDownListPreview() {
-    OllamaUITheme {
+    ULlamaTheme {
         Surface {
             Column(
                 verticalArrangement = Arrangement.Center,

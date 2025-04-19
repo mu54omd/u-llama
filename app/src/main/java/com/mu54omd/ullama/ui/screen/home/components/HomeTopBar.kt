@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.mu54omd.ullama.R
 import com.mu54omd.ullama.helper.network.NetworkStatus
 import com.mu54omd.ullama.ui.screen.common.CustomButton
-import com.mu54omd.ullama.ui.theme.OllamaUITheme
+import com.mu54omd.ullama.ui.theme.ULlamaTheme
 import com.mu54omd.ullama.utils.Constants.TOP_BAR_HEIGHT
 
 @Composable
@@ -64,8 +64,8 @@ fun HomeTopBar(
                 )
             }
             LogoTitle(
-                lightLogo = R.drawable.icon_light,
-                darkLogo = R.drawable.icon_dark,
+                lightLogo = R.drawable.icon,
+                darkLogo = R.drawable.icon,
                 networkStatus = networkStatus,
                 modifier = Modifier.align(Alignment.Center),
             )
@@ -131,7 +131,7 @@ fun HomeTopBar(
 @Preview
 @Composable
 private fun HomeTopBarPreview() {
-    OllamaUITheme {
+    ULlamaTheme {
         HomeTopBar(
             onLogClick = {},
             onSettingClick = {},

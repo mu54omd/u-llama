@@ -35,7 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mu54omd.ullama.R
 import com.mu54omd.ullama.ui.screen.common.CustomButton
-import com.mu54omd.ullama.ui.theme.OllamaUITheme
+import com.mu54omd.ullama.ui.theme.ULlamaTheme
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -206,7 +206,7 @@ fun TuningSlider(
 @Preview
 @Composable
 private fun TuningSliderPreview() {
-    OllamaUITheme {
+    ULlamaTheme {
         TuningSlider(
             sliderPosition = 4f,
             onSliderChange = {},

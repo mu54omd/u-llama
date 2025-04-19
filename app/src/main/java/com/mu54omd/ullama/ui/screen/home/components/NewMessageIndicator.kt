@@ -13,7 +13,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.mu54omd.ullama.ui.theme.OllamaUITheme
+import com.mu54omd.ullama.ui.theme.ULlamaTheme
 
 @Composable
 fun NewMessageIndicator(
@@ -38,7 +38,7 @@ fun NewMessageIndicator(
 @Preview
 @Composable
 private fun NewMessageIndicatorPreview() {
-    OllamaUITheme {
+    ULlamaTheme {
         NewMessageIndicator(
             isNewMessageReceived = true,
             color = Color.Green,

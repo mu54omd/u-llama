@@ -20,7 +20,7 @@ import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
 import com.mu54omd.ullama.R
 import com.mu54omd.ullama.ui.screen.common.CustomButton
-import com.mu54omd.ullama.ui.theme.OllamaUITheme
+import com.mu54omd.ullama.ui.theme.ULlamaTheme
 
 @Composable
 fun ChatBottomBar(
@@ -108,7 +108,7 @@ fun ChatBottomBar(
 @Preview
 @Composable
 private fun ChatBottomBarPreview() {
-    OllamaUITheme {
+    ULlamaTheme {
         ChatBottomBar(
             textValue = LoremIpsum(500).values.joinToString(),
 //            textValue = "",

@@ -24,7 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.mu54omd.ullama.ui.theme.OllamaUITheme
+import com.mu54omd.ullama.ui.theme.ULlamaTheme
 
 @Composable
 fun ChatTitle(
@@ -82,7 +82,7 @@ fun ChatTitle(
 @Preview(showSystemUi = true)
 @Composable
 private fun ChatTitlePreview() {
-    OllamaUITheme {
+    ULlamaTheme {
         ChatTitle(
             modelName = "Boooooooooooooooooooooooooooooooooot",
             title = "Chaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaat",

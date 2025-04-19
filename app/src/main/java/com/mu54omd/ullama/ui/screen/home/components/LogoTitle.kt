@@ -29,7 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mu54omd.ullama.R
 import com.mu54omd.ullama.helper.network.NetworkStatus
-import com.mu54omd.ullama.ui.theme.OllamaUITheme
+import com.mu54omd.ullama.ui.theme.ULlamaTheme
 import kotlinx.coroutines.delay
 
 @Composable
@@ -69,9 +69,9 @@ fun LogoTitle(
     LaunchedEffect(isVisible) {
         delay(3000)
         isVisible = false
-        if(title.value != "Ollama UI"){
+        if(title.value != "ullama"){
             delay(50)
-            title.value = "Ollama UI"
+            title.value = "ullama"
         }
     }
     Column(
@@ -107,10 +107,10 @@ fun LogoTitle(
 @Preview
 @Composable
 private fun LogoTitlePreview() {
-    OllamaUITheme {
+    ULlamaTheme {
         LogoTitle(
-            lightLogo = R.drawable.icon_light,
-            darkLogo = R.drawable.icon_dark,
+            lightLogo = R.drawable.icon,
+            darkLogo = R.drawable.icon,
             networkStatus = NetworkStatus.CONNECTED
         )
     }

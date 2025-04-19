@@ -57,7 +57,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.mu54omd.ullama.R
 import com.mu54omd.ullama.ui.screen.common.CustomButton
-import com.mu54omd.ullama.ui.theme.OllamaUITheme
+import com.mu54omd.ullama.ui.theme.ULlamaTheme
 import kotlin.math.roundToInt
 
 const val ANIMATION_DURATION = 200
@@ -304,7 +304,7 @@ fun ChatListItem(
 @Preview
 @Composable
 private fun ChatListItemPreview() {
-    OllamaUITheme {
+    ULlamaTheme {
         Surface {
             Column {
                 ChatListItem(

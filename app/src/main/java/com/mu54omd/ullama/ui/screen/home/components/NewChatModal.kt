@@ -28,7 +28,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mu54omd.ullama.ui.screen.common.CustomDropDownList
-import com.mu54omd.ullama.ui.theme.OllamaUITheme
+import com.mu54omd.ullama.ui.theme.ULlamaTheme
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -121,7 +121,7 @@ fun NewChatModal(
 @Preview(showBackground = true)
 @Composable
 private fun NewChatModalPreview() {
-    OllamaUITheme {
+    ULlamaTheme {
         NewChatModal(
             chatTitle = "Title",
             systemPrompt = "You are a serial killer!",

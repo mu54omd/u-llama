@@ -50,7 +50,7 @@ import com.mu54omd.ullama.domain.model.chat.ModelParameters
 import com.mu54omd.ullama.ui.screen.common.CustomDropDownList
 import com.mu54omd.ullama.ui.screen.setting.components.CustomSettingBox
 import com.mu54omd.ullama.ui.screen.setting.components.TuningSlider
-import com.mu54omd.ullama.ui.theme.OllamaUITheme
+import com.mu54omd.ullama.ui.theme.ULlamaTheme
 import com.mu54omd.ullama.utils.Constants.OLLAMA_IS_RUNNING
 import kotlinx.coroutines.launch
 
@@ -342,7 +342,7 @@ fun SettingScreen(
 @Preview
 @Composable
 private fun SettingScreenPreview() {
-    OllamaUITheme {
+    ULlamaTheme {
         SettingScreen(
             savedParameters = listOf("http://127.0.0.1:11434", "al-minilm","1.0","2048", "1.0", "1.5", "40", "1.0", "0.9"),
             embeddingModelList = listOf("all-minilm", "llama3.2"),

@@ -19,7 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.mu54omd.ullama.ui.theme.OllamaUITheme
+import com.mu54omd.ullama.ui.theme.ULlamaTheme
 import kotlinx.coroutines.delay
 
 @Composable
@@ -67,7 +67,7 @@ private fun DrawScope.drawPulsingDot(scale: Float, color: Color) {
 @Preview
 @Composable
 private fun PulsingDotsPreview() {
-    OllamaUITheme {
+    ULlamaTheme {
         Surface {
             PulsingDots()
         }

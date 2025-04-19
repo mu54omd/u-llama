@@ -20,7 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.mu54omd.ullama.ui.theme.OllamaUITheme
+import com.mu54omd.ullama.ui.theme.ULlamaTheme
 
 @Composable
 fun Modifier.shimmerEffect(
@@ -51,7 +51,7 @@ fun Modifier.shimmerEffect(
 @Preview
 @Composable
 private fun ShimmerEffectPreview() {
-    OllamaUITheme {
+    ULlamaTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             Row(
                 modifier = Modifier.fillMaxWidth().height(50.dp)

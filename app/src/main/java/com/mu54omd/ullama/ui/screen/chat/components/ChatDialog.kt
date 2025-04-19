@@ -40,7 +40,7 @@ import com.mu54omd.ullama.domain.model.MessageModel
 import com.mu54omd.ullama.ui.common.filterAssistantMessage
 import com.mu54omd.ullama.ui.common.filterUserMessage
 import com.mu54omd.ullama.ui.common.isFromMe
-import com.mu54omd.ullama.ui.theme.OllamaUITheme
+import com.mu54omd.ullama.ui.theme.ULlamaTheme
 import com.mu54omd.ullama.utils.Constants.USER_ROLE
 import com.halilibo.richtext.commonmark.CommonmarkAstNodeParser
 import com.halilibo.richtext.markdown.BasicMarkdown
@@ -238,7 +238,7 @@ fun ChatDialog(
 @Preview(uiMode = UI_MODE_NIGHT_YES)
 @Composable
 private fun ChatDialogPreview() {
-    OllamaUITheme {
+    ULlamaTheme {
         Column {
             ChatDialog(
                 messageModel = MessageModel(

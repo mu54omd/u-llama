@@ -22,7 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.mu54omd.ullama.ui.theme.OllamaUITheme
+import com.mu54omd.ullama.ui.theme.ULlamaTheme
 
 @Composable
 fun CustomDropUpMenu(
@@ -59,7 +59,7 @@ fun CustomDropUpMenu(
 @Preview
 @Composable
 private fun CustomDropUpMenuPreview() {
-    OllamaUITheme {
+    ULlamaTheme {
         Column {
             CustomDropUpMenu(
                 listItems = listOf("first item", "second item", "third item", "fourth item", "11111111111"),

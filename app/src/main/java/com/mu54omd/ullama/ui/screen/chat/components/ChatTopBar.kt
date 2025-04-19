@@ -28,7 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mu54omd.ullama.R
 import com.mu54omd.ullama.ui.screen.common.CustomButton
-import com.mu54omd.ullama.ui.theme.OllamaUITheme
+import com.mu54omd.ullama.ui.theme.ULlamaTheme
 import com.mu54omd.ullama.utils.Constants.TOP_BAR_HEIGHT
 
 @Composable
@@ -146,7 +146,7 @@ fun ChatTopBar(
 @Preview()
 @Composable
 private fun ChatTopBarPreview() {
-    OllamaUITheme {
+    ULlamaTheme {
         Surface {
             ChatTopBar(
                 modelName = "Very very very very very long name",

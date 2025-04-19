@@ -17,7 +17,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mu54omd.ullama.R
-import com.mu54omd.ullama.ui.theme.OllamaUITheme
+import com.mu54omd.ullama.ui.theme.ULlamaTheme
 
 @Composable
 fun CustomButton(
@@ -59,7 +59,7 @@ fun CustomButton(
 @Preview
 @Composable
 private fun SendButtonPreview() {
-    OllamaUITheme {
+    ULlamaTheme {
         Surface(color = MaterialTheme.colorScheme.secondary) {
             CustomButton(
                 onButtonClick = {},
