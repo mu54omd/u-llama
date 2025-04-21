@@ -16,7 +16,7 @@
 </p>
 
 <p align="center">
-    <img src="https://github.com/mu54omd/u-llama/blob/master/app/src/main/res/raw/image.png" alt="ullama picture">
+    <img src="https://github.com/mu54omd/u-llama/blob/master/app/src/main/res/raw/image1.png" alt="ullama picture">
 </p>
 
 
