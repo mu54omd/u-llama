@@ -15,6 +15,10 @@
   <a href="https://developer.android.com/tools/releases/platforms#8.0"><img src="https://img.shields.io/badge/minSdk-26-blue" alt="Minimum Sdk"></a>
 </p>
 
+<p align="center">
+    <img src="https://github.com/mu54omd/u-llama/blob/master/app/src/main/res/raw/image.png" alt="ullama picture">
+</p>
+
 
 ## Key Features
 * **Connect to local ollama server**
