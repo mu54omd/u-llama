@@ -1,6 +1,6 @@
 # ullama
 ### A simple but powerful user interface for ollama
-![Release Version](https://img.shields.io/badge/release-v1.0.35-green?cacheSeconds=https%3A%2F%2Fgithub.com%2Fmu54omd%2Fu-llama)
+![Release Version](https://img.shields.io/badge/release-v1.0.35-green)
 ![Kotlin Version](https://img.shields.io/badge/Kotlin-v2.0.20-red)
 ![OS](https://img.shields.io/badge/OS-Android-orange)
 ![Minimum Sdk](https://img.shields.io/badge/minSdk-26-blue)
