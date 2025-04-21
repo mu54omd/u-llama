@@ -1,9 +1,20 @@
-# ullama
-### A simple but powerful user interface for ollama
-![Release Version](https://img.shields.io/badge/release-v1.0.35-green)
-![Kotlin Version](https://img.shields.io/badge/Kotlin-v2.0.20-red)
-![OS](https://img.shields.io/badge/OS-Android-orange)
-![Minimum Sdk](https://img.shields.io/badge/minSdk-26-blue)
+<h1 align="center">
+  <br>
+  <a href="https://github.com/mu54omd/u-llama/"><img src="https://github.com/mu54omd/u-llama/blob/master/app/src/main/ic_launcher-playstore.png" alt="ullama" width="200"></a>
+  <br>
+  ullama
+  <br>
+</h1>
+
+<h3 align="center"> A simple but powerful user interface for ollama </h3>
+
+<p align="center">
+  <a href=""><img src="https://img.shields.io/badge/release-v1.0.35-green" alt="Release Version"></a>
+  <a href=""><img src="https://img.shields.io/badge/Kotlin-v2.0.20-red" alt="Kotlin Version"></a>
+  <a href=""><img src="https://img.shields.io/badge/OS-Android-orange" alt="OS"></a>
+  <a href=""><img src="https://img.shields.io/badge/minSdk-26-blue" alt="Minimum Sdk"></a>
+</p>
+
 
 ## Key Features
 * **Connect to local ollama server**
