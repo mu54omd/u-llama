@@ -9,10 +9,10 @@
 <h3 align="center"> A simple but powerful user interface for ollama </h3>
 
 <p align="center">
-  <a href=""><img src="https://img.shields.io/badge/release-v1.0.35-green" alt="Release Version"></a>
-  <a href=""><img src="https://img.shields.io/badge/Kotlin-v2.0.20-red" alt="Kotlin Version"></a>
+  <a href="https://github.com/mu54omd/u-llama/releases/tag/v1.0.35"><img src="https://img.shields.io/badge/release-v1.0.35-green" alt="Release Version"></a>
+  <a href="https://kotlinlang.org/docs/whatsnew2020.html"><img src="https://img.shields.io/badge/Kotlin-v2.0.20-red" alt="Kotlin Version"></a>
   <a href=""><img src="https://img.shields.io/badge/OS-Android-orange" alt="OS"></a>
-  <a href=""><img src="https://img.shields.io/badge/minSdk-26-blue" alt="Minimum Sdk"></a>
+  <a href="https://developer.android.com/tools/releases/platforms#8.0"><img src="https://img.shields.io/badge/minSdk-26-blue" alt="Minimum Sdk"></a>
 </p>
 
 
@@ -33,7 +33,7 @@
 
 
 ## How To Use
-
+You can download the source code and build it with android-studio or install the [release version](https://github.com/mu54omd/u-llama/releases/tag/v1.0.35).
 
 ## Known Issues
 * _It take some times to delete the imported files if they create too many chunks._ 
