@@ -15,8 +15,8 @@ android {
         applicationId = "com.mu54omd.ullama"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1034
-        versionName = "1.0.34"
+        versionCode = 1035
+        versionName = "1.0.35"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

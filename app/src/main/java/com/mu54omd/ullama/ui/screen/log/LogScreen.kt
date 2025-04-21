@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -37,6 +38,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -82,9 +84,9 @@ fun LogScreen(
             modifier = Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp).height(TOP_BAR_HEIGHT)
         ){
             Image(
-                painter = painterResource(R.drawable.icon),
+                painter = painterResource(R.drawable.ullama_icon),
                 contentDescription = "App logo",
-                modifier = Modifier.size(width = 96.dp, height = 64.dp),
+                modifier = Modifier.size(48.dp).clip(CircleShape),
             )
             Spacer(modifier = Modifier.width(10.dp))
             Column {

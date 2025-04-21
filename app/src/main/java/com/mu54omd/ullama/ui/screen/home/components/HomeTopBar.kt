@@ -64,8 +64,7 @@ fun HomeTopBar(
                 )
             }
             LogoTitle(
-                lightLogo = R.drawable.icon,
-                darkLogo = R.drawable.icon,
+                logoIcon = R.drawable.ullama_icon,
                 networkStatus = networkStatus,
                 modifier = Modifier.align(Alignment.Center),
             )

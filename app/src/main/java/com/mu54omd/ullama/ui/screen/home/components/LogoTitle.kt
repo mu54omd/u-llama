@@ -5,12 +5,11 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
@@ -35,8 +35,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun LogoTitle(
     modifier: Modifier = Modifier,
-    @DrawableRes lightLogo: Int,
-    @DrawableRes darkLogo: Int,
+    @DrawableRes logoIcon: Int,
     networkStatus: NetworkStatus,
 ) {
     val animatedColor by animateColorAsState(
@@ -80,11 +79,11 @@ fun LogoTitle(
         modifier = modifier
     ) {
             Image(
-                painter = painterResource(if(isSystemInDarkTheme()) darkLogo else lightLogo),
+                painter = painterResource(logoIcon),
                 contentDescription = "Logo Image",
                 modifier = Modifier
-                    .height(64.dp)
-                    .aspectRatio(2f)
+                    .size(48.dp)
+                    .clip(CircleShape)
                     .pointerInput(isVisible) { detectTapGestures { isVisible = !isVisible } },
             )
         AnimatedVisibility(visible = isVisible) {
@@ -109,8 +108,7 @@ fun LogoTitle(
 private fun LogoTitlePreview() {
     ULlamaTheme {
         LogoTitle(
-            lightLogo = R.drawable.icon,
-            darkLogo = R.drawable.icon,
+            logoIcon = R.drawable.ullama_icon,
             networkStatus = NetworkStatus.CONNECTED
         )
     }
