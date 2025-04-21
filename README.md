@@ -42,7 +42,7 @@
 
 
 ## How To Use
-You can download the source code and build it with android-studio or install the [release version](https://github.com/mu54omd/u-llama/releases/tag/v1.0.35).
+You can download the source code and build it with android-studio or install the [release version](https://github.com/mu54omd/u-llama/releases/tag/v1.0.35). After that, put the ip of your local server in the setting screen and save this change. Now you are ready to start a chat with the models.
 
 ## Known Issues
 * _It take some times to delete the imported files if they create too many chunks._ 
