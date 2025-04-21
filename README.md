@@ -8,7 +8,7 @@
 ## Key Features
 * **Connect to local ollama server**
 * **Attach images and documents(pdf/docx/txt) to the model using RAG**
-* **Using on-device vector database for fast searching through embedding vectors**
+* **Use on-device vector database for fast searching in embedding vectors**
 * **Offline TTS (text-to-speech) for reading LLMs message**
 * **Adaptive layout for phone/tablet/fold devices**
 
