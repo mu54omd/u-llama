@@ -51,5 +51,8 @@ You can download the source code and build it with android-studio or install the
 1. _Add online mode for using OpenAI_
 2. _Migrate to KMP (Kotlin Multiplatform)_
 
+## Medium Article About This Application
+[A Chat Application for Local Large Language Models (LLMs)](https://medium.com/@owmo13/a-chat-application-for-local-large-language-models-llms-89411c6b1d6a)
+
 
 
